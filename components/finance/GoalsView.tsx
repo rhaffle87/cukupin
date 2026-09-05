@@ -15,6 +15,9 @@ interface GoalsViewProps {
   userId?: string
 }
 
+import confetti from 'canvas-confetti'
+import { goalSchema, sanitizeNumericInput } from '@/lib/validations/finance'
+
 export function GoalsView({ supabase, data, userId }: GoalsViewProps) {
   const [show, setShow] = useState(false)
   const [name, setName] = useState('')
@@ -22,21 +25,49 @@ export function GoalsView({ supabase, data, userId }: GoalsViewProps) {
   const [adding, setAdding] = useState<SavingGoal | null>(null)
   const [amount, setAmount] = useState('')
 
+  function triggerCelebration() {
+    try {
+      confetti({
+        particleCount: 90,
+        spread: 65,
+        origin: { y: 0.65 },
+        colors: ['#3E8F68', '#BEE6CF', '#315DCB', '#D98362'],
+      })
+    } catch {
+      // ignore in environments without canvas
+    }
+  }
+
   async function createGoal(e: React.FormEvent) {
     e.preventDefault()
     if (!supabase || !userId) return toast.error('Hubungkan Supabase dan masuk untuk menyimpan.')
-    
-    const result = await supabase
-      .from('saving_goals')
-      .insert({ user_id: userId, name: name, target_amount: Number(target), current_amount: 0 })
-      
+
+    const numericTarget = sanitizeNumericInput(target)
+    const parsed = goalSchema.safeParse({ name, target_amount: numericTarget })
+    if (!parsed.success) {
+      toast.error(parsed.error.issues[0]?.message || 'Input target tidak valid')
+      return
+    }
+
+    const payload = {
+      user_id: userId,
+      name: parsed.data.name,
+      target_amount: parsed.data.target_amount,
+      current_amount: 0,
+    }
+
+    const result = await supabase.from('saving_goals').insert(payload).select().single()
+
     if (result.error) {
       toast.error(result.error.message)
     } else {
-      toast.success('Goal dibuat.')
+      toast.success('Target baru dibuat.')
       setShow(false)
       setName('')
       setTarget('')
+      if (result.data) {
+        data.setGoals(prev => [result.data as SavingGoal, ...prev])
+      }
       data.refresh()
     }
   }
@@ -44,14 +75,37 @@ export function GoalsView({ supabase, data, userId }: GoalsViewProps) {
   async function fundGoal(e: React.FormEvent) {
     e.preventDefault()
     if (!supabase || !adding) return
-    
-    const next = Math.min(Number(adding.target_amount), Number(adding.current_amount) + Number(amount))
-    const result = await supabase.from('saving_goals').update({ current_amount: next }).eq('id', adding.id)
-    
+
+    const numericAdd = sanitizeNumericInput(amount)
+    if (numericAdd <= 0) {
+      toast.error('Masukkan nominal dana yang valid')
+      return
+    }
+
+    const next = Math.min(Number(adding.target_amount), Number(adding.current_amount) + numericAdd)
+    const isCompleted = next >= Number(adding.target_amount)
+
+    // Optimistic update
+    const prevGoals = data.goals
+    data.setGoals(prev =>
+      prev.map(g => (g.id === adding.id ? { ...g, current_amount: next } : g))
+    )
+
+    const result = await supabase
+      .from('saving_goals')
+      .update({ current_amount: next })
+      .eq('id', adding.id)
+
     if (result.error) {
       toast.error(result.error.message)
+      data.setGoals(prevGoals)
     } else {
-      toast.success('Dana ditambahkan.')
+      if (isCompleted) {
+        triggerCelebration()
+        toast.success('Hore! Target tabunganmu sudah tercapai!')
+      } else {
+        toast.success('Dana berhasil ditambahkan.')
+      }
       setAdding(null)
       setAmount('')
       data.refresh()
@@ -59,8 +113,17 @@ export function GoalsView({ supabase, data, userId }: GoalsViewProps) {
   }
 
   async function deleteGoal(goal: SavingGoal) {
-    if (supabase && confirm('Hapus goal ini?')) {
-      await supabase.from('saving_goals').delete().eq('id', goal.id)
+    if (!supabase || !confirm('Hapus target ini?')) return
+
+    const prevGoals = data.goals
+    data.setGoals(prev => prev.filter(g => g.id !== goal.id))
+
+    const result = await supabase.from('saving_goals').delete().eq('id', goal.id)
+    if (result.error) {
+      toast.error(result.error.message)
+      data.setGoals(prevGoals)
+    } else {
+      toast.success('Target tabungan dihapus.')
       data.refresh()
     }
   }

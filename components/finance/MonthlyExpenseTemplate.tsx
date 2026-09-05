@@ -24,6 +24,14 @@ export function MonthlyExpenseTemplate({
   const initialMonth = defaultMonth || `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`
   const [selectedMonth, setSelectedMonth] = useState(initialMonth)
 
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [onClose])
+
   // Filter transactions by selected month
   const { monthTx, monthName, yearName, stats, runningTransactions, categoryTotals } = useMemo(() => {
     const [yearStr, monthStr] = selectedMonth.split('-')
@@ -274,15 +282,15 @@ export function MonthlyExpenseTemplate({
 
           {/* The Ledger Table matching Image 3 structure */}
           <div className="overflow-x-auto border border-[#111827]">
-            <table className="w-full border-collapse text-left text-xs">
+            <table className="w-full border-collapse text-left text-xs" aria-label="Tabel rincian transaksi bulanan">
               <thead>
                 <tr className="border-b border-[#111827] bg-[#F3F4F6] text-[10px] font-bold uppercase tracking-wider text-[#111827]">
-                  <th className="border-r border-[#111827] px-3 py-2.5 w-[110px]">DATE OF PAYMENT</th>
-                  <th className="border-r border-[#111827] px-3 py-2.5 w-[130px]">PAYMENT METHOD</th>
-                  <th className="border-r border-[#111827] px-3 py-2.5 w-[120px]">PAID TO</th>
-                  <th className="border-r border-[#111827] px-3 py-2.5 min-w-[160px]">DESCRIPTION</th>
-                  <th className="border-r border-[#111827] px-3 py-2.5 text-right w-[115px]">AMOUNT PAID</th>
-                  <th className="px-3 py-2.5 text-right w-[125px]">RUNNING TOTAL</th>
+                  <th scope="col" className="border-r border-[#111827] px-3 py-2.5 w-[110px]">DATE OF PAYMENT</th>
+                  <th scope="col" className="border-r border-[#111827] px-3 py-2.5 w-[130px]">PAYMENT METHOD</th>
+                  <th scope="col" className="border-r border-[#111827] px-3 py-2.5 w-[120px]">PAID TO</th>
+                  <th scope="col" className="border-r border-[#111827] px-3 py-2.5 min-w-[160px]">DESCRIPTION</th>
+                  <th scope="col" className="border-r border-[#111827] px-3 py-2.5 text-right w-[115px]">AMOUNT PAID</th>
+                  <th scope="col" className="px-3 py-2.5 text-right w-[125px]">RUNNING TOTAL</th>
                 </tr>
               </thead>
               <tbody>

@@ -30,6 +30,16 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
   const [from, setFrom] = useState('')
   const [to, setTo] = useState('')
 
+  // Listen for global shortcut 'N'
+  React.useEffect(() => {
+    function handleOpenNew() {
+      setEditing(undefined)
+      setShowForm(true)
+    }
+    window.addEventListener('cukupin:open-new-tx', handleOpenNew)
+    return () => window.removeEventListener('cukupin:open-new-tx', handleOpenNew)
+  }, [])
+
   const filtered = useMemo(() => {
     return data.transactions.filter(t => {
       const matchesQuery = !query || 
@@ -48,9 +58,16 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
 
   async function remove(t: Transaction) {
     if (!supabase || !confirm('Hapus transaksi ini?')) return
+
+    // Optimistic UI update
+    const previous = data.transactions
+    data.setTransactions(prev => prev.filter(item => item.id !== t.id))
+
     const result = await supabase.from('transactions').delete().eq('id', t.id)
     if (result.error) {
       toast.error(result.error.message)
+      // Rollback on failure
+      data.setTransactions(previous)
     } else {
       toast.success('Transaksi dihapus.')
       data.refresh()
@@ -185,7 +202,21 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
             supabase={supabase}
             userId={userId}
             initial={editing}
-            onDone={() => { setShowForm(false); data.refresh() }}
+            onDone={(saved) => {
+              setShowForm(false)
+              if (saved) {
+                data.setTransactions(prev => {
+                  const idx = prev.findIndex(x => x.id === saved.id)
+                  if (idx >= 0) {
+                    const next = [...prev]
+                    next[idx] = saved
+                    return next
+                  }
+                  return [saved, ...prev]
+                })
+              }
+              data.refresh()
+            }}
           />
         </Modal>
       )}

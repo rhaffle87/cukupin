@@ -22,6 +22,22 @@ export function AppShell({ children, user, onSignOut }: AppShellProps) {
   const [open, setOpen] = useState(false)
   const pathname = usePathname()
 
+  React.useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        setOpen(false)
+      }
+      if (
+        (e.key === 'n' || e.key === 'N') &&
+        !['INPUT', 'TEXTAREA', 'SELECT'].includes((e.target as HTMLElement)?.tagName)
+      ) {
+        window.dispatchEvent(new CustomEvent('cukupin:open-new-tx'))
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
+
   return (
     <div className="flex h-screen w-full overflow-hidden bg-paper font-sans text-ink selection:bg-green-soft selection:text-green">
       {/* Sidebar */}
@@ -29,11 +45,11 @@ export function AppShell({ children, user, onSignOut }: AppShellProps) {
         <div className="mb-8 flex items-center justify-between">
           <Brand />
           <button 
-            className="rounded-full p-2 text-ink hover:bg-black/5 md:hidden" 
+            className="flex h-11 w-11 items-center justify-center rounded-full text-ink hover:bg-black/5 md:hidden" 
             onClick={() => setOpen(false)} 
             aria-label="Tutup menu"
           >
-            <X size={18} />
+            <X size={20} />
           </button>
         </div>
         
@@ -75,7 +91,7 @@ export function AppShell({ children, user, onSignOut }: AppShellProps) {
             </div>
           </div>
           <button 
-            className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-coral transition-colors hover:bg-coral/10 hover:text-coral-dark" 
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-coral transition-colors hover:bg-coral/10 hover:text-coral-dark" 
             onClick={onSignOut}
           >
             <LogOut size={16} /> Keluar
@@ -89,24 +105,24 @@ export function AppShell({ children, user, onSignOut }: AppShellProps) {
         {/* Mobile Header */}
         <header className="flex items-center justify-between border-b border-line bg-card p-4 md:hidden">
           <button 
-            className="rounded-full p-2 text-ink transition-colors hover:bg-black/5" 
+            className="flex h-11 w-11 items-center justify-center rounded-full text-ink transition-colors hover:bg-black/5" 
             onClick={() => setOpen(true)} 
             aria-label="Buka menu"
           >
             <Menu size={20} />
           </button>
           <Brand compact />
-          <button className="rounded-full p-2 text-ink transition-colors hover:bg-black/5" aria-label="Fitur AI">
+          <button className="flex h-11 w-11 items-center justify-center rounded-full text-ink transition-colors hover:bg-black/5" aria-label="Fitur AI">
             <Sparkles size={18} />
           </button>
         </header>
         
-        <main className="flex-1 overflow-y-auto p-4 pb-24 md:p-8 lg:p-10">
+        <main className="flex-1 overflow-y-auto p-4 pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] md:p-8 lg:p-10">
           {children}
         </main>
         
         {/* Mobile Bottom Nav */}
-        <nav className="fixed bottom-0 left-0 right-0 z-30 flex items-center justify-around border-t border-line bg-card/90 pb-6 pt-3 backdrop-blur-md md:hidden">
+        <nav className="fixed bottom-0 left-0 right-0 z-30 flex items-center justify-around border-t border-line bg-card/90 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] pt-2.5 backdrop-blur-md md:hidden">
           {navItems.map((item) => {
             const Icon = item.icon
             const isActive = pathname === item.href
@@ -114,10 +130,10 @@ export function AppShell({ children, user, onSignOut }: AppShellProps) {
               <Link
                 key={item.href}
                 href={item.href}
-                className="flex flex-col items-center gap-1.5 transition-colors"
+                className="flex min-h-[44px] min-w-[48px] flex-col items-center justify-center gap-1 transition-colors"
               >
-                <div className={`flex h-8 w-8 items-center justify-center rounded-full transition-all ${isActive ? 'bg-green/10 text-green' : 'text-muted'}`}>
-                  <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+                <div className={`flex h-7 w-7 items-center justify-center rounded-full transition-all ${isActive ? 'bg-green/10 text-green' : 'text-muted'}`}>
+                  <Icon size={19} strokeWidth={isActive ? 2.5 : 2} />
                 </div>
                 <span className={`text-[9px] ${isActive ? 'font-bold text-ink' : 'font-medium text-muted'}`}>
                   {item.label}

@@ -7,6 +7,7 @@ import { PageHeader } from '@/components/ui/PageHeader'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { useFinanceData } from '@/hooks/useFinanceData'
 import { currency } from '@/lib/finance'
+import { sanitizeNumericInput, wishlistSchema } from '@/lib/validations/finance'
 
 interface WishlistViewProps {
   supabase: SupabaseClient | null
@@ -23,34 +24,71 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
     e.preventDefault()
     if (!supabase || !userId) return toast.error('Hubungkan Supabase dan masuk untuk menyimpan.')
     
+    const numericPrice = sanitizeNumericInput(price)
+    const parsed = wishlistSchema.safeParse({ name, price: numericPrice, priority })
+    if (!parsed.success) {
+      toast.error(parsed.error.issues[0]?.message || 'Data wishlist tidak valid')
+      return
+    }
+
+    const tempId = `temp-${Date.now()}`
+    const newItem: WishlistItem = {
+      id: tempId,
+      user_id: userId,
+      name: parsed.data.name,
+      price: parsed.data.price,
+      url: null,
+      priority: parsed.data.priority,
+      created_at: new Date().toISOString(),
+    }
+
+    // Zero-latency optimistic UI update
+    const previous = data.wishlist
+    data.setWishlist(prev => [newItem, ...prev])
+    setName('')
+    setPrice('')
+
     const r = await supabase.from('wishlist').insert({
       user_id: userId,
-      name: name,
-      price: Number(price),
-      priority
-    })
+      name: parsed.data.name,
+      price: parsed.data.price,
+      url: null,
+      priority: parsed.data.priority,
+    }).select().single()
     
     if (r.error) {
       toast.error(r.error.message)
+      data.setWishlist(previous)
     } else {
       toast.success('Wishlist ditambahkan.')
-      setName('')
-      setPrice('')
-      data.refresh()
+      data.setWishlist(prev => prev.map(item => item.id === tempId ? (r.data as WishlistItem) : item))
     }
   }
 
   async function toggle(item: WishlistItem) {
     if (!supabase) return
     const newPrio = item.priority === 'High' ? 'Low' : 'High'
-    await supabase.from('wishlist').update({ priority: newPrio }).eq('id', item.id)
-    data.refresh()
+    const previous = data.wishlist
+    data.setWishlist(prev => prev.map(w => w.id === item.id ? { ...w, priority: newPrio } : w))
+    
+    const r = await supabase.from('wishlist').update({ priority: newPrio }).eq('id', item.id)
+    if (r.error) {
+      toast.error(r.error.message)
+      data.setWishlist(previous)
+    }
   }
   
   async function remove(item: WishlistItem) {
-    if (supabase && confirm('Hapus item ini?')) {
-      await supabase.from('wishlist').delete().eq('id', item.id)
-      data.refresh()
+    if (!supabase || !confirm('Hapus item ini?')) return
+    const previous = data.wishlist
+    data.setWishlist(prev => prev.filter(w => w.id !== item.id))
+    
+    const r = await supabase.from('wishlist').delete().eq('id', item.id)
+    if (r.error) {
+      toast.error(r.error.message)
+      data.setWishlist(previous)
+    } else {
+      toast.success('Item dihapus.')
     }
   }
 
@@ -69,7 +107,7 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
           <form onSubmit={add}>
             <input required value={name} onChange={e => setName(e.target.value)} placeholder="Nama barang atau keinginan" />
             <div className="inline-form">
-              <input type="number" required min="1" value={price} onChange={e => setPrice(e.target.value)} placeholder="Perkiraan harga" />
+              <input type="text" inputMode="numeric" required value={price} onChange={e => setPrice(e.target.value)} placeholder="Perkiraan harga (contoh: 150.000)" />
               <select
                 style={{
                   width: '80px',

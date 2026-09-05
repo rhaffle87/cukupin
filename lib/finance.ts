@@ -52,3 +52,53 @@ export function comparator(current: Transaction[], previous: Transaction[]) {
     return { category, current: currentValue, previous: previousValue, change }
   }).sort((a, b) => b.current - a.current)
 }
+
+/**
+ * Calculates remaining days in the current month and daily safe spend allowance.
+ */
+export function calculateDailySafeSpend(balance: number) {
+  const now = new Date()
+  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
+  const currentDay = now.getDate()
+  const remainingDays = Math.max(1, lastDay - currentDay + 1)
+  const dailyAllowance = balance > 0 ? Math.floor(balance / remainingDays) : 0
+
+  return {
+    remainingDays,
+    totalDays: lastDay,
+    dailyAllowance,
+  }
+}
+
+/**
+ * 50/30/20 Budget Rule breakdown for expenses.
+ */
+export function budgetRule503020(transactions: Transaction[]) {
+  const needsCategories = ['Food', 'Transport', 'Bills', 'Health']
+
+  let needs = 0
+  let wants = 0
+
+  for (const t of transactions) {
+    if (t.type === 'expense') {
+      const amt = Number(t.amount) || 0
+      if (needsCategories.includes(t.category)) {
+        needs += amt
+      } else {
+        wants += amt
+      }
+    }
+  }
+
+  const totalExpense = needs + wants
+  const needsPct = totalExpense > 0 ? Math.round((needs / totalExpense) * 100) : 0
+  const wantsPct = totalExpense > 0 ? Math.round((wants / totalExpense) * 100) : 0
+
+  return {
+    needs,
+    wants,
+    totalExpense,
+    needsPct,
+    wantsPct,
+  }
+}

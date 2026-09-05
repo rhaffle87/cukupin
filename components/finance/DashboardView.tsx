@@ -1,12 +1,12 @@
 import React, { useMemo } from 'react'
 import type { Transaction } from '@/lib/database.types'
-import { ArrowDownLeft, ArrowUpRight, BarChart3, ChevronRight, CircleDollarSign, Plus, Wallet, Receipt } from 'lucide-react'
+import { ArrowDownLeft, ArrowUpRight, BarChart3, ChevronRight, CircleDollarSign, Plus, Wallet, Receipt, Sparkles } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { StatCard } from '@/components/ui/StatCard'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { TransactionRow } from './TransactionRow'
-import { categoryBreakdown, currency, dailySeries, monthBounds, monthLabel, shortCurrency, totals } from '@/lib/finance'
+import { categoryBreakdown, currency, dailySeries, monthBounds, monthLabel, shortCurrency, totals, calculateDailySafeSpend } from '@/lib/finance'
 import { useFinanceData } from '@/hooks/useFinanceData'
 
 import {
@@ -100,14 +100,33 @@ interface DashboardViewProps {
 }
 
 export function DashboardView({ data, user }: DashboardViewProps) {
-  const { monthTx, stats, series, breakdown } = useMemo(() => {
+  const { monthTx, stats, series, breakdown, insight, safeSpend } = useMemo(() => {
     const current = monthBounds()
     const tx = data.transactions.filter(t => t.transaction_date >= current.start && t.transaction_date <= current.end)
+    const st = totals(tx)
+    const bd = categoryBreakdown(tx)
+    const safe = calculateDailySafeSpend(st.balance)
+    
+    let ins = 'Mulai catat transaksi pertamamu biar pola pengeluaranmu terlihat jelas.'
+    if (bd.length > 0 && st.expense > 0) {
+      const top = bd[0]
+      const pct = Math.round((top.value / st.expense) * 100)
+      if (st.balance >= 0) {
+        ins = `Pengeluaran terbanyakmu ada di ${top.name} (${pct}%). Budget amanmu sekitar ${shortCurrency(safe.dailyAllowance)}/hari untuk ${safe.remainingDays} hari ke depan.`
+      } else {
+        ins = `Pengeluaran bulan ini sedikit melebihi pemasukan, paling besar di ${top.name} (${pct}%). Yuk atur pengeluaran berikutnya lebih santai.`
+      }
+    } else if (tx.length > 0 && st.expense === 0) {
+      ins = 'Pemasukan bulan ini tercatat rapi. Belum ada pengeluaran yang dicatat.'
+    }
+
     return {
       monthTx: tx,
-      stats: totals(tx),
+      stats: st,
       series: dailySeries(data.transactions),
-      breakdown: categoryBreakdown(tx)
+      breakdown: bd,
+      insight: ins,
+      safeSpend: safe,
     }
   }, [data.transactions])
 
@@ -144,6 +163,11 @@ export function DashboardView({ data, user }: DashboardViewProps) {
             <small className="block text-[11px] text-[#BAC9C0]">
               {stats.balance >= 0 ? 'sisa uang bulan ini' : 'pengeluaran melebihi pemasukan'}
             </small>
+            {stats.balance > 0 && (
+              <span className="mt-1.5 inline-flex items-center rounded-full bg-white/[0.08] px-2 py-0.5 text-[9px] font-semibold text-[#BEE6CF]">
+                Aman: {shortCurrency(safeSpend.dailyAllowance)}/hr
+              </span>
+            )}
           </div>
         </div>
       </div>
@@ -158,6 +182,17 @@ export function DashboardView({ data, user }: DashboardViewProps) {
         <div className="animate-in slide-in-from-bottom-2 duration-500 delay-100 fill-mode-both">
           <StatCard label="Sisa saldo" value={currency(stats.balance)} tone="blue" icon={Wallet} note={stats.balance >= 0 ? 'Masih aman' : 'Mulai menipis'} />
         </div>
+      </div>
+
+      {/* Smart Contextual Spending Insight Banner */}
+      <div className="mb-4 flex items-center gap-3 rounded-[18px] border border-line bg-card p-4 shadow-[0_2px_12px_rgba(30,50,73,0.02)] animate-in slide-in-from-bottom-2 duration-500 delay-100">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-green-soft text-green">
+          <Sparkles size={16} />
+        </div>
+        <p className="text-xs leading-relaxed text-muted">
+          <strong className="text-ink font-bold">Catatan Cukupin: </strong>
+          {insight}
+        </p>
       </div>
       
       <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-[minmax(0,1.55fr)_minmax(270px,0.85fr)]">
