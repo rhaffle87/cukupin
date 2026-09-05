@@ -1,162 +1,114 @@
 import React from 'react'
 import Link from 'next/link'
 import { Brand } from '@/components/ui/Brand'
+import { ArrowRight, ShieldCheck, Sparkles, PieChart } from 'lucide-react'
 
 export default function LandingPage() {
   return (
-    <div className="landing-page">
-      <header className="landing-header">
+    <div className="flex min-h-screen flex-col bg-paper text-ink selection:bg-green-soft selection:text-green">
+      <header className="fixed top-0 z-50 flex w-full items-center justify-between border-b border-line/50 bg-paper/80 px-6 py-4 backdrop-blur-md md:px-12">
         <Brand />
-        <nav>
-          <Link href="/auth/login" className="button secondary small">Masuk</Link>
-          <Link href="/auth/login" className="button primary small">Daftar</Link>
+        <nav className="flex items-center gap-3 md:gap-4">
+          <Link href="/auth/login" className="text-sm font-semibold text-muted hover:text-ink transition-colors">
+            Masuk
+          </Link>
+          <Link 
+            href="/auth/login" 
+            className="flex items-center justify-center rounded-xl bg-ink px-4 py-2 text-sm font-bold text-white shadow-lg shadow-ink/10 transition-all hover:scale-[0.98] hover:bg-ink/90 active:scale-95"
+          >
+            Daftar
+          </Link>
         </nav>
       </header>
 
-      <main>
-        <section className="hero-section">
-          <p className="eyebrow">PERSONAL FINANCE, SIMPLIFIED</p>
-          <h1>Yang penting bukan banyaknya.<br /><em>Yang penting cukup.</em></h1>
-          <p className="hero-subtitle">
-            Cukupin membantu kamu melihat arus uang dengan lebih jernih, 
-            satu bulan demi satu bulan, tanpa rasa bersalah.
+      <main className="flex-1 pt-24">
+        {/* Hero Section */}
+        <section className="relative flex flex-col items-center justify-center overflow-hidden px-6 pb-20 pt-24 text-center md:pb-32 md:pt-32">
+          {/* Background Decorative Blur */}
+          <div className="absolute left-1/2 top-1/2 -z-10 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-green-soft/50 blur-[100px]" />
+          
+          <span className="mb-6 flex items-center gap-2 rounded-full border border-green/20 bg-green-soft px-4 py-1.5 text-[10px] font-bold tracking-widest text-green shadow-sm uppercase">
+            <Sparkles size={12} /> Personal Finance, Simplified
+          </span>
+          
+          <h1 className="max-w-4xl font-display text-[2.5rem] font-bold leading-[1.05] tracking-tight text-ink md:text-[4.5rem]">
+            Yang penting bukan banyaknya.<br />
+            <em className="text-green not-italic">Yang penting cukup.</em>
+          </h1>
+          
+          <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-muted md:text-xl">
+            Cukupin membantu kamu melihat arus uang dengan lebih jernih, satu bulan demi satu bulan, tanpa rasa bersalah.
           </p>
-          <div className="cta-group">
-            <Link href="/auth/login" className="button primary large">Mulai ruang uangmu — Gratis</Link>
+          
+          <div className="mt-10 flex flex-col items-center gap-6 sm:flex-row">
+            <Link 
+              href="/auth/login" 
+              className="group flex h-14 items-center justify-center gap-2 rounded-2xl bg-ink px-8 text-base font-bold text-white shadow-xl shadow-ink/15 transition-all hover:-translate-y-0.5 hover:bg-ink/90 active:translate-y-0"
+            >
+              Mulai ruang uangmu — Gratis
+              <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
+            </Link>
           </div>
-          <p className="social-proof">
-            <span className="avatars">
-              <span className="avatar">R</span>
-              <span className="avatar">S</span>
-              <span className="avatar">A</span>
-            </span>
-            Bergabunglah dengan <strong>ratusan pengguna</strong> lainnya yang telah beralih ke pencatatan yang menenangkan.
-          </p>
+          
+          <div className="mt-16 flex flex-col items-center justify-center gap-4 text-sm text-muted sm:flex-row sm:gap-6">
+            <div className="flex -space-x-3">
+              {['R', 'S', 'A', 'M'].map((letter, i) => (
+                <div key={i} className={`flex h-10 w-10 items-center justify-center rounded-full border-2 border-paper text-xs font-bold text-white shadow-sm ${i === 0 ? 'bg-green' : i === 1 ? 'bg-blue' : i === 2 ? 'bg-coral' : 'bg-ink'}`}>
+                  {letter}
+                </div>
+              ))}
+            </div>
+            <p>
+              Bergabunglah dengan <strong className="text-ink">ratusan pengguna</strong> lainnya<br className="hidden sm:block" /> yang telah beralih ke pencatatan yang menenangkan.
+            </p>
+          </div>
+        </section>
+
+        {/* Features Preview */}
+        <section className="bg-white/50 px-6 py-24 border-t border-line/40">
+          <div className="mx-auto max-w-6xl">
+            <div className="grid gap-8 md:grid-cols-3">
+              <div className="flex flex-col gap-4 rounded-3xl bg-card p-8 shadow-sm border border-line/50 transition-transform hover:-translate-y-1">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-green-soft text-green">
+                  <PieChart size={24} />
+                </div>
+                <h3 className="font-display text-xl font-bold">Kategori Jelas</h3>
+                <p className="text-sm leading-relaxed text-muted">
+                  Bukan hanya sekadar angka, tapi tahu persis ke mana perginya uangmu bulan ini.
+                </p>
+              </div>
+              
+              <div className="flex flex-col gap-4 rounded-3xl bg-card p-8 shadow-sm border border-line/50 transition-transform hover:-translate-y-1">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-soft text-blue">
+                  <ShieldCheck size={24} />
+                </div>
+                <h3 className="font-display text-xl font-bold">Keamanan Data</h3>
+                <p className="text-sm leading-relaxed text-muted">
+                  Data keuanganmu tersimpan dengan aman. Kamu memegang penuh kendali atas privasimu.
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-4 rounded-3xl bg-card p-8 shadow-sm border border-line/50 transition-transform hover:-translate-y-1">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-coral-soft text-coral">
+                  <Sparkles size={24} />
+                </div>
+                <h3 className="font-display text-xl font-bold">Bebas Stres</h3>
+                <p className="text-sm leading-relaxed text-muted">
+                  Tanpa budget yang kaku. Fokuslah pada apa yang cukup untukmu hari ini.
+                </p>
+              </div>
+            </div>
+          </div>
         </section>
       </main>
 
-      <footer className="landing-footer">
-        <div className="footer-links">
-          <Link href="/privacy">Kebijakan Privasi</Link>
-          <span>&middot;</span>
-          <Link href="#">Syarat & Ketentuan</Link>
+      <footer className="border-t border-line bg-paper px-6 py-12 text-center text-sm text-muted">
+        <div className="mb-6 flex justify-center gap-6">
+          <Link href="/legal/privacy" className="hover:text-ink transition-colors">Kebijakan Privasi</Link>
+          <Link href="/legal/terms" className="hover:text-ink transition-colors">Syarat & Ketentuan</Link>
         </div>
         <p>&copy; {new Date().getFullYear()} cukupin. All rights reserved.</p>
       </footer>
-
-      {/* Basic styling for the landing page */}
-      <style dangerouslySetInnerHTML={{ __html: `
-        .landing-page {
-          min-height: 100vh;
-          display: flex;
-          flex-direction: column;
-          background-color: var(--paper);
-          color: var(--ink);
-        }
-        .landing-header {
-          padding: 24px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          max-width: 1200px;
-          margin: 0 auto;
-          width: 100%;
-        }
-        .landing-header nav {
-          display: flex;
-          gap: 12px;
-        }
-        .hero-section {
-          max-width: 800px;
-          margin: 120px auto;
-          padding: 0 24px;
-          text-align: center;
-        }
-        .hero-section h1 {
-          font-size: 3rem;
-          line-height: 1.1;
-          letter-spacing: -0.04em;
-          margin: 24px 0;
-        }
-        .hero-section em {
-          color: var(--green);
-          font-style: italic;
-        }
-        .hero-subtitle {
-          font-size: 1.2rem;
-          color: var(--muted);
-          max-width: 500px;
-          margin: 0 auto 40px;
-          line-height: 1.5;
-        }
-        .cta-group {
-          margin-bottom: 48px;
-        }
-        .social-proof {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 12px;
-          font-size: 0.9rem;
-          color: var(--muted);
-        }
-        .avatars {
-          display: flex;
-        }
-        .avatars .avatar {
-          width: 32px;
-          height: 32px;
-          border-radius: 50%;
-          background: var(--card);
-          border: 2px solid var(--paper);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 12px;
-          font-weight: bold;
-          margin-left: -12px;
-        }
-        .avatars .avatar:first-child {
-          margin-left: 0;
-          background: var(--green);
-          color: white;
-        }
-        .avatars .avatar:nth-child(2) {
-          background: var(--blue);
-          color: white;
-        }
-        .landing-footer {
-          margin-top: auto;
-          padding: 40px 24px;
-          text-align: center;
-          font-size: 0.85rem;
-          color: var(--muted);
-        }
-        .footer-links {
-          display: flex;
-          justify-content: center;
-          gap: 16px;
-          margin-bottom: 12px;
-        }
-        .footer-links a {
-          color: var(--ink);
-          text-decoration: none;
-        }
-        .footer-links a:hover {
-          text-decoration: underline;
-        }
-        @media (max-width: 768px) {
-          .hero-section {
-            margin: 60px auto;
-          }
-          .hero-section h1 {
-            font-size: 2.2rem;
-          }
-          .social-proof {
-            flex-direction: column;
-          }
-        }
-      `}} />
     </div>
   )
 }

@@ -23,16 +23,25 @@ export function AppShell({ children, user, onSignOut }: AppShellProps) {
   const pathname = usePathname()
 
   return (
-    <div className="app-shell">
-      <aside className={`sidebar ${open ? 'open' : ''}`}>
-        <div className="sidebar-top">
+    <div className="flex min-h-screen w-full bg-paper font-sans text-ink selection:bg-green-soft selection:text-green">
+      {/* Sidebar */}
+      <aside className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col bg-paper p-6 transition-transform duration-300 md:static md:w-[280px] md:translate-x-0 md:border-r md:border-line lg:w-[300px] ${open ? 'translate-x-0 shadow-2xl' : '-translate-x-full'}`}>
+        <div className="mb-8 flex items-center justify-between">
           <Brand />
-          <button className="icon-button mobile-close" onClick={() => setOpen(false)} aria-label="Tutup menu">
+          <button 
+            className="rounded-full p-2 text-ink hover:bg-black/5 md:hidden" 
+            onClick={() => setOpen(false)} 
+            aria-label="Tutup menu"
+          >
             <X size={18} />
           </button>
         </div>
-        <div className="workspace-label">RUANG UANGMU</div>
-        <nav>
+        
+        <div className="mb-4 px-3 text-[10px] font-bold tracking-widest text-muted uppercase">
+          RUANG UANGMU
+        </div>
+        
+        <nav className="flex flex-col gap-1">
           {navItems.map((item) => {
             const Icon = item.icon
             const isActive = pathname === item.href
@@ -41,57 +50,63 @@ export function AppShell({ children, user, onSignOut }: AppShellProps) {
                 key={item.href}
                 href={item.href}
                 onClick={() => setOpen(false)}
-                className={`nav-item ${isActive ? 'active' : ''}`}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '12px',
-                  borderRadius: '11px',
-                  color: isActive ? 'var(--ink)' : '#748077',
-                  background: isActive ? 'var(--card)' : 'transparent',
-                  boxShadow: isActive ? '0 5px 18px rgba(30,50,73,.05)' : 'none',
-                  fontWeight: isActive ? 700 : 'normal',
-                  border: 'none',
-                  cursor: 'pointer',
-                  width: '100%',
-                }}
+                className={`group relative flex items-center gap-3 rounded-xl px-3 py-3 transition-all ${isActive ? 'bg-card text-ink shadow-[0_5px_18px_rgba(30,50,73,0.05)] font-bold' : 'text-muted font-normal hover:bg-black/5 hover:text-ink'}`}
               >
-                <Icon size={18} />
+                <Icon size={18} className={isActive ? 'text-green' : 'text-muted group-hover:text-ink transition-colors'} />
                 <span>{item.label}</span>
-                {isActive && <span className="nav-dot" />}
+                {isActive && <span className="absolute right-3 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-green shadow-[0_0_8px_rgba(62,143,104,0.6)]" />}
               </Link>
             )
           })}
         </nav>
-        <div className="sidebar-footer">
-          <div className="user-chip">
-            <div className="avatar">{user?.email?.slice(0, 1).toUpperCase() || 'C'}</div>
-            <div style={{ textAlign: 'left' }}>
-              <strong>{user?.email?.split('@')[0] || 'User'}</strong>
-              <small>{user?.email || 'Belum terhubung'}</small>
+        
+        <div className="mt-auto pt-6 border-t border-line">
+          <div className="mb-4 flex items-center gap-3 px-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue/10 font-display text-sm font-bold text-blue">
+              {user?.email?.slice(0, 1).toUpperCase() || 'C'}
+            </div>
+            <div className="flex min-w-0 flex-col text-left">
+              <strong className="truncate text-sm leading-tight text-ink">
+                {user?.email?.split('@')[0] || 'User'}
+              </strong>
+              <small className="truncate text-[11px] text-muted">
+                {user?.email || 'Belum terhubung'}
+              </small>
             </div>
           </div>
-          <button className="logout-button" onClick={onSignOut} style={{ width: '100%', justifyContent: 'flex-start' }}>
-            <LogOut size={15} /> Keluar
+          <button 
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-coral transition-colors hover:bg-coral/10 hover:text-coral-dark" 
+            onClick={onSignOut}
+          >
+            <LogOut size={16} /> Keluar
           </button>
         </div>
       </aside>
       
-      <div className="main-column">
-        <header className="mobile-header">
-          <button className="icon-button" onClick={() => setOpen(true)} aria-label="Buka menu">
+      {/* Main Content Area */}
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden md:m-3 md:rounded-3xl md:border md:border-line md:bg-card md:shadow-sm">
+        
+        {/* Mobile Header */}
+        <header className="flex items-center justify-between border-b border-line bg-card p-4 md:hidden">
+          <button 
+            className="rounded-full p-2 text-ink transition-colors hover:bg-black/5" 
+            onClick={() => setOpen(true)} 
+            aria-label="Buka menu"
+          >
             <Menu size={20} />
           </button>
           <Brand compact />
-          <button className="icon-button" aria-label="Fitur AI">
+          <button className="rounded-full p-2 text-ink transition-colors hover:bg-black/5" aria-label="Fitur AI">
             <Sparkles size={18} />
           </button>
         </header>
         
-        <main className="page-content">{children}</main>
+        <main className="flex-1 overflow-y-auto p-4 pb-24 md:p-8 lg:p-10">
+          {children}
+        </main>
         
-        <nav className="bottom-nav">
+        {/* Mobile Bottom Nav */}
+        <nav className="fixed bottom-0 left-0 right-0 z-30 flex items-center justify-around border-t border-line bg-card/90 pb-6 pt-3 backdrop-blur-md md:hidden">
           {navItems.map((item) => {
             const Icon = item.icon
             const isActive = pathname === item.href
@@ -99,29 +114,27 @@ export function AppShell({ children, user, onSignOut }: AppShellProps) {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`nav-item ${isActive ? 'active' : ''}`}
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '4px',
-                  fontSize: '9px',
-                  color: isActive ? 'var(--ink)' : 'var(--muted)',
-                  fontWeight: isActive ? 700 : 'normal',
-                  background: 'transparent',
-                  border: 'none',
-                  cursor: 'pointer',
-                }}
+                className="flex flex-col items-center gap-1.5 transition-colors"
               >
-                <Icon size={19} color={isActive ? 'var(--green)' : 'inherit'} />
-                <span>{item.label}</span>
+                <div className={`flex h-8 w-8 items-center justify-center rounded-full transition-all ${isActive ? 'bg-green/10 text-green' : 'text-muted'}`}>
+                  <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+                </div>
+                <span className={`text-[9px] ${isActive ? 'font-bold text-ink' : 'font-medium text-muted'}`}>
+                  {item.label}
+                </span>
               </Link>
             )
           })}
         </nav>
       </div>
       
-      {open && <div className="scrim" onClick={() => setOpen(false)} />}
+      {/* Mobile Scrim */}
+      {open && (
+        <div 
+          className="fixed inset-0 z-30 bg-ink/20 backdrop-blur-sm transition-opacity md:hidden" 
+          onClick={() => setOpen(false)} 
+        />
+      )}
     </div>
   )
 }
