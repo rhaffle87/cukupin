@@ -5,14 +5,14 @@ import { CookieConsent } from '@/components/ui/CookieConsent'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'cukupin — Catat santai, tahu arah uangmu',
+  title: 'cukupin: Catat santai, tahu arah uangmu',
   description: 'Catat pengeluaran harian, pantau uang masuk-keluar, dan atur keuangan dengan santai.',
   applicationName: 'cukupin',
   authors: [{ name: 'cukupin' }],
   generator: 'v0.app',
   metadataBase: new URL('https://cukupin.app'),
   openGraph: {
-    title: 'cukupin — Catat santai, tahu arah uangmu',
+    title: 'cukupin: Catat santai, tahu arah uangmu',
     description: 'Catat pengeluaran harian, pantau uang masuk-keluar, dan atur keuangan dengan santai.',
     url: 'https://cukupin.app',
     siteName: 'cukupin',
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'cukupin — Catat santai, tahu arah uangmu',
+    title: 'cukupin: Catat santai, tahu arah uangmu',
     description: 'Catat pengeluaran harian, pantau uang masuk-keluar, dan atur keuangan dengan santai.',
   },
   appleWebApp: {

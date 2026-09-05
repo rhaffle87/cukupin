@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'cukupin — Catat santai, tahu arah uangmu',
+    name: 'cukupin: Catat santai, tahu arah uangmu',
     short_name: 'cukupin',
     description: 'Catat pengeluaran harian, pantau uang masuk-keluar, dan atur keuangan dengan santai.',
     start_url: '/',

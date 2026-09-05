@@ -33,7 +33,7 @@ export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> 
       doc.text('cukupin', 20, 24)
       doc.setFontSize(10)
       doc.setTextColor('#718078')
-      doc.text(`Laporan ${from} — ${to}`, 20, 33)
+      doc.text(`Laporan ${from} s/d ${to}`, 20, 33)
       doc.setFontSize(12)
       doc.setTextColor('#1E3249')
       doc.text(`Pemasukan: ${currency(stats.income)}`, 20, 52)
@@ -95,7 +95,7 @@ export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> 
               className="mt-1 rounded-lg border border-line bg-paper px-3 py-1.5 text-xs text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
             />
           </label>
-          <span className="self-end pb-2 text-muted">—</span>
+          <span className="self-end pb-2 text-xs font-medium text-muted">s/d</span>
           <label className="flex flex-col text-[11px] font-bold text-muted">
             Sampai
             <input

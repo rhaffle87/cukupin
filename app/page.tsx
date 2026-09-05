@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { Brand } from '@/components/ui/Brand'
 import {
+  ArrowDown,
   ArrowRight,
   Check,
   ChevronDown,
@@ -29,7 +30,7 @@ export default function LandingPage() {
   const faqs = [
     {
       q: 'Apakah Cukupin benar-benar gratis?',
-      a: 'Ya, Cukupin 100% gratis digunakan tanpa biaya langganan, tanpa uji coba berbayar, dan tanpa fitur tersembunyi. Kamu bisa langsung pakai semua fitur tanpa batas.',
+      a: 'Ya, Cukupin 100% gratis digunakan tanpa biaya langganan, tanpa masa percobaan berbayar, dan tanpa fitur tersembunyi. Kamu bisa langsung menggunakan semua fitur tanpa batas.',
     },
     {
       q: 'Apakah Cukupin meminta akses ke rekening bank saya?',
@@ -41,7 +42,7 @@ export default function LandingPage() {
     },
     {
       q: 'Apakah Cukupin bisa digunakan di smartphone?',
-      a: 'Bisa. Cukupin adalah Progressive Web App (PWA) yang bisa langsung di-install di HP Android maupun iPhone tanpa perlu download dari App Store yang berat.',
+      a: 'Bisa. Cukupin adalah Progressive Web App (PWA) yang bisa langsung dipasang di ponsel Android maupun iPhone tanpa perlu unduh dari App Store yang berat.',
     },
     {
       q: 'Bagaimana keamanan data keuangan saya?',
@@ -60,19 +61,19 @@ export default function LandingPage() {
       {/* Navigation Bar */}
       <header className="sticky top-0 z-40 flex w-full items-center justify-between border-b border-line/60 bg-paper/85 px-6 py-3.5 backdrop-blur-md md:px-12">
         <Brand />
-        <nav className="hidden items-center gap-6 text-xs font-semibold text-muted md:flex">
-          <a href="#masalah" className="hover:text-ink transition-colors">Masalah</a>
-          <a href="#fitur" className="hover:text-ink transition-colors">Fitur</a>
-          <a href="#perbandingan" className="hover:text-ink transition-colors">Perbandingan</a>
-          <a href="#faq" className="hover:text-ink transition-colors">Tanya Jawab</a>
+        <nav className="hidden items-center gap-6 text-xs font-semibold text-muted md:flex" aria-label="Navigasi Utama">
+          <a href="#masalah" className="hover:text-ink transition-colors focus-visible:ring-2 focus-visible:ring-green rounded-md px-1">Masalah</a>
+          <a href="#fitur" className="hover:text-ink transition-colors focus-visible:ring-2 focus-visible:ring-green rounded-md px-1">Fitur</a>
+          <a href="#perbandingan" className="hover:text-ink transition-colors focus-visible:ring-2 focus-visible:ring-green rounded-md px-1">Perbandingan</a>
+          <a href="#faq" className="hover:text-ink transition-colors focus-visible:ring-2 focus-visible:ring-green rounded-md px-1">Tanya Jawab</a>
         </nav>
         <div className="flex items-center gap-3">
-          <Link href="/auth/login" className="text-xs font-bold text-muted hover:text-ink transition-colors px-2 py-1">
+          <Link href="/auth/login" className="text-xs font-bold text-muted hover:text-ink transition-colors px-2 py-1 focus-visible:ring-2 focus-visible:ring-green rounded-md">
             Masuk
           </Link>
           <Link
             href="/auth/login"
-            className="flex items-center justify-center rounded-xl bg-ink px-4 py-2 text-xs font-bold !text-white shadow-sm transition-all hover:bg-ink/90 active:scale-95"
+            className="flex items-center justify-center rounded-xl bg-ink px-4 py-2 text-xs font-bold !text-white shadow-sm transition-all hover:bg-ink/90 active:scale-95 focus-visible:ring-2 focus-visible:ring-green"
           >
             Mulai Sekarang
           </Link>
@@ -85,7 +86,7 @@ export default function LandingPage() {
         <div className="pointer-events-none absolute left-1/2 top-1/3 -z-10 h-[380px] w-[380px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-green-soft/60 blur-[100px] md:h-[520px] md:w-[520px]" />
 
         <div className="mx-auto max-w-4xl flex flex-col items-center">
-          <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-green/20 bg-green-soft px-3.5 py-1 text-[11px] font-bold tracking-widest text-green uppercase shadow-xs">
+          <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-green/20 bg-green-soft px-3.5 py-1 text-[11px] font-bold tracking-widest text-green uppercase shadow-xs transition-transform hover:scale-105">
             <Sparkles size={13} /> Catat santai, tahu arah uangmu
           </span>
 
@@ -105,16 +106,17 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row items-center gap-3.5 mt-2">
             <Link
               href="/auth/login"
-              className="group flex h-12 items-center justify-center gap-2.5 rounded-2xl bg-ink px-7 text-sm font-bold !text-white shadow-xl shadow-ink/15 transition-all hover:-translate-y-0.5 hover:bg-ink/90 active:translate-y-0"
+              className="group flex h-12 items-center justify-center gap-2.5 rounded-2xl bg-ink px-7 text-sm font-bold !text-white shadow-xl shadow-ink/15 transition-all hover:-translate-y-0.5 hover:bg-ink/90 active:translate-y-0 focus-visible:ring-2 focus-visible:ring-green"
             >
-              Coba Sekarang — Gratis
-              <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+              Coba Sekarang, Gratis
+              <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-1" />
             </Link>
             <a
               href="#cara-kerja"
-              className="flex h-12 items-center justify-center rounded-2xl border border-line bg-card px-6 text-sm font-bold text-ink transition-colors hover:bg-paper active:scale-98"
+              className="group flex h-12 items-center justify-center gap-2 rounded-2xl border border-line bg-card px-6 text-sm font-bold text-ink transition-all hover:bg-paper active:scale-98 focus-visible:ring-2 focus-visible:ring-green"
             >
-              Lihat Cara Kerja ↓
+              Lihat Cara Kerja
+              <ArrowDown size={14} className="text-muted transition-transform duration-200 group-hover:translate-y-0.5" />
             </a>
           </div>
 
@@ -199,9 +201,9 @@ export default function LandingPage() {
               <div className="mt-6 flex items-center gap-3">
                 <Link
                   href="/auth/login"
-                  className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-xs font-bold text-ink shadow-md transition-all hover:bg-[#F0F1EA] active:scale-95"
+                  className="group inline-flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-xs font-bold text-ink shadow-md transition-all hover:bg-[#F0F1EA] active:scale-95 focus-visible:ring-2 focus-visible:ring-green"
                 >
-                  Mulai Sekarang — Gratis <ArrowRight size={14} />
+                  Mulai Sekarang Gratis <ArrowRight size={14} className="transition-transform duration-200 group-hover:translate-x-0.5" />
                 </Link>
               </div>
             </div>
@@ -230,7 +232,7 @@ export default function LandingPage() {
               </div>
               <h3 className="font-display text-lg font-bold text-ink">Deteksi Kategori Otomatis</h3>
               <p className="mt-2 text-xs leading-relaxed text-muted">
-                Ketik "kopi", "makan siang", atau "bensin" — kategori langsung terpilih otomatis. Kamu selesai mencatat dalam 3 detik tanpa perlu scroll menu panjang.
+                Ketik "kopi", "makan siang", atau "bensin", kategori langsung terpilih otomatis. Kamu selesai mencatat dalam 3 detik tanpa perlu scroll menu panjang.
               </p>
             </div>
 
@@ -352,41 +354,41 @@ export default function LandingPage() {
             <table className="w-full text-left text-xs border-collapse">
               <thead>
                 <tr className="border-b border-line bg-paper/80">
-                  <th className="p-4 font-bold text-ink">Kriteria</th>
-                  <th className="p-4 font-bold text-green bg-green-soft/40">Cukupin</th>
-                  <th className="p-4 font-bold text-muted">Aplikasi Bank / Fintech</th>
-                  <th className="p-4 font-bold text-muted">Excel / Buku Kas</th>
+                  <th scope="col" className="p-4 font-bold text-ink">Kriteria</th>
+                  <th scope="col" className="p-4 font-bold text-green bg-green-soft/40">Cukupin</th>
+                  <th scope="col" className="p-4 font-bold text-muted">Aplikasi Bank & Fintech</th>
+                  <th scope="col" className="p-4 font-bold text-muted">Excel & Buku Kas</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-line/60">
                 <tr>
-                  <td className="p-4 font-semibold text-ink">Biaya Aplikasi</td>
+                  <th scope="row" className="p-4 font-semibold text-ink text-left">Biaya Aplikasi</th>
                   <td className="p-4 text-green font-bold bg-green-soft/20">100% Gratis & Tanpa Iklan</td>
-                  <td className="p-4 text-muted">Gratis dengan iklan / langganan</td>
+                  <td className="p-4 text-muted">Gratis dengan iklan atau langganan</td>
                   <td className="p-4 text-muted">Gratis</td>
                 </tr>
                 <tr>
-                  <td className="p-4 font-semibold text-ink">Akses Rekening & OTP</td>
+                  <th scope="row" className="p-4 font-semibold text-ink text-left">Akses Rekening & OTP</th>
                   <td className="p-4 text-green font-bold bg-green-soft/20">Tidak Butuh (Privasi Penuh)</td>
                   <td className="p-4 text-coral">Wajib hubung akun bank & OTP</td>
                   <td className="p-4 text-muted">Tidak Butuh</td>
                 </tr>
                 <tr>
-                  <td className="p-4 font-semibold text-ink">Kecepatan Catat Harian</td>
+                  <th scope="row" className="p-4 font-semibold text-ink text-left">Kecepatan Catat Harian</th>
                   <td className="p-4 text-green font-bold bg-green-soft/20">&lt; 3 Detik (Auto Kategori)</td>
-                  <td className="p-4 text-muted">Lambat (Banyak loading & menu)</td>
+                  <td className="p-4 text-muted">Lambat (Banyak menu)</td>
                   <td className="p-4 text-muted">Repot (Perlu buka laptop)</td>
                 </tr>
                 <tr>
-                  <td className="p-4 font-semibold text-ink">Fitur Budget Aman Harian</td>
+                  <th scope="row" className="p-4 font-semibold text-ink text-left">Fitur Budget Aman Harian</th>
                   <td className="p-4 text-green font-bold bg-green-soft/20">Tersedia Otomatis</td>
                   <td className="p-4 text-muted">Jarang Ada</td>
                   <td className="p-4 text-muted">Harus bikin rumus manual</td>
                 </tr>
                 <tr>
-                  <td className="p-4 font-semibold text-ink">Sinkronisasi Otomatis Bank</td>
+                  <th scope="row" className="p-4 font-semibold text-ink text-left">Sinkronisasi Otomatis Bank</th>
                   <td className="p-4 text-muted bg-green-soft/20">
-                    Tidak ada <span className="text-[10px] text-muted block font-normal">(Kami mengutamakan kesadaran mencatat mandiri)</span>
+                    Tidak ada <span className="text-[10px] text-muted block font-normal">(Mengutamakan kesadaran mencatat mandiri)</span>
                   </td>
                   <td className="p-4 text-green font-semibold">Ada otomatis</td>
                   <td className="p-4 text-muted">Tidak ada</td>
@@ -504,10 +506,10 @@ export default function LandingPage() {
               </p>
               <Link
                 href="/auth/login"
-                className="mt-8 group inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-white px-8 text-sm font-bold text-ink shadow-lg transition-all hover:bg-[#F0F1EA] active:scale-95"
+                className="mt-8 group inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-white px-8 text-sm font-bold text-ink shadow-lg transition-all hover:bg-[#F0F1EA] active:scale-95 focus-visible:ring-2 focus-visible:ring-green"
               >
-                Coba Cukupin Sekarang — Gratis
-                <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+                Coba Cukupin Sekarang, Gratis
+                <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-1" />
               </Link>
             </div>
           </div>
@@ -524,17 +526,17 @@ export default function LandingPage() {
             </p>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-6 font-medium">
-            <a href="#masalah" className="hover:text-ink transition-colors">Masalah</a>
-            <a href="#fitur" className="hover:text-ink transition-colors">Fitur</a>
-            <a href="#perbandingan" className="hover:text-ink transition-colors">Perbandingan</a>
-            <a href="#faq" className="hover:text-ink transition-colors">FAQ</a>
-            <Link href="/legal/privacy" className="hover:text-ink transition-colors">Kebijakan Privasi</Link>
-            <Link href="/legal/terms" className="hover:text-ink transition-colors">Syarat & Ketentuan</Link>
+            <a href="#masalah" className="hover:text-ink transition-colors focus-visible:ring-2 focus-visible:ring-green rounded-md px-1">Masalah</a>
+            <a href="#fitur" className="hover:text-ink transition-colors focus-visible:ring-2 focus-visible:ring-green rounded-md px-1">Fitur</a>
+            <a href="#perbandingan" className="hover:text-ink transition-colors focus-visible:ring-2 focus-visible:ring-green rounded-md px-1">Perbandingan</a>
+            <a href="#faq" className="hover:text-ink transition-colors focus-visible:ring-2 focus-visible:ring-green rounded-md px-1">FAQ</a>
+            <Link href="/legal/privacy" className="hover:text-ink transition-colors focus-visible:ring-2 focus-visible:ring-green rounded-md px-1">Kebijakan Privasi</Link>
+            <Link href="/legal/terms" className="hover:text-ink transition-colors focus-visible:ring-2 focus-visible:ring-green rounded-md px-1">Syarat & Ketentuan</Link>
           </div>
         </div>
         <div className="mx-auto max-w-5xl mt-8 pt-6 border-t border-line/40 text-center sm:text-left text-[11px] text-muted flex flex-col sm:flex-row items-center justify-between gap-2">
-          <p>&copy; {new Date().getFullYear()} cukupin. All rights reserved.</p>
-          <p className="text-[10px]">Dibuat dengan rasa cukup untuk ketenangan finansialmu.</p>
+          <p>&copy; {new Date().getFullYear()} cukupin. Hak cipta dilindungi.</p>
+          <p className="text-[10px]">Pencatatan keuangan mandiri tanpa repot.</p>
         </div>
       </footer>
     </div>
