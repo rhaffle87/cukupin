@@ -30,7 +30,7 @@ export function AuthScreen({ supabase }: AuthScreenProps) {
       toast.error(result.error.message)
     } else {
       toast.success(mode === 'login' ? 'Selamat datang kembali.' : 'Akun berhasil dibuat.')
-      router.push('/') // Redirect to dashboard
+      router.push('/dashboard') // Redirect to dashboard
     }
   }
 

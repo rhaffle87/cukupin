@@ -18,7 +18,7 @@ export default function LoginPage() {
     
     supabase.auth.getUser().then(({ data }) => {
       if (data.user) {
-        router.push('/')
+        router.push('/dashboard')
       } else {
         setChecking(false)
       }
@@ -31,9 +31,6 @@ export default function LoginPage() {
     <div className="login-page-wrapper">
       <AuthScreen 
         supabase={supabase} 
-        onSuccess={() => {
-          router.push('/')
-        }} 
       />
     </div>
   )

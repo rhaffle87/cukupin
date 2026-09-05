@@ -11,7 +11,7 @@ interface AppShellProps {
 }
 
 const navItems = [
-  { href: '/', label: 'Ringkasan', icon: HomeIcon },
+  { href: '/dashboard', label: 'Ringkasan', icon: HomeIcon },
   { href: '/transactions', label: 'Transaksi', icon: Receipt },
   { href: '/reports', label: 'Laporan', icon: FileText },
   { href: '/goals', label: 'Target tabungan', icon: Target },

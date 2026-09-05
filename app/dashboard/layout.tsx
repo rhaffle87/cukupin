@@ -22,7 +22,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       if (data.user) {
         setUser({ id: data.user.id, email: data.user.email })
       } else {
-        router.push('/login')
+        router.push('/auth/login')
       }
       setChecking(false)
     })
@@ -32,7 +32,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         setUser({ id: session.user.id, email: session.user.email })
       } else {
         setUser(null)
-        router.push('/login')
+        router.push('/auth/login')
       }
     })
     
