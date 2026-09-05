@@ -23,7 +23,7 @@ export function AppShell({ children, user, onSignOut }: AppShellProps) {
   const pathname = usePathname()
 
   return (
-    <div className="flex min-h-screen w-full bg-paper font-sans text-ink selection:bg-green-soft selection:text-green">
+    <div className="flex h-screen w-full overflow-hidden bg-paper font-sans text-ink selection:bg-green-soft selection:text-green">
       {/* Sidebar */}
       <aside className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col bg-paper p-6 transition-transform duration-300 md:static md:w-[280px] md:translate-x-0 md:border-r md:border-line lg:w-[300px] ${open ? 'translate-x-0 shadow-2xl' : '-translate-x-full'}`}>
         <div className="mb-8 flex items-center justify-between">
