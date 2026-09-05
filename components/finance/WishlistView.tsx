@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import type { WishlistItem } from '@/lib/database.types'
+import type { SavingGoal, Transaction, WishlistItem } from '@/lib/database.types'
 import { SupabaseClient } from '@supabase/supabase-js'
 import {
   AlertCircle,
@@ -10,6 +10,7 @@ import {
   Plus,
   ShoppingBag,
   Sparkles,
+  Target,
   Trash2,
   Wallet,
 } from 'lucide-react'
@@ -60,8 +61,6 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
 
   async function add(e: React.FormEvent) {
     e.preventDefault()
-    if (!supabase || !userId) return toast.error('Hubungkan Supabase dan masuk untuk menyimpan.')
-    
     const numericPrice = sanitizeNumericInput(price)
     const parsed = wishlistSchema.safeParse({ name, price: numericPrice, priority })
     if (!parsed.success) {
@@ -72,7 +71,7 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
     const tempId = `temp-${Date.now()}`
     const newItem: WishlistItem = {
       id: tempId,
-      user_id: userId,
+      user_id: userId || 'local-dev-user',
       name: parsed.data.name,
       price: parsed.data.price,
       url: null,
@@ -87,6 +86,15 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
     setPrice('')
     setPriority('Medium')
     setShowAddModal(false)
+
+    if (userId === 'local-dev-user' || !supabase) {
+      const stored = localStorage.getItem('cukupin_local_wishlist')
+      const localWish: WishlistItem[] = stored ? JSON.parse(stored) : []
+      const updated = [newItem, ...localWish]
+      localStorage.setItem('cukupin_local_wishlist', JSON.stringify(updated))
+      toast.success('Barang impian berhasil ditambahkan!')
+      return
+    }
 
     const r = await supabase.from('wishlist').insert({
       user_id: userId,
@@ -106,16 +114,15 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
   }
 
   async function checkout(item: WishlistItem) {
-    if (!supabase || !userId) return
     if (!confirm(`Catat "${item.name}" (${currency(Number(item.price))}) sebagai pengeluaran belanja dan tandai sudah terbeli?`)) return
 
     // Optimistic UI update
     const previousWishlist = data.wishlist
     data.setWishlist(prev => prev.filter(w => w.id !== item.id))
 
-    // 1. Insert into transactions
-    const txPayload = {
-      user_id: userId,
+    const txPayload: Transaction = {
+      id: 'tx-' + Date.now(),
+      user_id: userId || 'local-dev-user',
       type: 'expense' as const,
       description: item.name,
       amount: Number(item.price),
@@ -123,16 +130,44 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
       transaction_date: isoDate(new Date()),
       note: 'Dibeli dari Wishlist',
       payment_method: 'Transfer Bank',
+      created_at: new Date().toISOString(),
     }
 
-    const txRes = await supabase.from('transactions').insert(txPayload).select().single()
+    if (userId === 'local-dev-user' || !supabase) {
+      const storedWish = localStorage.getItem('cukupin_local_wishlist')
+      const localWish: WishlistItem[] = storedWish ? JSON.parse(storedWish) : []
+      localStorage.setItem('cukupin_local_wishlist', JSON.stringify(localWish.filter(w => w.id !== item.id)))
+
+      const storedTx = localStorage.getItem('cukupin_local_transactions')
+      const localTx: Transaction[] = storedTx ? JSON.parse(storedTx) : []
+      localStorage.setItem('cukupin_local_transactions', JSON.stringify([txPayload, ...localTx]))
+      data.setTransactions(prev => [txPayload, ...prev])
+
+      try {
+        confetti({ particleCount: 75, spread: 65, origin: { y: 0.65 }, colors: ['#3E8F68', '#BEE6CF', '#315DCB'] })
+      } catch {}
+      toast.success(`Hore! "${item.name}" berhasil dibeli dan dicatat ke pengeluaran.`)
+      return
+    }
+
+    const txRes = await supabase.from('transactions').insert({
+      user_id: userId,
+      type: 'expense',
+      description: item.name,
+      amount: Number(item.price),
+      category: 'Shopping',
+      transaction_date: isoDate(new Date()),
+      note: 'Dibeli dari Wishlist',
+      payment_method: 'Transfer Bank',
+    }).select().single()
+
     if (txRes.error) {
       toast.error('Gagal mencatat transaksi: ' + txRes.error.message)
       data.setWishlist(previousWishlist)
       return
     }
 
-    // 2. Delete from wishlist
+    // Delete from wishlist
     await supabase.from('wishlist').delete().eq('id', item.id)
 
     try {
@@ -151,9 +186,17 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
   }
   
   async function remove(item: WishlistItem) {
-    if (!supabase || !confirm('Hapus barang ini dari wishlist?')) return
+    if (!confirm('Hapus barang ini dari wishlist?')) return
     const previous = data.wishlist
     data.setWishlist(prev => prev.filter(w => w.id !== item.id))
+
+    if (userId === 'local-dev-user' || !supabase) {
+      const stored = localStorage.getItem('cukupin_local_wishlist')
+      const localWish: WishlistItem[] = stored ? JSON.parse(stored) : []
+      localStorage.setItem('cukupin_local_wishlist', JSON.stringify(localWish.filter(w => w.id !== item.id)))
+      toast.success('Item dihapus dari wishlist.')
+      return
+    }
     
     const r = await supabase.from('wishlist').delete().eq('id', item.id)
     if (r.error) {
@@ -161,6 +204,53 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
       data.setWishlist(previous)
     } else {
       toast.success('Item dihapus dari wishlist.')
+    }
+  }
+
+  async function convertToGoal(item: WishlistItem) {
+    if (!confirm(`Buat target tabungan untuk "${item.name}" sebesar ${currency(Number(item.price))}?`)) return
+
+    const newGoal: SavingGoal = {
+      id: 'goal-' + Date.now(),
+      user_id: userId || 'local-dev-user',
+      name: `Beli ${item.name}`,
+      target_amount: Number(item.price),
+      current_amount: 0,
+      deadline: null,
+      created_at: new Date().toISOString(),
+    }
+
+    if (userId === 'local-dev-user' || !supabase) {
+      const stored = localStorage.getItem('cukupin_local_goals')
+      const localGoals: SavingGoal[] = stored ? JSON.parse(stored) : []
+      const updated = [newGoal, ...localGoals]
+      localStorage.setItem('cukupin_local_goals', JSON.stringify(updated))
+      data.setGoals(updated)
+      try {
+        confetti({ particleCount: 60, spread: 50, origin: { y: 0.7 } })
+      } catch {}
+      toast.success(`Target tabungan untuk "${item.name}" berhasil dibuat! Cek di menu Tabungan.`)
+      return
+    }
+
+    const res = await supabase.from('saving_goals').insert({
+      user_id: userId,
+      name: `Beli ${item.name}`,
+      target_amount: Number(item.price),
+      current_amount: 0,
+    }).select().single()
+
+    if (res.error) {
+      toast.error('Gagal membuat target tabungan: ' + res.error.message)
+    } else {
+      try {
+        confetti({ particleCount: 60, spread: 50, origin: { y: 0.7 } })
+      } catch {}
+      toast.success(`Target tabungan untuk "${item.name}" berhasil dibuat! Cek di menu Tabungan.`)
+      if (res.data) {
+        data.setGoals(prev => [res.data as SavingGoal, ...prev])
+      }
+      data.refresh()
     }
   }
 
@@ -346,16 +436,27 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
                 </div>
 
                 {/* Bottom Action: Buy & Record */}
-                <div className="mt-5 pt-3.5 border-t border-line/60 flex items-center justify-between">
+                <div className="mt-5 pt-3.5 border-t border-line/60 flex items-center justify-between gap-2">
                   <span className="text-[10px] text-muted">
                     {new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(item.created_at))}
                   </span>
-                  <button
-                    onClick={() => checkout(item)}
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-ink px-3.5 py-2 text-xs font-bold !text-white shadow-2xs hover:bg-ink/90 active:scale-95 transition-all"
-                  >
-                    <Check size={14} className="text-[#BEE6CF]" /> Sudah Beli
-                  </button>
+                  <div className="flex items-center gap-1.5">
+                    {!isAffordable && (
+                      <button
+                        onClick={() => convertToGoal(item)}
+                        className="inline-flex items-center gap-1.5 rounded-xl bg-blue-soft px-3 py-2 text-xs font-bold text-blue hover:bg-blue-soft/80 active:scale-95 transition-all cursor-pointer"
+                        title="Buat rencana tabungan untuk barang ini"
+                      >
+                        <Target size={13} /> Nabung
+                      </button>
+                    )}
+                    <button
+                      onClick={() => checkout(item)}
+                      className="inline-flex items-center gap-1.5 rounded-xl bg-ink px-3.5 py-2 text-xs font-bold !text-white shadow-2xs hover:bg-ink/90 active:scale-95 transition-all cursor-pointer"
+                    >
+                      <Check size={14} className="text-[#BEE6CF]" /> Sudah Beli
+                    </button>
+                  </div>
                 </div>
               </div>
             )

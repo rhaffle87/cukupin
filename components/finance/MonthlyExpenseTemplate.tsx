@@ -3,7 +3,7 @@
 import React, { useMemo, useState, useRef } from 'react'
 import type { Transaction } from '@/lib/database.types'
 import { currency, shortCurrency } from '@/lib/finance'
-import { Download, FileSpreadsheet, Printer, X } from 'lucide-react'
+import { Download, FileSpreadsheet, X } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface MonthlyExpenseTemplateProps {
@@ -39,7 +39,7 @@ export function MonthlyExpenseTemplate({
     const month = parseInt(monthStr, 10) - 1
     const dateObj = new Date(year, month, 1)
 
-    const mName = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(dateObj).toUpperCase()
+    const mName = new Intl.DateTimeFormat('id-ID', { month: 'long' }).format(dateObj).toUpperCase()
     const yName = year.toString()
 
     const prefix = `${selectedMonth}-`
@@ -54,16 +54,16 @@ export function MonthlyExpenseTemplate({
       if (t.type === 'expense') {
         running += amt
       }
-      // Payment method: use explicit field if available, or extract from note, otherwise '-'
+      // Payment method: use explicit field if available, or extract from note, otherwise 'Tidak Ditentukan'
       let paymentMethod = (t as any).payment_method?.trim() || ''
-      if (!paymentMethod) {
+      if (!paymentMethod || paymentMethod === '-') {
         const noteLower = (t.note || '').toLowerCase()
-        if (noteLower.includes('cash') || noteLower.includes('tunai')) paymentMethod = 'Cash'
+        if (noteLower.includes('cash') || noteLower.includes('tunai')) paymentMethod = 'Tunai / Cash'
         else if (noteLower.includes('qris')) paymentMethod = 'QRIS'
-        else if (noteLower.includes('kartu') || noteLower.includes('card') || noteLower.includes('debit') || noteLower.includes('kredit')) paymentMethod = 'Debit/Credit'
+        else if (noteLower.includes('kartu') || noteLower.includes('card') || noteLower.includes('debit') || noteLower.includes('kredit')) paymentMethod = 'Debit/Kredit'
         else if (noteLower.includes('gopay') || noteLower.includes('ovo') || noteLower.includes('dana') || noteLower.includes('shopeepay')) paymentMethod = 'E-Wallet'
         else if (noteLower.includes('transfer') || noteLower.includes('bca') || noteLower.includes('mandiri') || noteLower.includes('bri') || noteLower.includes('bni')) paymentMethod = 'Transfer Bank'
-        else paymentMethod = '-'
+        else paymentMethod = 'Tidak Ditentukan'
       }
 
       return {
@@ -94,11 +94,6 @@ export function MonthlyExpenseTemplate({
       categoryTotals: catSorted,
     }
   }, [transactions, selectedMonth])
-
-  // Print function
-  const handlePrint = () => {
-    window.print()
-  }
 
   // Export CSV
   const handleExportCsv = () => {
@@ -216,26 +211,20 @@ export function MonthlyExpenseTemplate({
 
           <div className="flex items-center gap-2">
             <button
-              onClick={handlePrint}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-ink px-3.5 py-2 text-xs font-bold text-white shadow-sm hover:bg-[#2A4360] transition-colors"
-            >
-              <Printer size={15} /> Cetak / Print
-            </button>
-            <button
               onClick={handleExportPdf}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-line bg-card px-3.5 py-2 text-xs font-bold text-ink hover:bg-paper transition-colors"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-ink px-4 py-2 text-xs font-bold !text-white shadow-sm hover:bg-ink/90 active:scale-95 transition-all cursor-pointer"
             >
               <Download size={15} /> Download PDF
             </button>
             <button
               onClick={handleExportCsv}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-line bg-card px-3.5 py-2 text-xs font-bold text-ink hover:bg-paper transition-colors"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-line bg-card px-3.5 py-2 text-xs font-bold text-ink hover:bg-paper active:scale-95 transition-all cursor-pointer"
             >
               <FileSpreadsheet size={15} /> CSV
             </button>
             <button
               onClick={onClose}
-              className="rounded-xl p-2 text-muted hover:bg-line/50 hover:text-ink transition-colors ml-1"
+              className="rounded-xl p-2 text-muted hover:bg-line/50 hover:text-ink transition-colors ml-1 cursor-pointer"
               aria-label="Tutup modal"
             >
               <X size={18} />

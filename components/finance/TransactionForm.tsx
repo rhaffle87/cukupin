@@ -128,6 +128,27 @@ export function TransactionForm({ supabase, userId, initial, onDone }: Transacti
       ...parsed.data,
     }
 
+    if (userId === 'local-dev-user' || !supabase) {
+      const stored = localStorage.getItem('cukupin_local_transactions')
+      const localTxs: Transaction[] = stored ? JSON.parse(stored) : []
+      const savedTx: Transaction = {
+        id: initial?.id || 'tx-' + Date.now(),
+        created_at: initial?.created_at || new Date().toISOString(),
+        user_id: userId || 'local-dev-user',
+        ...parsed.data,
+      } as Transaction
+
+      const updated = initial
+        ? localTxs.map(t => (t.id === initial.id ? savedTx : t))
+        : [savedTx, ...localTxs]
+
+      localStorage.setItem('cukupin_local_transactions', JSON.stringify(updated))
+      setBusy(false)
+      toast.success(initial ? 'Transaksi diperbarui (Local).' : 'Transaksi dicatat (Local).')
+      onDone(savedTx)
+      return
+    }
+
     const result = initial
       ? await supabase.from('transactions').update(payload).eq('id', initial.id).select().single()
       : await supabase.from('transactions').insert(payload).select().single()

@@ -146,6 +146,27 @@ export function AuthScreen({ supabase }: AuthScreenProps) {
           >
             {mode === 'login' ? 'Belum punya akun? Daftar' : 'Sudah punya akun? Masuk'}
           </button>
+
+          {typeof window !== 'undefined' &&
+            (window.location.hostname === 'localhost' ||
+              window.location.hostname === '127.0.0.1' ||
+              window.location.hostname.endsWith('.local')) && (
+              <div className="mt-8 rounded-2xl border border-dashed border-green/40 bg-green-soft/20 p-4 text-center">
+                <p className="text-[11px] font-bold text-green uppercase tracking-wider">Mode Developer (Localhost)</p>
+                <p className="mt-1 text-xs text-muted">Akses instan ke dashboard tanpa perlu konfigurasi auth Supabase.</p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    localStorage.removeItem('cukupin_dev_logged_out')
+                    toast.success('Masuk sebagai developer lokal.')
+                    router.push('/dashboard')
+                  }}
+                  className="mt-3 inline-flex items-center justify-center gap-1.5 w-full rounded-xl bg-green px-4 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-[#327756] transition-all cursor-pointer"
+                >
+                  Masuk Instan (Mode Dev) <ArrowRight size={14} />
+                </button>
+              </div>
+            )}
         </div>
       </div>
       

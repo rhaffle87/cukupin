@@ -4,6 +4,7 @@ import { SupabaseClient } from '@supabase/supabase-js'
 import {
   Archive,
   CalendarDays,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
   Download,
@@ -11,6 +12,7 @@ import {
   Plus,
   Receipt,
   RotateCcw,
+  SlidersHorizontal,
   Sparkles,
   Upload,
   X,
@@ -23,6 +25,7 @@ import { TransactionRow } from './TransactionRow'
 import { TransactionForm } from './TransactionForm'
 import { MonthlyExpenseTemplate } from './MonthlyExpenseTemplate'
 import { CsvImportModal } from './CsvImportModal'
+import { RestoreJsonModal } from './RestoreJsonModal'
 import { useFinanceData } from '@/hooks/useFinanceData'
 import { currency, isoDate, monthBounds } from '@/lib/finance'
 
@@ -39,6 +42,8 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
   const [showForm, setShowForm] = useState(false)
   const [showExportTemplate, setShowExportTemplate] = useState(false)
   const [showCsvImport, setShowCsvImport] = useState(false)
+  const [showJsonRestore, setShowJsonRestore] = useState(false)
+  const [showManageMenu, setShowManageMenu] = useState(false)
   
   const [query, setQuery] = useState('')
   const [selectedTag, setSelectedTag] = useState('')
@@ -283,10 +288,19 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
   }
 
   async function remove(t: Transaction) {
-    if (!supabase || !confirm('Hapus transaksi ini?')) return
+    if (!confirm('Hapus transaksi ini?')) return
 
     const previous = data.transactions
     data.setTransactions(prev => prev.filter(item => item.id !== t.id))
+
+    if (userId === 'local-dev-user' || !supabase) {
+      const stored = localStorage.getItem('cukupin_local_transactions')
+      const localTxs: Transaction[] = stored ? JSON.parse(stored) : []
+      const updated = localTxs.filter(item => item.id !== t.id)
+      localStorage.setItem('cukupin_local_transactions', JSON.stringify(updated))
+      toast.success('Transaksi dihapus.')
+      return
+    }
 
     const result = await supabase.from('transactions').delete().eq('id', t.id)
     if (result.error) {
@@ -308,42 +322,64 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
         title="Transaksi"
         subtitle="Catat pengeluaran dan pemasukan harianmu biar gampang dipantau."
         action={
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-2">
             <button
               onClick={() => { setEditing(undefined); setShowForm(true) }}
-              className="inline-flex items-center gap-2 rounded-xl bg-ink px-4 py-2.5 text-xs font-bold !text-white shadow-sm transition-all hover:bg-ink/90 active:scale-95"
+              className="inline-flex items-center gap-2 rounded-xl bg-ink px-4 py-2.5 text-xs font-bold !text-white shadow-sm transition-all hover:bg-ink/90 active:scale-95 cursor-pointer"
             >
               <Plus size={16} /> Tambah catatan
             </button>
-            <div className="flex flex-wrap items-center gap-1.5">
+
+            {/* Consolidated Data Management Dropdown Menu */}
+            <div className="relative">
               <button
-                className="inline-flex items-center gap-1.5 rounded-xl border border-line bg-card px-3 py-2 text-xs font-semibold text-ink shadow-2xs transition-all hover:bg-paper"
-                onClick={() => setShowCsvImport(true)}
-                title="Impor data transaksi dari file CSV"
+                type="button"
+                onClick={() => setShowManageMenu(prev => !prev)}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-line bg-card px-3.5 py-2.5 text-xs font-semibold text-ink shadow-2xs transition-all hover:bg-paper cursor-pointer"
               >
-                <Upload size={14} className="text-green" /> Impor CSV
+                <SlidersHorizontal size={14} className="text-muted" />
+                <span>Kelola Data</span>
+                <ChevronDown size={14} className="text-muted" />
               </button>
-              <button
-                className="inline-flex items-center gap-1.5 rounded-xl border border-line bg-card px-3 py-2 text-xs font-semibold text-ink shadow-2xs transition-all hover:bg-paper"
-                onClick={exportFilteredCsv}
-                title="Unduh hasil filter ke CSV"
-              >
-                <Download size={14} /> Export CSV
-              </button>
-              <button
-                className="inline-flex items-center gap-1.5 rounded-xl border border-line bg-card px-3 py-2 text-xs font-semibold text-ink shadow-2xs transition-all hover:bg-paper"
-                onClick={() => setShowExportTemplate(true)}
-                title="Buka template ledger bulanan"
-              >
-                <FileSpreadsheet size={14} className="text-green" /> Format Bulanan
-              </button>
-              <button
-                className="inline-flex items-center gap-1.5 rounded-xl border border-line bg-card px-3 py-2 text-xs font-semibold text-ink shadow-2xs transition-all hover:bg-paper"
-                onClick={exportJsonBackup}
-                title="Unduh backup semua data Cukupin (JSON)"
-              >
-                <Archive size={14} /> Backup JSON
-              </button>
+
+              {showManageMenu && (
+                <>
+                  <div className="fixed inset-0 z-20" onClick={() => setShowManageMenu(false)} />
+                  <div className="absolute right-0 top-full mt-1.5 z-30 w-56 rounded-2xl border border-line bg-card p-1.5 shadow-xl animate-in fade-in-50 zoom-in-95">
+                    <button
+                      onClick={() => { setShowManageMenu(false); setShowCsvImport(true) }}
+                      className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-ink hover:bg-paper transition-colors text-left cursor-pointer"
+                    >
+                      <Upload size={14} className="text-green" /> Impor CSV
+                    </button>
+                    <button
+                      onClick={() => { setShowManageMenu(false); exportFilteredCsv() }}
+                      className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-ink hover:bg-paper transition-colors text-left cursor-pointer"
+                    >
+                      <Download size={14} className="text-muted" /> Export CSV (Hasil Filter)
+                    </button>
+                    <button
+                      onClick={() => { setShowManageMenu(false); setShowExportTemplate(true) }}
+                      className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-ink hover:bg-paper transition-colors text-left cursor-pointer"
+                    >
+                      <FileSpreadsheet size={14} className="text-green" /> Format Bulanan (Ledger)
+                    </button>
+                    <div className="my-1 border-t border-line/60" />
+                    <button
+                      onClick={() => { setShowManageMenu(false); exportJsonBackup() }}
+                      className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-ink hover:bg-paper transition-colors text-left cursor-pointer"
+                    >
+                      <Archive size={14} className="text-muted" /> Backup JSON Lengkap
+                    </button>
+                    <button
+                      onClick={() => { setShowManageMenu(false); setShowJsonRestore(true) }}
+                      className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-blue hover:bg-paper transition-colors text-left cursor-pointer"
+                    >
+                      <Upload size={14} className="text-blue" /> Pulihkan (Restore) JSON
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         }
@@ -462,35 +498,53 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
             <button
               type="button"
               onClick={() => setPreset('all')}
-              className={`rounded-lg px-2.5 py-1 text-[11px] font-semibold transition-colors ${!from && !to ? 'bg-ink !text-white' : 'bg-black/5 hover:bg-black/10 text-muted'}`}
+              className={`rounded-lg px-2.5 py-1 text-[11px] font-semibold transition-all cursor-pointer ${
+                !from && !to ? 'bg-ink !text-white' : 'bg-paper border border-line/60 text-muted hover:text-ink'
+              }`}
             >
               Semua
             </button>
             <button
               type="button"
               onClick={() => setPreset('today')}
-              className="rounded-lg bg-black/5 px-2.5 py-1 text-[11px] font-semibold text-muted hover:bg-black/10 hover:text-ink transition-colors"
+              className={`rounded-lg px-2.5 py-1 text-[11px] font-semibold transition-all cursor-pointer ${
+                from === isoDate(new Date()) && to === isoDate(new Date())
+                  ? 'bg-ink !text-white'
+                  : 'bg-paper border border-line/60 text-muted hover:text-ink'
+              }`}
             >
               Hari Ini
             </button>
             <button
               type="button"
               onClick={() => setPreset('month')}
-              className="rounded-lg bg-black/5 px-2.5 py-1 text-[11px] font-semibold text-muted hover:bg-black/10 hover:text-ink transition-colors"
+              className={`rounded-lg px-2.5 py-1 text-[11px] font-semibold transition-all cursor-pointer ${
+                from === monthBounds().start && to === monthBounds().end
+                  ? 'bg-ink !text-white'
+                  : 'bg-paper border border-line/60 text-muted hover:text-ink'
+              }`}
             >
               Bulan Ini
             </button>
             <button
               type="button"
               onClick={() => setPreset('7days')}
-              className="rounded-lg bg-black/5 px-2.5 py-1 text-[11px] font-semibold text-muted hover:bg-black/10 hover:text-ink transition-colors"
+              className={`rounded-lg px-2.5 py-1 text-[11px] font-semibold transition-all cursor-pointer ${
+                from === isoDate(new Date(Date.now() - 7 * 86400000)) && to === isoDate(new Date())
+                  ? 'bg-ink !text-white'
+                  : 'bg-paper border border-line/60 text-muted hover:text-ink'
+              }`}
             >
               7 Hari
             </button>
             <button
               type="button"
               onClick={() => setPreset('30days')}
-              className="rounded-lg bg-black/5 px-2.5 py-1 text-[11px] font-semibold text-muted hover:bg-black/10 hover:text-ink transition-colors"
+              className={`rounded-lg px-2.5 py-1 text-[11px] font-semibold transition-all cursor-pointer ${
+                from === isoDate(new Date(Date.now() - 30 * 86400000)) && to === isoDate(new Date())
+                  ? 'bg-ink !text-white'
+                  : 'bg-paper border border-line/60 text-muted hover:text-ink'
+              }`}
             >
               30 Hari
             </button>
@@ -499,7 +553,7 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
               <button
                 type="button"
                 onClick={resetFilters}
-                className="ml-2 inline-flex items-center gap-1 text-[11px] font-bold text-coral hover:underline"
+                className="ml-2 inline-flex items-center gap-1 text-[11px] font-bold text-coral hover:underline cursor-pointer"
               >
                 <RotateCcw size={12} /> Reset
               </button>
@@ -635,7 +689,7 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
           )}
         </section>
 
-        {/* Dynamic Financial Companion Card (Solves Image 3 static card) */}
+        {/* Dynamic Financial Companion Card (Solves Image 3 static card & Image 1 redundancy) */}
         <aside className="panel quick-note flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between">
@@ -643,17 +697,7 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
                 <Sparkles size={13} className="text-green" />
                 {currentInsight.badge}
               </span>
-              {companionInsights.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() => setTipIndex(prev => prev + 1)}
-                  className="rounded-lg bg-white/10 p-1 text-white/80 hover:bg-white/20 hover:text-white transition-colors cursor-pointer"
-                  title="Ganti tips wawasan"
-                  aria-label="Tips wawasan berikutnya"
-                >
-                  <ChevronRight size={14} />
-                </button>
-              )}
+              {/* Top-right next button removed per user request (redundant) */}
             </div>
             <h3 className="mt-6 font-display font-bold">{currentInsight.title}</h3>
             <p className="mt-3 text-xs leading-relaxed text-[#B9C6BD]">{currentInsight.body}</p>
@@ -665,9 +709,10 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
               <button
                 type="button"
                 onClick={() => setTipIndex(prev => prev + 1)}
-                className="font-bold text-[#BEE6CF] hover:underline cursor-pointer"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-white/10 px-3 py-1.5 text-xs font-bold text-[#BEE6CF] hover:bg-white/20 active:scale-95 transition-all cursor-pointer"
               >
-                Tips Lainnya →
+                <span>Tips Berikutnya</span>
+                <ChevronRight size={13} />
               </button>
             )}
           </div>
@@ -717,6 +762,15 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
           userId={userId}
           onClose={() => setShowCsvImport(false)}
           onSuccess={() => data.refresh()}
+        />
+      )}
+
+      {showJsonRestore && (
+        <RestoreJsonModal
+          supabase={supabase}
+          userId={userId}
+          onClose={() => setShowJsonRestore(false)}
+          onRestored={data.refresh}
         />
       )}
     </>

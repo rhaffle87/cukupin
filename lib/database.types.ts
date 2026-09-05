@@ -17,7 +17,7 @@ export type SavingGoal = {
   name: string
   target_amount: number
   current_amount: number
-  deadline: string | null
+  deadline?: string | null
   created_at: string
 }
 
@@ -26,7 +26,7 @@ export type WishlistItem = {
   user_id: string
   name: string
   price: number
-  url: string | null
+  url?: string | null
   priority: 'Low' | 'Medium' | 'High'
   created_at: string
 }

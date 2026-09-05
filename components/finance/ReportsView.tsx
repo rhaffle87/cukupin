@@ -8,6 +8,7 @@ import { TransactionRow } from './TransactionRow'
 import { useFinanceData } from '@/hooks/useFinanceData'
 import { budgetRule503020, comparator, currency, isoDate, monthBounds, paymentMethodBreakdown, totals } from '@/lib/finance'
 import { MonthlyExpenseTemplate } from './MonthlyExpenseTemplate'
+import { exportUnifiedPdf } from '@/lib/pdfExport'
 
 export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> }) {
   const [showTemplate, setShowTemplate] = useState(false)
@@ -42,32 +43,32 @@ export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> 
     setTo(isoDate(end))
   }
 
-  function exportPdf() {
-    import('jspdf').then(({ jsPDF }) => {
-      const doc = new jsPDF()
-      doc.setTextColor('#1E3249')
-      doc.setFontSize(24)
-      doc.text('cukupin', 20, 24)
-      doc.setFontSize(10)
-      doc.setTextColor('#718078')
-      doc.text(`Laporan ${from} s/d ${to}`, 20, 33)
-      doc.setFontSize(12)
-      doc.setTextColor('#1E3249')
-      doc.text(`Pemasukan: ${currency(stats.income)}`, 20, 52)
-      doc.text(`Pengeluaran: ${currency(stats.expense)}`, 20, 61)
-      doc.text(`Saldo akhir: ${currency(stats.balance)}`, 20, 70)
-      
-      let y = 88
-      filtered.slice(0, 22).forEach(t => {
-        doc.setTextColor('#1E3249')
-        doc.text(`${t.transaction_date}  ${t.category}`, 20, y)
-        doc.text(`${t.type === 'income' ? '+' : '-'} ${currency(Number(t.amount))}`, 145, y)
-        y += 8
+  async function exportPdf() {
+    if (!filtered.length) {
+      toast.error('Tidak ada transaksi pada periode ini untuk diekspor.')
+      return
+    }
+    const toastId = toast.loading('Menyiapkan laporan PDF resmi...')
+    try {
+      await exportUnifiedPdf({
+        title: 'LAPORAN KEUANGAN CUKUPIN',
+        periodLabel: `${from} s/d ${to}`,
+        transactions: filtered,
+        stats: {
+          income: stats.income,
+          expense: stats.expense,
+          balance: stats.balance,
+          count: filtered.length,
+        },
+        filename: `laporan-cukupin-${from}-sd-${to}.pdf`,
       })
-      
-      doc.save(`cukupin-${from}-${to}.pdf`)
-      toast.success('Laporan PDF diunduh.')
-    })
+      toast.dismiss(toastId)
+      toast.success('Laporan PDF resmi berhasil diunduh.')
+    } catch (err) {
+      toast.dismiss(toastId)
+      toast.error('Gagal membuat PDF.')
+      console.error(err)
+    }
   }
 
   return (

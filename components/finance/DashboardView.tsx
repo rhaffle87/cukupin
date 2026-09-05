@@ -106,7 +106,7 @@ export function DashboardView({ data, user }: DashboardViewProps) {
     const st = totals(tx)
     const bd = categoryBreakdown(tx)
     const safe = calculateDailySafeSpend(st.balance)
-    
+
     let ins = 'Mulai catat transaksi pertamamu biar pola pengeluaranmu terlihat jelas.'
     if (bd.length > 0 && st.expense > 0) {
       const top = bd[0]
@@ -139,10 +139,10 @@ export function DashboardView({ data, user }: DashboardViewProps) {
       <div className="relative mb-4 flex min-h-[240px] flex-col justify-between gap-6 overflow-hidden rounded-[24px] bg-ink p-7 text-white md:min-h-[230px] md:flex-row md:items-center md:px-11 md:py-8 animate-in slide-in-from-bottom-2 duration-500">
         {/* Subtle circular arc in background matching Image 2 */}
         <div className="pointer-events-none absolute -right-14 -top-20 h-[380px] w-[380px] rounded-full border border-white/[0.08] shadow-[0_0_0_28px_rgba(255,255,255,0.018),0_0_0_64px_rgba(255,255,255,0.012)]" />
-        
+
         <div className="relative z-10 max-w-[500px]">
           <p className="text-[10px] font-bold tracking-widest text-[#B9C6BD] uppercase">{monthLabel().toUpperCase()}</p>
-          <h1 className="mt-2.5 font-display text-[2.45rem] font-bold leading-tight tracking-tight md:text-[clamp(2.1rem,4vw,3.55rem)]">
+          <h1 className="mt-2.5 font-display text-[2.45rem] font-bold leading-tight tracking-tight">
             Halo, {firstName}.<br />
             <em className="text-[#BEE6CF] not-italic">Cek uangmu bulan ini.</em>
           </h1>
@@ -150,7 +150,7 @@ export function DashboardView({ data, user }: DashboardViewProps) {
             Pantau pengeluaran hari ini biar tetap santai sampai akhir bulan.
           </p>
         </div>
-        
+
         {/* Sleek compact balance card container matching Image 2 */}
         <div className="relative z-10 flex h-[140px] w-full max-w-[260px] flex-col justify-center rounded-[20px] border border-white/10 bg-white/[0.04] p-5 shadow-[0_10px_28px_rgba(0,0,0,0.2)] backdrop-blur-md md:mr-1">
           <div className="flex flex-col items-end text-right">
@@ -171,7 +171,7 @@ export function DashboardView({ data, user }: DashboardViewProps) {
           </div>
         </div>
       </div>
-      
+
       <div className="mb-4 grid grid-cols-3 gap-2 md:gap-3">
         <div className="animate-in slide-in-from-bottom-2 duration-500 delay-50 fill-mode-both">
           <StatCard label="Pemasukan" value={currency(stats.income)} tone="green" icon={ArrowDownLeft} note="Bulan ini" />
@@ -194,7 +194,7 @@ export function DashboardView({ data, user }: DashboardViewProps) {
           {insight}
         </p>
       </div>
-      
+
       <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-[minmax(0,1.55fr)_minmax(270px,0.85fr)]">
         <section className="min-h-[320px] rounded-[18px] border border-line bg-card p-5 shadow-[0_5px_20px_rgba(30,50,73,0.025)] md:min-h-[347px] md:p-6 animate-in slide-in-from-bottom-2 duration-500 delay-100 fill-mode-both">
           <div className="mb-5 flex items-start justify-between gap-3 md:mb-6">
@@ -232,7 +232,7 @@ export function DashboardView({ data, user }: DashboardViewProps) {
             />
           )}
         </section>
-        
+
         <section className="min-h-[320px] rounded-[18px] border border-line bg-card p-5 shadow-[0_5px_20px_rgba(30,50,73,0.025)] md:min-h-[347px] md:p-6 animate-in slide-in-from-bottom-2 duration-500 delay-100 fill-mode-both">
           <div className="mb-5 flex items-start justify-between gap-3 md:mb-6">
             <div>
