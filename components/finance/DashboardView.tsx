@@ -9,17 +9,18 @@ import { TransactionRow } from './TransactionRow'
 import { categoryBreakdown, currency, dailySeries, monthBounds, monthLabel, shortCurrency, totals } from '@/lib/finance'
 import { useFinanceData } from '@/hooks/useFinanceData'
 
-// Lazy load Recharts for performance optimization
-const ResponsiveContainer = dynamic(() => import('recharts').then(mod => mod.ResponsiveContainer), { ssr: false })
-const BarChart = dynamic(() => import('recharts').then(mod => mod.BarChart), { ssr: false })
-const Bar = dynamic(() => import('recharts').then(mod => mod.Bar), { ssr: false })
-const CartesianGrid = dynamic(() => import('recharts').then(mod => mod.CartesianGrid), { ssr: false })
-const XAxis = dynamic(() => import('recharts').then(mod => mod.XAxis), { ssr: false })
-const YAxis = dynamic(() => import('recharts').then(mod => mod.YAxis), { ssr: false })
-const Tooltip = dynamic(() => import('recharts').then(mod => mod.Tooltip), { ssr: false })
-const PieChart = dynamic(() => import('recharts').then(mod => mod.PieChart), { ssr: false })
-const Pie = dynamic(() => import('recharts').then(mod => mod.Pie), { ssr: false })
-const Cell = dynamic(() => import('recharts').then(mod => mod.Cell), { ssr: false })
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+  PieChart,
+  Pie,
+  Cell
+} from 'recharts'
 
 const colors = ['#3E8F68', '#315DCB', '#D98362', '#8E9A8B', '#1E3249']
 
@@ -199,6 +200,10 @@ export function DashboardView({ data, user }: DashboardViewProps) {
           {breakdown.length ? (
             <>
               <div className="relative h-[190px]">
+                <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
+                  <strong className="block font-display text-[18px] text-ink">{shortCurrency(stats.expense)}</strong>
+                  <small className="mt-1 block text-[10px] text-muted">total</small>
+                </div>
                 <ResponsiveContainer width="100%" height={190}>
                   <PieChart>
                     <Pie data={breakdown} innerRadius={58} outerRadius={78} paddingAngle={3} dataKey="value">
@@ -209,10 +214,6 @@ export function DashboardView({ data, user }: DashboardViewProps) {
                     <Tooltip formatter={(v: any) => currency(Number(v))} />
                   </PieChart>
                 </ResponsiveContainer>
-                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
-                  <strong className="block font-display text-[18px] text-ink">{shortCurrency(stats.expense)}</strong>
-                  <small className="mt-1 block text-[10px] text-muted">total</small>
-                </div>
               </div>
               <div className="mt-3 flex flex-col gap-2 border-t border-line pt-3">
                 {breakdown.slice(0, 4).map((item, i) => (
