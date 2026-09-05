@@ -7,6 +7,7 @@ export type Transaction = {
   category: string
   transaction_date: string
   note: string | null
+  payment_method?: string | null
   created_at: string
 }
 

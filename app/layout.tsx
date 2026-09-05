@@ -2,6 +2,7 @@ import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Toaster } from 'sonner'
 import { CookieConsent } from '@/components/ui/CookieConsent'
+import { RegisterServiceWorker } from '@/components/pwa/RegisterServiceWorker'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -59,6 +60,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <Toaster position="top-center" />
         {process.env.NODE_ENV === 'production' && <Analytics />}
         <CookieConsent />
+        <RegisterServiceWorker />
       </body>
     </html>
   )

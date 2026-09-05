@@ -49,6 +49,15 @@ function predictCategory(text: string): string | null {
   return null
 }
 
+const paymentMethods = [
+  { label: 'Pilih metode (opsional)', value: '' },
+  { label: 'QRIS', value: 'QRIS' },
+  { label: 'Tunai / Cash', value: 'Cash' },
+  { label: 'Transfer Bank', value: 'Transfer Bank' },
+  { label: 'Kartu Debit / Kredit', value: 'Debit/Credit' },
+  { label: 'E-Wallet', value: 'E-Wallet' },
+]
+
 export function TransactionForm({ supabase, userId, initial, onDone }: TransactionFormProps) {
   const [type, setType] = useState<'income' | 'expense'>(initial?.type || 'expense')
   const [amount, setAmount] = useState(initial ? String(initial.amount) : '')
@@ -56,6 +65,7 @@ export function TransactionForm({ supabase, userId, initial, onDone }: Transacti
   const [date, setDate] = useState(initial?.transaction_date || isoDate(new Date()))
   const [desc, setDesc] = useState(initial?.description || '')
   const [note, setNote] = useState(initial?.note || '')
+  const [paymentMethod, setPaymentMethod] = useState<string>((initial as any)?.payment_method || '')
   const [busy, setBusy] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
 
@@ -79,6 +89,11 @@ export function TransactionForm({ supabase, userId, initial, onDone }: Transacti
     }
   }
 
+  function appendTag(tag: string) {
+    if (note.includes(tag)) return
+    setNote(prev => (prev ? `${prev} ${tag}` : tag))
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault()
     setFormError(null)
@@ -96,6 +111,7 @@ export function TransactionForm({ supabase, userId, initial, onDone }: Transacti
       transaction_date: date,
       description: desc,
       note: note || null,
+      payment_method: paymentMethod || null,
     }
 
     const parsed = transactionSchema.safeParse(rawPayload)
@@ -223,10 +239,37 @@ export function TransactionForm({ supabase, userId, initial, onDone }: Transacti
         </div>
       </div>
 
-      <label>
-        Catatan <span className="optional">opsional</span>
-        <input value={note} onChange={e => setNote(e.target.value)} placeholder="Misal: Bayar pakai QRIS" />
-      </label>
+      <div className="form-grid">
+        <label>
+          Metode Bayar <span className="optional">opsional</span>
+          <select value={paymentMethod} onChange={e => setPaymentMethod(e.target.value)}>
+            {paymentMethods.map(p => (
+              <option key={p.value} value={p.value}>{p.label}</option>
+            ))}
+          </select>
+        </label>
+        <div>
+          <label>
+            Catatan <span className="optional">opsional</span>
+            <input value={note} onChange={e => setNote(e.target.value)} placeholder="Misal: Sarapan bareng tim" />
+          </label>
+        </div>
+      </div>
+
+      {/* Quick Tag Suggestion Chips */}
+      <div className="flex flex-wrap items-center gap-1.5 -mt-1 mb-2">
+        <span className="text-[10px] font-bold text-muted uppercase">Tag:</span>
+        {['#rutin', '#jajan', '#liburan', '#keluarga', '#kantor', '#urgent'].map(t => (
+          <button
+            key={t}
+            type="button"
+            onClick={() => appendTag(t)}
+            className="rounded-md border border-line bg-paper px-2 py-0.5 text-[10px] font-semibold text-muted hover:border-green hover:bg-green-soft hover:text-green transition-colors"
+          >
+            {t}
+          </button>
+        ))}
+      </div>
 
       {formError && (
         <p className="text-xs font-bold text-coral bg-coral/10 p-2.5 rounded-xl text-center">

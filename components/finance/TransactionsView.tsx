@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react'
 import type { Transaction } from '@/lib/database.types'
 import { SupabaseClient } from '@supabase/supabase-js'
-import { CalendarDays, FileSpreadsheet, Plus, Receipt, X } from 'lucide-react'
+import { CalendarDays, Download, FileSpreadsheet, Plus, Receipt, Upload, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { EmptyState } from '@/components/ui/EmptyState'
@@ -9,7 +9,9 @@ import { Modal } from '@/components/ui/Modal'
 import { TransactionRow } from './TransactionRow'
 import { TransactionForm } from './TransactionForm'
 import { MonthlyExpenseTemplate } from './MonthlyExpenseTemplate'
+import { CsvImportModal } from './CsvImportModal'
 import { useFinanceData } from '@/hooks/useFinanceData'
+import { currency, isoDate, monthBounds } from '@/lib/finance'
 
 const categories = ['Food', 'Transport', 'Bills', 'Shopping', 'Health', 'Salary', 'Freelance', 'Other']
 
@@ -23,8 +25,10 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
   const [editing, setEditing] = useState<Transaction | undefined>()
   const [showForm, setShowForm] = useState(false)
   const [showExportTemplate, setShowExportTemplate] = useState(false)
+  const [showCsvImport, setShowCsvImport] = useState(false)
   
   const [query, setQuery] = useState('')
+  const [selectedTag, setSelectedTag] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('Semua kategori')
   const [typeFilter, setTypeFilter] = useState('Semua tipe')
   const [from, setFrom] = useState('')
@@ -40,21 +44,95 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
     return () => window.removeEventListener('cukupin:open-new-tx', handleOpenNew)
   }, [])
 
+  const allTags = useMemo(() => {
+    const tagSet = new Set<string>()
+    for (const t of data.transactions) {
+      const text = `${t.description || ''} ${t.note || ''}`
+      const matches = text.match(/#[\w-]+/g)
+      if (matches) {
+        for (const m of matches) tagSet.add(m)
+      }
+    }
+    return Array.from(tagSet)
+  }, [data.transactions])
+
   const filtered = useMemo(() => {
     return data.transactions.filter(t => {
-      const matchesQuery = !query || 
-        t.category.toLowerCase().includes(query.toLowerCase()) || 
-        (t.description || '').toLowerCase().includes(query.toLowerCase()) || 
-        (t.note || '').toLowerCase().includes(query.toLowerCase())
+      const text = `${t.description || ''} ${t.note || ''} ${t.category}`.toLowerCase()
+      const matchesQuery = !query || text.includes(query.toLowerCase())
+      const matchesTag = !selectedTag || `${t.description || ''} ${t.note || ''}`.includes(selectedTag)
       
       const matchesCategory = categoryFilter === 'Semua kategori' || t.category === categoryFilter
       const matchesType = typeFilter === 'Semua tipe' || t.type === typeFilter
       const matchesFrom = !from || t.transaction_date >= from
       const matchesTo = !to || t.transaction_date <= to
       
-      return matchesQuery && matchesCategory && matchesType && matchesFrom && matchesTo
+      return matchesQuery && matchesTag && matchesCategory && matchesType && matchesFrom && matchesTo
     })
-  }, [data.transactions, query, categoryFilter, typeFilter, from, to])
+  }, [data.transactions, query, selectedTag, categoryFilter, typeFilter, from, to])
+
+  const filteredStats = useMemo(() => {
+    let income = 0
+    let expense = 0
+    for (const t of filtered) {
+      if (t.type === 'income') income += Number(t.amount)
+      else expense += Number(t.amount)
+    }
+    return { income, expense, balance: income - expense }
+  }, [filtered])
+
+  function setPreset(preset: 'all' | 'today' | 'month' | '7days' | '30days') {
+    const today = new Date()
+    const todayStr = isoDate(today)
+    if (preset === 'all') {
+      setFrom('')
+      setTo('')
+    } else if (preset === 'today') {
+      setFrom(todayStr)
+      setTo(todayStr)
+    } else if (preset === 'month') {
+      const bounds = monthBounds()
+      setFrom(bounds.start)
+      setTo(bounds.end)
+    } else if (preset === '7days') {
+      const d = new Date()
+      d.setDate(d.getDate() - 7)
+      setFrom(isoDate(d))
+      setTo(todayStr)
+    } else if (preset === '30days') {
+      const d = new Date()
+      d.setDate(d.getDate() - 30)
+      setFrom(isoDate(d))
+      setTo(todayStr)
+    }
+  }
+
+  function exportFilteredCsv() {
+    if (!filtered.length) {
+      toast.error('Tidak ada transaksi untuk diekspor')
+      return
+    }
+    const headers = ['Tanggal', 'Tipe', 'Kategori', 'Deskripsi', 'Jumlah', 'Metode Pembayaran', 'Catatan']
+    const rows = filtered.map(t => [
+      t.transaction_date,
+      t.type === 'income' ? 'Pemasukan' : 'Pengeluaran',
+      `"${t.category.replace(/"/g, '""')}"`,
+      `"${(t.description || '').replace(/"/g, '""')}"`,
+      t.amount,
+      `"${(t.payment_method || '-').replace(/"/g, '""')}"`,
+      `"${(t.note || '').replace(/"/g, '""')}"`,
+    ])
+    const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n')
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.setAttribute('href', url)
+    link.setAttribute('download', `transaksi-cukupin-${new Date().toISOString().slice(0, 10)}.csv`)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    toast.success('File CSV berhasil diunduh.')
+  }
 
   async function remove(t: Transaction) {
     if (!supabase || !confirm('Hapus transaksi ini?')) return
@@ -81,12 +159,18 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
         title="Transaksi"
         subtitle="Catat pengeluaran dan pemasukan harianmu biar gampang dipantau."
         action={
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <button className="button secondary" onClick={() => setShowCsvImport(true)} title="Impor data transaksi dari file CSV">
+              <Upload size={15} /> Impor CSV
+            </button>
+            <button className="button secondary" onClick={exportFilteredCsv} title="Unduh hasil filter ke CSV">
+              <Download size={15} /> Export CSV
+            </button>
             <button className="button secondary" onClick={() => setShowExportTemplate(true)}>
-              <FileSpreadsheet size={16} /> Format Bulanan
+              <FileSpreadsheet size={15} /> Format Bulanan
             </button>
             <button className="button primary" onClick={() => { setEditing(undefined); setShowForm(true) }}>
-              <Plus size={16} /> Tambah catatan
+              <Plus size={15} /> Tambah catatan
             </button>
           </div>
         }
@@ -137,10 +221,79 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
             <input type="date" value={to} onChange={e => setTo(e.target.value)} />
           </label>
         </div>
-        {(query || categoryFilter !== 'Semua kategori' || typeFilter !== 'Semua tipe' || from || to) && (
+
+        {/* Quick Date Presets */}
+        <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-line/50">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-muted mr-1">Preset:</span>
+          <button
+            type="button"
+            onClick={() => setPreset('all')}
+            className={`rounded-lg px-2.5 py-1 text-[11px] font-semibold transition-colors ${!from && !to ? 'bg-ink !text-white' : 'bg-black/5 hover:bg-black/10 text-muted'}`}
+          >
+            Semua
+          </button>
+          <button
+            type="button"
+            onClick={() => setPreset('today')}
+            className="rounded-lg bg-black/5 px-2.5 py-1 text-[11px] font-semibold text-muted hover:bg-black/10 hover:text-ink transition-colors"
+          >
+            Hari Ini
+          </button>
+          <button
+            type="button"
+            onClick={() => setPreset('month')}
+            className="rounded-lg bg-black/5 px-2.5 py-1 text-[11px] font-semibold text-muted hover:bg-black/10 hover:text-ink transition-colors"
+          >
+            Bulan Ini
+          </button>
+          <button
+            type="button"
+            onClick={() => setPreset('7days')}
+            className="rounded-lg bg-black/5 px-2.5 py-1 text-[11px] font-semibold text-muted hover:bg-black/10 hover:text-ink transition-colors"
+          >
+            7 Hari
+          </button>
+          <button
+            type="button"
+            onClick={() => setPreset('30days')}
+            className="rounded-lg bg-black/5 px-2.5 py-1 text-[11px] font-semibold text-muted hover:bg-black/10 hover:text-ink transition-colors"
+          >
+            30 Hari
+          </button>
+        </div>
+
+        {/* Custom Tag Filter Pills */}
+        {allTags.length > 0 && (
+          <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-line/50">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-muted mr-1">Tag:</span>
+            <button
+              type="button"
+              onClick={() => setSelectedTag('')}
+              className={`rounded-lg px-2.5 py-0.5 text-[10px] font-bold transition-colors ${
+                !selectedTag ? 'bg-ink !text-white' : 'bg-black/5 hover:bg-black/10 text-muted'
+              }`}
+            >
+              Semua Tag
+            </button>
+            {allTags.map(tag => (
+              <button
+                key={tag}
+                type="button"
+                onClick={() => setSelectedTag(selectedTag === tag ? '' : tag)}
+                className={`rounded-lg px-2.5 py-0.5 text-[10px] font-bold transition-colors ${
+                  selectedTag === tag ? 'bg-green text-white' : 'bg-green-soft text-green hover:bg-green/20'
+                }`}
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {(query || selectedTag || categoryFilter !== 'Semua kategori' || typeFilter !== 'Semua tipe' || from || to) && (
           <button
             className="reset-filters"
-            onClick={() => { setQuery(''); setCategoryFilter('Semua kategori'); setTypeFilter('Semua tipe'); setFrom(''); setTo('') }}
+            onClick={() => { setQuery(''); setSelectedTag(''); setCategoryFilter('Semua kategori'); setTypeFilter('Semua tipe'); setFrom(''); setTo('') }}
           >
             Reset filter
           </button>
@@ -158,6 +311,26 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
               <CalendarDays size={13} /> {data.transactions.length} total
             </span>
           </div>
+
+          {/* Filtered KPI Summary Strip */}
+          {filtered.length > 0 && (
+            <div className="mb-4 grid grid-cols-3 gap-2 rounded-xl bg-paper/80 p-3 border border-line/60 text-xs shadow-2xs">
+              <div>
+                <span className="block text-[10px] font-bold text-muted uppercase">Pemasukan</span>
+                <strong className="text-green font-display text-sm">{currency(filteredStats.income)}</strong>
+              </div>
+              <div>
+                <span className="block text-[10px] font-bold text-muted uppercase">Pengeluaran</span>
+                <strong className="text-coral font-display text-sm">{currency(filteredStats.expense)}</strong>
+              </div>
+              <div>
+                <span className="block text-[10px] font-bold text-muted uppercase">Net Sisa</span>
+                <strong className={`font-display text-sm ${filteredStats.balance >= 0 ? 'text-blue' : 'text-coral'}`}>
+                  {currency(filteredStats.balance)}
+                </strong>
+              </div>
+            </div>
+          )}
           {filtered.length ? (
             <div className="transaction-list">
               {filtered.map(t => (
@@ -225,6 +398,15 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
         <MonthlyExpenseTemplate
           transactions={data.transactions}
           onClose={() => setShowExportTemplate(false)}
+        />
+      )}
+
+      {showCsvImport && (
+        <CsvImportModal
+          supabase={supabase}
+          userId={userId}
+          onClose={() => setShowCsvImport(false)}
+          onSuccess={() => data.refresh()}
         />
       )}
     </>

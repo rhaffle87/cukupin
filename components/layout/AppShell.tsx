@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 import { Brand } from '@/components/ui/Brand'
-import { FileText, Home as HomeIcon, LogOut, Menu, Receipt, ShoppingBag, Sparkles, Target, X } from 'lucide-react'
+import { Bell, FileText, Home as HomeIcon, LogOut, Menu, Plus, Receipt, ShoppingBag, Sparkles, Target, X } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { DailyReminderModal } from '@/components/finance/DailyReminderModal'
 
 interface AppShellProps {
   children: React.ReactNode
@@ -20,6 +21,7 @@ const navItems = [
 
 export function AppShell({ children, user, onSignOut }: AppShellProps) {
   const [open, setOpen] = useState(false)
+  const [showReminderModal, setShowReminderModal] = useState(false)
   const pathname = usePathname()
 
   React.useEffect(() => {
@@ -91,11 +93,26 @@ export function AppShell({ children, user, onSignOut }: AppShellProps) {
             </div>
           </div>
           <button 
+            className="mb-1 flex w-full items-center gap-3 rounded-xl px-3 py-2 text-xs font-semibold text-muted transition-colors hover:bg-black/5 hover:text-ink" 
+            onClick={() => setShowReminderModal(true)}
+          >
+            <Bell size={15} className="text-green" /> Pengingat Harian
+          </button>
+          <button 
             className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-coral transition-colors hover:bg-coral/10 hover:text-coral-dark" 
             onClick={onSignOut}
           >
             <LogOut size={16} /> Keluar
           </button>
+
+          {/* Desktop Keyboard Shortcut Badge */}
+          <div className="mt-3 hidden md:flex items-center justify-between rounded-xl bg-black/[0.03] px-3 py-2 text-[10px] text-muted">
+            <span>Pintasan</span>
+            <div className="flex items-center gap-1.5 font-medium">
+              <kbd className="rounded border border-line bg-card px-1.5 py-0.5 font-mono font-bold text-ink shadow-2xs">N</kbd>
+              <span>Catat baru</span>
+            </div>
+          </div>
         </div>
       </aside>
       
@@ -112,8 +129,13 @@ export function AppShell({ children, user, onSignOut }: AppShellProps) {
             <Menu size={20} />
           </button>
           <Brand compact />
-          <button className="flex h-11 w-11 items-center justify-center rounded-full text-ink transition-colors hover:bg-black/5" aria-label="Fitur AI">
-            <Sparkles size={18} />
+          <button 
+            className="flex h-10 w-10 items-center justify-center rounded-xl bg-ink !text-white shadow-xs transition-transform active:scale-95" 
+            onClick={() => window.dispatchEvent(new CustomEvent('cukupin:open-new-tx'))}
+            aria-label="Tambah catatan baru"
+            title="Tambah catatan baru"
+          >
+            <Plus size={18} />
           </button>
         </header>
         
@@ -150,6 +172,10 @@ export function AppShell({ children, user, onSignOut }: AppShellProps) {
           className="fixed inset-0 z-30 bg-ink/20 backdrop-blur-sm transition-opacity md:hidden" 
           onClick={() => setOpen(false)} 
         />
+      )}
+
+      {showReminderModal && (
+        <DailyReminderModal onClose={() => setShowReminderModal(false)} />
       )}
     </div>
   )

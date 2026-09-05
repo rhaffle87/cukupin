@@ -54,14 +54,17 @@ export function MonthlyExpenseTemplate({
       if (t.type === 'expense') {
         running += amt
       }
-      // Infer payment method from note or category if available
-      let paymentMethod = 'Bank Transfer'
-      const noteLower = (t.note || '').toLowerCase()
-      if (noteLower.includes('cash') || noteLower.includes('tunai')) paymentMethod = 'Cash'
-      else if (noteLower.includes('qris')) paymentMethod = 'QRIS'
-      else if (noteLower.includes('kartu') || noteLower.includes('card')) paymentMethod = 'Debit/Credit'
-      else if (noteLower.includes('gopay') || noteLower.includes('ovo') || noteLower.includes('dana')) paymentMethod = 'E-Wallet'
-      else if (t.category === 'Food' || t.category === 'Shopping') paymentMethod = 'QRIS / Cash'
+      // Payment method: use explicit field if available, or extract from note, otherwise '-'
+      let paymentMethod = (t as any).payment_method?.trim() || ''
+      if (!paymentMethod) {
+        const noteLower = (t.note || '').toLowerCase()
+        if (noteLower.includes('cash') || noteLower.includes('tunai')) paymentMethod = 'Cash'
+        else if (noteLower.includes('qris')) paymentMethod = 'QRIS'
+        else if (noteLower.includes('kartu') || noteLower.includes('card') || noteLower.includes('debit') || noteLower.includes('kredit')) paymentMethod = 'Debit/Credit'
+        else if (noteLower.includes('gopay') || noteLower.includes('ovo') || noteLower.includes('dana') || noteLower.includes('shopeepay')) paymentMethod = 'E-Wallet'
+        else if (noteLower.includes('transfer') || noteLower.includes('bca') || noteLower.includes('mandiri') || noteLower.includes('bri') || noteLower.includes('bni')) paymentMethod = 'Transfer Bank'
+        else paymentMethod = '-'
+      }
 
       return {
         ...t,

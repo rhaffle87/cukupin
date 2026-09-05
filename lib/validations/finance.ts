@@ -16,6 +16,7 @@ export const transactionSchema = z.object({
     .max(120, 'Deskripsi maksimal 120 karakter')
     .trim(),
   note: z.string().max(300, 'Catatan maksimal 300 karakter').optional().nullable(),
+  payment_method: z.string().max(50, 'Metode pembayaran maksimal 50 karakter').optional().nullable(),
 })
 
 export type TransactionInput = z.infer<typeof transactionSchema>

@@ -16,9 +16,17 @@ export function TransactionRow({ transaction: t, onDelete, onEdit }: Transaction
         {t.type === 'income' ? <ArrowDownLeft size={16} /> : <ArrowUpRight size={16} />}
       </div>
       <div className="transaction-meta">
-        <strong>{t.description || t.note || t.category}</strong>
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <strong>{t.description || t.note || t.category}</strong>
+          {(t.note || '').match(/#[\w-]+/g)?.map(tag => (
+            <span key={tag} className="rounded-md bg-green-soft px-1.5 py-0.2 text-[9px] font-bold text-green">
+              {tag}
+            </span>
+          ))}
+        </div>
         <span>
           {t.category} · {new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short' }).format(new Date(t.transaction_date))}
+          {t.payment_method && ` · ${t.payment_method}`}
         </span>
       </div>
       <strong className={`transaction-amount ${t.type}`}>
