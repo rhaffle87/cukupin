@@ -1,47 +1,98 @@
-export default function Page() {
-  return (
-    <main
-      style={{
-        colorScheme: 'light dark',
-        position: 'relative',
-        display: 'flex',
-        minHeight: '100vh',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'light-dark(#fff, #000)',
-        color: 'light-dark(#000, #fff)',
-      }}
-    >
-      <svg
-        aria-hidden="true"
-        style={{ width: 80, height: 80 }}
-        width={80}
-        height={80}
-        fill="none"
-        viewBox="0 0 20 20"
-        xmlns="http://www.w3.org/2000/svg"
-        stroke="currentColor"
-        strokeWidth="0.5"
-      >
-        <path
-          d="M14.2 14.2H17V6.9375C17 4.76288 15.2371 3 13.0625 3H5.8V5.8M14.2 14.2V7.79063L7.79062 14.2H14.2ZM14.2 14.2V17H6.9375C4.76288 17 3 15.2371 3 13.0625V5.8H5.8M5.8 5.8V12.2313L12.2313 5.8H5.8Z"
-          strokeLinejoin="round"
-        />
-      </svg>
-      <p
-        style={{
-          position: 'absolute',
-          left: '50%',
-          top: 'calc(50% + 56px)',
-          transform: 'translateX(-50%)',
-          whiteSpace: 'nowrap',
-          fontSize: '14px',
-          fontWeight: 500,
-          color: 'light-dark(#71717a, #a1a1aa)',
-        }}
-      >
-        Your v0 generation will show here.
-      </p>
-    </main>
-  )
+'use client'
+
+import { useEffect, useMemo, useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
+import type { Transaction, SavingGoal, WishlistItem } from '@/lib/database.types'
+import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { ArrowDownLeft, ArrowUpRight, BarChart3, Check, ChevronRight, CircleDollarSign, Download, Gift, LayoutDashboard, LogOut, Menu, Plus, Search, Settings, ShoppingBag, Sparkles, Target, Wallet, X } from 'lucide-react'
+import { jsPDF } from 'jspdf'
+
+const categories = ['Food', 'Transport', 'Bills', 'Shopping', 'Health', 'Salary', 'Freelance', 'Other']
+const currency = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 })
+const formatMoney = (value: number) => currency.format(value).replace('IDR', 'Rp')
+const monthName = new Intl.DateTimeFormat('en-US', { month: 'long' })
+const today = new Date().toISOString().slice(0, 10)
+const chartColors = ['#296b57', '#d7973f', '#bb5c4b', '#6f8f85', '#9b8b76']
+type View = 'dashboard' | 'transactions' | 'reports' | 'goals' | 'wishlist'
+
+export default function Home() {
+  const supabase = useMemo(() => createClient(), [])
+  const [user, setUser] = useState<{ id: string; email?: string } | null>(null)
+  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login')
+  const [authEmail, setAuthEmail] = useState('')
+  const [authPassword, setAuthPassword] = useState('')
+  const [authError, setAuthError] = useState('')
+  const [authBusy, setAuthBusy] = useState(false)
+  const [view, setView] = useState<View>('dashboard')
+  const [transactions, setTransactions] = useState<Transaction[]>([])
+  const [goals, setGoals] = useState<SavingGoal[]>([])
+  const [wishlist, setWishlist] = useState<WishlistItem[]>([])
+  const [search, setSearch] = useState('')
+  const [showTransactionForm, setShowTransactionForm] = useState(false)
+  const [notice, setNotice] = useState('')
+
+  const loadData = async (id: string) => {
+    const [tx, goalRows, wishRows] = await Promise.all([
+      supabase.from('transactions').select('*').eq('user_id', id).order('transaction_date', { ascending: false }),
+      supabase.from('saving_goals').select('*').eq('user_id', id).order('created_at', { ascending: false }),
+      supabase.from('wishlist').select('*').eq('user_id', id).order('created_at', { ascending: false }),
+    ])
+    if (tx.data) setTransactions(tx.data as Transaction[])
+    if (goalRows.data) setGoals(goalRows.data as SavingGoal[])
+    if (wishRows.data) setWishlist(wishRows.data as WishlistItem[])
+  }
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => { if (data.user) { setUser(data.user); loadData(data.user.id) } })
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => setUser(session?.user ?? null))
+    return () => listener.subscription.unsubscribe()
+  }, [supabase])
+
+  useEffect(() => {
+    if (!user) return
+    const channel = supabase.channel('transactions-live').on('postgres_changes', { event: '*', schema: 'public', table: 'transactions', filter: `user_id=eq.${user.id}` }, () => loadData(user.id)).subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [supabase, user])
+
+  const handleAuth = async (event: React.FormEvent) => {
+    event.preventDefault(); setAuthBusy(true); setAuthError('')
+    const result = authMode === 'login' ? await supabase.auth.signInWithPassword({ email: authEmail, password: authPassword }) : await supabase.auth.signUp({ email: authEmail, password: authPassword })
+    setAuthBusy(false)
+    if (result.error) setAuthError(result.error.message)
+    else if (authMode === 'signup') setNotice('Check your email to confirm your account.')
+  }
+
+  const signOut = async () => { await supabase.auth.signOut(); setUser(null); setTransactions([]); setGoals([]); setWishlist([]) }
+  if (!user) return <AuthScreen mode={authMode} setMode={setAuthMode} email={authEmail} setEmail={setAuthEmail} password={authPassword} setPassword={setAuthPassword} error={authError} busy={authBusy} onSubmit={handleAuth} notice={notice} />
+
+  const now = new Date()
+  const currentMonth = now.toISOString().slice(0, 7)
+  const previousMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString().slice(0, 7)
+  const monthTransactions = transactions.filter((tx) => tx.transaction_date.startsWith(currentMonth))
+  const previousTransactions = transactions.filter((tx) => tx.transaction_date.startsWith(previousMonth))
+  const income = monthTransactions.filter((tx) => tx.type === 'income').reduce((sum, tx) => sum + Number(tx.amount), 0)
+  const expenses = monthTransactions.filter((tx) => tx.type === 'expense').reduce((sum, tx) => sum + Number(tx.amount), 0)
+  const balance = income - expenses
+  const prevExpenses = previousTransactions.filter((tx) => tx.type === 'expense').reduce((sum, tx) => sum + Number(tx.amount), 0)
+  const trend = prevExpenses ? Math.round(((expenses - prevExpenses) / prevExpenses) * 100) : 0
+  const visibleTransactions = transactions.filter((tx) => `${tx.description} ${tx.category}`.toLowerCase().includes(search.toLowerCase()))
+  const daily = Array.from({ length: 30 }, (_, index) => { const date = new Date(now); date.setDate(now.getDate() - (29 - index)); const key = date.toISOString().slice(0, 10); return { day: date.getDate(), amount: transactions.filter((tx) => tx.transaction_date === key && tx.type === 'expense').reduce((sum, tx) => sum + Number(tx.amount), 0) } })
+  const categoryData = categories.map((category) => ({ name: category, value: monthTransactions.filter((tx) => tx.category === category && tx.type === 'expense').reduce((sum, tx) => sum + Number(tx.amount), 0) })).filter((item) => item.value > 0)
+  const addTransaction = async (data: { type: 'income' | 'expense'; description: string; amount: number; category: string; transaction_date: string; note: string }) => { if (!data.description || !data.amount || data.amount <= 0) return setNotice('Enter a description and a positive amount.'); const { error } = await supabase.from('transactions').insert({ ...data, user_id: user.id }); if (error) setNotice(error.message); else { setShowTransactionForm(false); setNotice('Transaction added.'); await loadData(user.id) } }
+  const deleteTransaction = async (id: string) => { await supabase.from('transactions').delete().eq('id', id).eq('user_id', user.id); await loadData(user.id) }
+  const exportReport = () => { const doc = new jsPDF(); doc.setFontSize(20); doc.text('Cukupin monthly report', 16, 20); doc.setFontSize(11); doc.text(`${monthName.format(now)} ${now.getFullYear()}`, 16, 29); doc.text(`Income: ${formatMoney(income)}`, 16, 42); doc.text(`Expenses: ${formatMoney(expenses)}`, 16, 50); doc.text(`Balance: ${formatMoney(balance)}`, 16, 58); visibleTransactions.slice(0, 25).forEach((tx, index) => doc.text(`${tx.transaction_date}  ${tx.description}  ${formatMoney(Number(tx.amount))}`, 16, 72 + index * 7)); doc.save('cukupin-report.pdf') }
+
+  return <div className="min-h-screen bg-background text-foreground"><aside className="sidebar"><div className="brand"><span className="brand-mark"><CircleDollarSign /></span><span>cukupin</span></div><nav className="nav-list">{([['dashboard', LayoutDashboard, 'Dashboard'], ['transactions', ArrowDownLeft, 'Transactions'], ['reports', BarChart3, 'Reports'], ['goals', Target, 'Saving Goals'], ['wishlist', Gift, 'Wishlist']] as const).map(([key, Icon, label]) => <button key={key} onClick={() => setView(key)} className={`nav-item ${view === key ? 'active' : ''}`}><Icon /><span>{label}</span></button>)}</nav><div className="sidebar-bottom"><button className="nav-item"><Settings /><span>Settings</span></button><button onClick={signOut} className="nav-item"><LogOut /><span>Sign out</span></button><div className="profile"><div className="avatar">{(user.email?.[0] || 'U').toUpperCase()}</div><div><strong>{user.email?.split('@')[0]}</strong><small>Personal account</small></div></div></div></aside><main className="main-content"><header className="topbar"><div><p className="eyebrow">{monthName.format(now)} {now.getFullYear()}</p><h1>{view === 'dashboard' ? 'Good morning.' : view[0].toUpperCase() + view.slice(1)}</h1></div><div className="top-actions"><button className="icon-button"><Search /></button><button className="icon-button"><Menu /></button></div></header>{notice && <div className="notice"><Check /> {notice}<button onClick={() => setNotice('')}><X /></button></div>}{view === 'dashboard' && <Dashboard income={income} expenses={expenses} balance={balance} trend={trend} daily={daily} categoryData={categoryData} transactions={visibleTransactions.slice(0, 5)} onAdd={() => setShowTransactionForm(true)} onDelete={deleteTransaction} onViewAll={() => setView('transactions')} goals={goals} />}{view === 'transactions' && <Transactions transactions={visibleTransactions} search={search} setSearch={setSearch} onAdd={() => setShowTransactionForm(true)} onDelete={deleteTransaction} />}{view === 'reports' && <Reports transactions={transactions} onExport={exportReport} />}{view === 'goals' && <Goals goals={goals} userId={user.id} reload={() => loadData(user.id)} supabase={supabase} />}{view === 'wishlist' && <Wishlist items={wishlist} userId={user.id} reload={() => loadData(user.id)} supabase={supabase} />}<nav className="mobile-nav">{([['dashboard', LayoutDashboard, 'Home'], ['transactions', ArrowDownLeft, 'Activity'], ['reports', BarChart3, 'Reports'], ['goals', Target, 'Goals'], ['wishlist', Gift, 'Wish']] as const).map(([key, Icon, label]) => <button key={key} onClick={() => setView(key)} className={view === key ? 'active' : ''}><Icon /><span>{label}</span></button>)}</nav></main>{showTransactionForm && <TransactionForm onClose={() => setShowTransactionForm(false)} onSave={addTransaction} />}</div>
 }
+
+function AuthScreen({ mode, setMode, email, setEmail, password, setPassword, error, busy, onSubmit, notice }: any) { return <main className="auth-page"><div className="auth-card"><div className="brand"><span className="brand-mark"><CircleDollarSign /></span><span>cukupin</span></div><div className="auth-copy"><p className="eyebrow">Your money, in focus</p><h1>Build a calmer relationship with money.</h1><p>Track every rupiah, spot your patterns, and make room for the things that matter.</p></div><form onSubmit={onSubmit} className="auth-form"><label>Email<input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="you@example.com" /></label><label>Password<input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} placeholder="At least 6 characters" /></label>{error && <p className="form-error">{error}</p>}{notice && <p className="success-text">{notice}</p>}<button className="primary-button" disabled={busy}>{busy ? 'Working...' : mode === 'login' ? 'Sign in' : 'Create account'}</button></form><button className="switch-auth" onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}>{mode === 'login' ? 'New to cukupin? Create an account' : 'Already have an account? Sign in'}</button></div><div className="auth-aside"><Sparkles /><p>“The best budget is one you can actually understand.”</p><small>Simple tools for everyday clarity.</small></div></main> }
+
+function Dashboard({ income, expenses, balance, trend, daily, categoryData, transactions, onAdd, onDelete, onViewAll, goals }: any) { return <div className="content-stack"><section className="welcome-row"><div><p className="muted">Here’s your financial pulse.</p><h2>Make it count.</h2></div><button className="primary-button" onClick={onAdd}><Plus /> Add transaction</button></section><section className="metric-grid"><Metric label="Balance this month" value={formatMoney(balance)} icon={<Wallet />} tone="green" helper="Available after expenses" /><Metric label="Total income" value={formatMoney(income)} icon={<ArrowDownLeft />} tone="blue" helper="Money in" /><Metric label="Total expenses" value={formatMoney(expenses)} icon={<ArrowUpRight />} tone="orange" helper={`${Math.abs(trend)}% vs last month`} /></section><section className="dashboard-grid"><div className="panel chart-panel"><div className="panel-heading"><div><p className="eyebrow">Spending overview</p><h3>Last 30 days</h3></div><span className="legend"><i /> Expenses</span></div><ResponsiveContainer width="100%" height={235}><AreaChart data={daily}><defs><linearGradient id="spendFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#296b57" stopOpacity={0.22} /><stop offset="100%" stopColor="#296b57" stopOpacity={0} /></linearGradient></defs><CartesianGrid vertical={false} stroke="#e4e7e3" /><XAxis dataKey="day" tickLine={false} axisLine={false} tick={{ fontSize: 11 }} /><YAxis hide /><Tooltip formatter={(value) => formatMoney(Number(value))} /><Area type="monotone" dataKey="amount" stroke="#296b57" strokeWidth={2.5} fill="url(#spendFill)" /></AreaChart></ResponsiveContainer></div><div className="panel"><div className="panel-heading"><div><p className="eyebrow">Where it goes</p><h3>Categories</h3></div></div>{categoryData.length ? <div className="category-wrap"><ResponsiveContainer width="46%" height={150}><PieChart><Pie data={categoryData} dataKey="value" innerRadius={43} outerRadius={65} paddingAngle={3}>{categoryData.map((_: any, i: number) => <Cell key={i} fill={chartColors[i % chartColors.length]} />)}</Pie><Tooltip formatter={(value) => formatMoney(Number(value))} /></PieChart></ResponsiveContainer><div className="category-list">{categoryData.slice(0, 4).map((item: any, i: number) => <div className="category-line" key={item.name}><span><i style={{ background: chartColors[i % chartColors.length] }} />{item.name}</span><strong>{formatMoney(item.value)}</strong></div>)}</div></div> : <Empty text="Add expenses to see your categories." />}</div></section><section className="dashboard-grid lower-grid"><div className="panel"><div className="panel-heading"><div><p className="eyebrow">Recent activity</p><h3>Latest transactions</h3></div><button className="text-button" onClick={onViewAll}>View all <ChevronRight /></button></div><TransactionList transactions={transactions} onDelete={onDelete} /></div><div className="panel goals-panel"><div className="panel-heading"><div><p className="eyebrow">Your intentions</p><h3>Saving goals</h3></div></div>{goals.length ? goals.slice(0, 3).map((goal: SavingGoal) => <div className="goal-row" key={goal.id}><div className="goal-icon"><Target /></div><div className="goal-info"><div><strong>{goal.name}</strong><span>{formatMoney(Number(goal.current_amount))} / {formatMoney(Number(goal.target_amount))}</span></div><div className="progress"><i style={{ width: `${Math.min(100, Number(goal.current_amount) / Number(goal.target_amount) * 100)}%` }} /></div></div></div>) : <Empty text="Create your first saving goal." />}</div></section></div> }
+function Metric({ label, value, icon, tone, helper }: any) { return <div className="metric-card"><div className={`metric-icon ${tone}`}>{icon}</div><p className="muted">{label}</p><strong>{value}</strong><small>{helper}</small></div> }
+function Empty({ text }: { text: string }) { return <div className="empty">{text}</div> }
+function TransactionList({ transactions, onDelete }: any) { return <div className="transaction-list">{transactions.length ? transactions.map((tx: Transaction) => <div className="transaction-row" key={tx.id}><div className={`transaction-icon ${tx.type}`} >{tx.type === 'income' ? <ArrowDownLeft /> : <ArrowUpRight />}</div><div className="transaction-meta"><strong>{tx.description}</strong><span>{tx.category} · {tx.transaction_date}</span></div><div className={tx.type === 'income' ? 'amount income' : 'amount'}>{tx.type === 'income' ? '+' : '-'}{formatMoney(Number(tx.amount))}</div><button className="delete-button" onClick={() => onDelete(tx.id)} aria-label={`Delete ${tx.description}`}><X /></button></div>) : <Empty text="No transactions yet." />}</div> }
+function Transactions({ transactions, search, setSearch, onAdd, onDelete }: any) { return <div className="content-stack"><div className="page-heading"><div><p className="eyebrow">Your money trail</p><h2>Transactions</h2></div><button className="primary-button" onClick={onAdd}><Plus /> Add transaction</button></div><div className="panel"><div className="search-row"><div className="search-field"><Search /><input placeholder="Search transactions" value={search} onChange={(e) => setSearch(e.target.value)} /></div><span className="muted">{transactions.length} records</span></div><TransactionList transactions={transactions} onDelete={onDelete} /></div></div> }
+function Reports({ transactions, onExport }: any) { const byCategory = categories.map((name) => ({ name, income: transactions.filter((tx: Transaction) => tx.category === name && tx.type === 'income').reduce((s: number, tx: Transaction) => s + Number(tx.amount), 0), expense: transactions.filter((tx: Transaction) => tx.category === name && tx.type === 'expense').reduce((s: number, tx: Transaction) => s + Number(tx.amount), 0) })).filter((x) => x.income || x.expense); return <div className="content-stack"><div className="page-heading"><div><p className="eyebrow">Understand the pattern</p><h2>Reports</h2></div><button className="secondary-button" onClick={onExport}><Download /> Export PDF</button></div><div className="panel"><div className="panel-heading"><div><h3>Income vs expenses</h3><p className="muted">All recorded transactions</p></div></div><ResponsiveContainer width="100%" height={300}><BarChart data={byCategory}><CartesianGrid vertical={false} stroke="#e4e7e3" /><XAxis dataKey="name" tickLine={false} axisLine={false} /><YAxis tickLine={false} axisLine={false} tickFormatter={(v) => `${Math.round(v / 1000)}k`} /><Tooltip formatter={(value) => formatMoney(Number(value))} /><Bar dataKey="income" fill="#6f8f85" radius={[4, 4, 0, 0]} /><Bar dataKey="expense" fill="#bb5c4b" radius={[4, 4, 0, 0]} /></BarChart></ResponsiveContainer></div></div> }
+function TransactionForm({ onClose, onSave }: any) { const [type, setType] = useState<'expense' | 'income'>('expense'); const [form, setForm] = useState({ description: '', amount: '', category: 'Food', transaction_date: today, note: '' }); return <div className="modal-backdrop"><div className="modal"><div className="modal-heading"><div><p className="eyebrow">New record</p><h3>Add transaction</h3></div><button className="icon-button" onClick={onClose}><X /></button></div><div className="toggle"><button className={type === 'expense' ? 'selected' : ''} onClick={() => setType('expense')}>Expense</button><button className={type === 'income' ? 'selected' : ''} onClick={() => setType('income')}>Income</button></div><div className="form-grid"><label>Description<input autoFocus value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="e.g. Morning coffee" /></label><label>Amount<input type="number" min="1" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} placeholder="0" /></label><label>Category<select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>{categories.map((category) => <option key={category}>{category}</option>)}</select></label><label>Date<input type="date" value={form.transaction_date} onChange={(e) => setForm({ ...form, transaction_date: e.target.value })} /></label><label className="full">Note <textarea value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} placeholder="Optional note" /></label></div><button className="primary-button full-button" onClick={() => onSave({ ...form, type, amount: Number(form.amount) })}><Check /> Save transaction</button></div></div> }
+function Goals({ goals, userId, reload, supabase }: any) { const [name, setName] = useState(''); const [target, setTarget] = useState(''); const [current, setCurrent] = useState(''); const save = async () => { if (!name || !Number(target)) return; await supabase.from('saving_goals').insert({ user_id: userId, name, target_amount: Number(target), current_amount: Number(current) || 0 }); setName(''); setTarget(''); setCurrent(''); reload() }; return <div className="content-stack"><div className="page-heading"><div><p className="eyebrow">Give your money a direction</p><h2>Saving goals</h2></div></div><div className="panel quick-form"><label>Goal name<input value={name} onChange={(e) => setName(e.target.value)} placeholder="Emergency fund" /></label><label>Target<input type="number" value={target} onChange={(e) => setTarget(e.target.value)} placeholder="5000000" /></label><label>Saved so far<input type="number" value={current} onChange={(e) => setCurrent(e.target.value)} placeholder="0" /></label><button className="primary-button" onClick={save}><Plus /> Add goal</button></div><div className="goal-card-grid">{goals.length ? goals.map((goal: SavingGoal) => <div className="panel goal-card" key={goal.id}><div className="goal-card-top"><div className="goal-icon"><Target /></div><button className="delete-button" onClick={async () => { await supabase.from('saving_goals').delete().eq('id', goal.id).eq('user_id', userId); reload() }}><X /></button></div><h3>{goal.name}</h3><strong>{formatMoney(Number(goal.current_amount))}</strong><span className="muted">of {formatMoney(Number(goal.target_amount))}</span><div className="progress"><i style={{ width: `${Math.min(100, Number(goal.current_amount) / Number(goal.target_amount) * 100)}%` }} /></div></div>) : <Empty text="No saving goals yet." />}</div></div> }
+function Wishlist({ items, userId, reload, supabase }: any) { const [name, setName] = useState(''); const [price, setPrice] = useState(''); const [priority, setPriority] = useState<'Low' | 'Medium' | 'High'>('Medium'); const save = async () => { if (!name || !Number(price)) return; await supabase.from('wishlist').insert({ user_id: userId, name, price: Number(price), priority }); setName(''); setPrice(''); reload() }; return <div className="content-stack"><div className="page-heading"><div><p className="eyebrow">Spend with intention</p><h2>Wishlist</h2></div></div><div className="panel quick-form"><label>Item<input value={name} onChange={(e) => setName(e.target.value)} placeholder="Noise cancelling headphones" /></label><label>Price<input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="2500000" /></label><label>Priority<select value={priority} onChange={(e) => setPriority(e.target.value as any)}><option>Low</option><option>Medium</option><option>High</option></select></label><button className="primary-button" onClick={save}><Plus /> Add item</button></div><div className="wishlist-grid">{items.length ? items.map((item: WishlistItem) => <div className="panel wish-card" key={item.id}><div className="wish-card-top"><div className="wish-icon"><ShoppingBag /></div><button className="delete-button" onClick={async () => { await supabase.from('wishlist').delete().eq('id', item.id).eq('user_id', userId); reload() }}><X /></button></div><h3>{item.name}</h3><strong>{formatMoney(Number(item.price))}</strong><span className={`priority ${item.priority.toLowerCase()}`}>{item.priority} priority</span></div>) : <Empty text="Your wishlist is empty." />}</div></div> }
