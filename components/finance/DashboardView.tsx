@@ -151,8 +151,7 @@ export function DashboardView({ data, user }: DashboardViewProps) {
           </p>
         </div>
 
-        {/* Sleek compact balance card container matching Image 2 */}
-        <div className="relative z-10 flex h-[140px] w-full max-w-[260px] flex-col justify-center rounded-[20px] border border-white/10 bg-white/[0.04] p-5 shadow-[0_10px_28px_rgba(0,0,0,0.2)] backdrop-blur-md md:mr-1">
+        <div className="relative z-10 flex h-[200px] w-full max-w-[260px] flex-col justify-center rounded-[20px] border border-white/10 bg-white/[0.04] p-5 shadow-[0_10px_28px_rgba(0,0,0,0.2)] backdrop-blur-md md:mr-1">
           <div className="flex flex-col items-end text-right">
             <span className="block text-[10px] font-bold tracking-widest text-[#B9C6BD] uppercase">
               {stats.balance >= 0 ? 'MASIH AMAN' : 'PERLU DICEK'}

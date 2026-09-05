@@ -4,7 +4,7 @@ import { SupabaseClient } from '@supabase/supabase-js'
 import { ArrowDownLeft, ArrowUpRight } from 'lucide-react'
 import { isoDate } from '@/lib/finance'
 import { toast } from 'sonner'
-import { sanitizeNumericInput, transactionSchema } from '@/lib/validations/finance'
+import { formatRupiahInput, sanitizeNumericInput, transactionSchema } from '@/lib/validations/finance'
 
 interface TransactionFormProps {
   supabase: SupabaseClient | null
@@ -60,7 +60,7 @@ const paymentMethods = [
 
 export function TransactionForm({ supabase, userId, initial, onDone }: TransactionFormProps) {
   const [type, setType] = useState<'income' | 'expense'>(initial?.type || 'expense')
-  const [amount, setAmount] = useState(initial ? String(initial.amount) : '')
+  const [amount, setAmount] = useState(initial ? formatRupiahInput(initial.amount) : '')
   const [category, setCategory] = useState(initial?.category || categories[0])
   const [date, setDate] = useState(initial?.transaction_date || isoDate(new Date()))
   const [desc, setDesc] = useState(initial?.description || '')
@@ -71,7 +71,7 @@ export function TransactionForm({ supabase, userId, initial, onDone }: Transacti
 
   function addPreset(val: number) {
     const current = sanitizeNumericInput(amount)
-    setAmount(String(current + val))
+    setAmount(formatRupiahInput(current + val))
     setFormError(null)
   }
 
@@ -185,8 +185,8 @@ export function TransactionForm({ supabase, userId, initial, onDone }: Transacti
         </button>
       </div>
 
-      <label>
-        Nama / Deskripsi
+      <label className="flex flex-col gap-1.5">
+        <span className="text-xs font-bold text-ink">Nama / Deskripsi</span>
         <input
           required
           value={desc}
@@ -196,16 +196,19 @@ export function TransactionForm({ supabase, userId, initial, onDone }: Transacti
         />
       </label>
 
-      <label>
-        Jumlah (Rp)
+      <label className="flex flex-col gap-1.5">
+        <span className="text-xs font-bold text-ink">Jumlah (Rp)</span>
         <input
           type="text"
           inputMode="numeric"
           required
           value={amount}
-          onChange={e => { setAmount(e.target.value); setFormError(null) }}
+          onChange={e => {
+            setAmount(formatRupiahInput(e.target.value))
+            setFormError(null)
+          }}
           placeholder="0"
-          className="focus-visible:ring-2 focus-visible:ring-green focus-visible:outline-none font-semibold"
+          className="focus-visible:ring-2 focus-visible:ring-green focus-visible:outline-none font-semibold font-mono"
         />
       </label>
 
@@ -216,65 +219,69 @@ export function TransactionForm({ supabase, userId, initial, onDone }: Transacti
             key={q.value}
             type="button"
             onClick={() => addPreset(q.value)}
-            className="rounded-lg border border-line bg-paper px-2 py-1 text-[11px] font-bold text-muted hover:border-green/50 hover:bg-green-soft hover:text-green transition-all active:scale-95"
+            className="rounded-lg border border-line bg-paper px-2 py-1 text-[11px] font-bold text-muted hover:border-green/50 hover:bg-green-soft hover:text-green transition-all active:scale-95 cursor-pointer"
           >
             {q.label}
           </button>
         ))}
       </div>
 
-      <div className="form-grid">
-        <label>
-          Kategori
+      <div className="grid grid-cols-2 gap-3 items-start">
+        <label className="flex flex-col gap-1.5">
+          <span className="text-xs font-bold text-ink">Kategori</span>
           <select value={category} onChange={e => setCategory(e.target.value)}>
             {categories.map(c => (
               <option key={c}>{c}</option>
             ))}
           </select>
         </label>
-        <div>
-          <label>
-            Tanggal
-            <input type="date" required value={date} onChange={e => setDate(e.target.value)} />
-          </label>
-          <div className="flex gap-1.5 mt-1.5">
-            <button
-              type="button"
-              onClick={() => setDate(todayStr)}
-              className={`rounded-md px-2 py-0.5 text-[10px] font-bold transition-colors ${
-                date === todayStr ? 'bg-green text-white' : 'bg-line/60 text-muted hover:text-ink'
-              }`}
-            >
-              Hari ini
-            </button>
-            <button
-              type="button"
-              onClick={() => setDate(yesterdayStr)}
-              className={`rounded-md px-2 py-0.5 text-[10px] font-bold transition-colors ${
-                date === yesterdayStr ? 'bg-green text-white' : 'bg-line/60 text-muted hover:text-ink'
-              }`}
-            >
-              Kemarin
-            </button>
+        <label className="flex flex-col gap-1.5">
+          <div className="flex items-center justify-between text-xs font-bold text-ink">
+            <span>Tanggal</span>
+            <div className="flex gap-1">
+              <button
+                type="button"
+                onClick={() => setDate(todayStr)}
+                className={`rounded px-1.5 py-0.5 text-[10px] font-bold transition-colors cursor-pointer ${
+                  date === todayStr ? 'bg-green text-white' : 'bg-line/70 text-muted hover:text-ink'
+                }`}
+              >
+                Hari ini
+              </button>
+              <button
+                type="button"
+                onClick={() => setDate(yesterdayStr)}
+                className={`rounded px-1.5 py-0.5 text-[10px] font-bold transition-colors cursor-pointer ${
+                  date === yesterdayStr ? 'bg-green text-white' : 'bg-line/70 text-muted hover:text-ink'
+                }`}
+              >
+                Kemarin
+              </button>
+            </div>
           </div>
-        </div>
+          <input type="date" required value={date} onChange={e => setDate(e.target.value)} />
+        </label>
       </div>
 
-      <div className="form-grid">
-        <label>
-          Metode Bayar <span className="optional">opsional</span>
+      <div className="grid grid-cols-2 gap-3 items-start">
+        <label className="flex flex-col gap-1.5">
+          <div className="flex items-center gap-1.5 text-xs font-bold text-ink">
+            <span>Metode Bayar</span>
+            <span className="text-[11px] font-normal text-muted">(opsional)</span>
+          </div>
           <select value={paymentMethod} onChange={e => setPaymentMethod(e.target.value)}>
             {paymentMethods.map(p => (
               <option key={p.value} value={p.value}>{p.label}</option>
             ))}
           </select>
         </label>
-        <div>
-          <label>
-            Catatan <span className="optional">opsional</span>
-            <input value={note} onChange={e => setNote(e.target.value)} placeholder="Misal: Sarapan bareng tim" />
-          </label>
-        </div>
+        <label className="flex flex-col gap-1.5">
+          <div className="flex items-center gap-1.5 text-xs font-bold text-ink">
+            <span>Catatan</span>
+            <span className="text-[11px] font-normal text-muted">(opsional)</span>
+          </div>
+          <input value={note} onChange={e => setNote(e.target.value)} placeholder="Misal: Sarapan bareng tim" />
+        </label>
       </div>
 
       {/* Quick Tag Suggestion Chips */}

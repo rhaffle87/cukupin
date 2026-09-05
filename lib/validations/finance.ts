@@ -53,7 +53,18 @@ export type WishlistInput = z.infer<typeof wishlistSchema>
 /**
  * Sanitizes numeric strings by removing currency prefixes, commas, and dots.
  */
-export function sanitizeNumericInput(value: string): number {
-  const cleaned = value.replace(/[^0-9]/g, '')
+export function sanitizeNumericInput(value: string | number): number {
+  const cleaned = String(value).replace(/[^0-9]/g, '')
   return cleaned ? parseInt(cleaned, 10) : 0
+}
+
+/**
+ * Formats a raw number or string with Indonesian thousand dots (e.g. 2500000 -> 2.500.000).
+ * Strips all non-digit characters automatically so users cannot type invalid letters like 'p'.
+ */
+export function formatRupiahInput(value: string | number | null | undefined): string {
+  if (value === null || value === undefined || value === '') return ''
+  const digitsOnly = String(value).replace(/\D/g, '')
+  if (!digitsOnly) return ''
+  return new Intl.NumberFormat('id-ID').format(parseInt(digitsOnly, 10))
 }

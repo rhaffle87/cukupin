@@ -20,7 +20,7 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { Modal } from '@/components/ui/Modal'
 import { useFinanceData } from '@/hooks/useFinanceData'
 import { currency, isoDate, totals } from '@/lib/finance'
-import { sanitizeNumericInput, wishlistSchema } from '@/lib/validations/finance'
+import { formatRupiahInput, sanitizeNumericInput, wishlistSchema } from '@/lib/validations/finance'
 import confetti from 'canvas-confetti'
 
 interface WishlistViewProps {
@@ -103,7 +103,7 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
       url: null,
       priority: parsed.data.priority,
     }).select().single()
-    
+
     if (r.error) {
       toast.error(r.error.message)
       data.setWishlist(previous)
@@ -145,7 +145,7 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
 
       try {
         confetti({ particleCount: 75, spread: 65, origin: { y: 0.65 }, colors: ['#3E8F68', '#BEE6CF', '#315DCB'] })
-      } catch {}
+      } catch { }
       toast.success(`Hore! "${item.name}" berhasil dibeli dan dicatat ke pengeluaran.`)
       return
     }
@@ -184,7 +184,7 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
     toast.success(`Hore! "${item.name}" berhasil dibeli dan dicatat ke pengeluaran.`)
     data.refresh()
   }
-  
+
   async function remove(item: WishlistItem) {
     if (!confirm('Hapus barang ini dari wishlist?')) return
     const previous = data.wishlist
@@ -197,7 +197,7 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
       toast.success('Item dihapus dari wishlist.')
       return
     }
-    
+
     const r = await supabase.from('wishlist').delete().eq('id', item.id)
     if (r.error) {
       toast.error(r.error.message)
@@ -228,7 +228,7 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
       data.setGoals(updated)
       try {
         confetti({ particleCount: 60, spread: 50, origin: { y: 0.7 } })
-      } catch {}
+      } catch { }
       toast.success(`Target tabungan untuk "${item.name}" berhasil dibuat! Cek di menu Tabungan.`)
       return
     }
@@ -245,7 +245,7 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
     } else {
       try {
         confetti({ particleCount: 60, spread: 50, origin: { y: 0.7 } })
-      } catch {}
+      } catch { }
       toast.success(`Target tabungan untuk "${item.name}" berhasil dibuat! Cek di menu Tabungan.`)
       if (res.data) {
         data.setGoals(prev => [res.data as SavingGoal, ...prev])
@@ -325,45 +325,40 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
           <button
             type="button"
             onClick={() => setFilterTab('all')}
-            className={`rounded-xl px-3 py-1.5 text-xs font-bold transition-colors ${
-              filterTab === 'all' ? 'bg-ink !text-white shadow-2xs' : 'bg-paper text-muted hover:bg-black/5 hover:text-ink'
-            }`}
+            className={`rounded-xl px-3 py-1.5 text-xs font-bold transition-colors ${filterTab === 'all' ? 'bg-ink !text-white shadow-2xs' : 'bg-paper text-muted hover:bg-black/5 hover:text-ink'
+              }`}
           >
             Semua ({data.wishlist.length})
           </button>
           <button
             type="button"
             onClick={() => setFilterTab('affordable')}
-            className={`rounded-xl px-3 py-1.5 text-xs font-bold transition-colors ${
-              filterTab === 'affordable' ? 'bg-green !text-white shadow-2xs' : 'bg-green-soft text-green hover:bg-green/20'
-            }`}
+            className={`rounded-xl px-3 py-1.5 text-xs font-bold transition-colors ${filterTab === 'affordable' ? 'bg-green !text-white shadow-2xs' : 'bg-green-soft text-green hover:bg-green/20'
+              }`}
           >
             Siap Dibeli ({affordableCount})
           </button>
           <button
             type="button"
             onClick={() => setFilterTab('High')}
-            className={`rounded-xl px-3 py-1.5 text-xs font-bold transition-colors ${
-              filterTab === 'High' ? 'bg-coral !text-white shadow-2xs' : 'bg-coral-soft text-coral hover:bg-coral/20'
-            }`}
+            className={`rounded-xl px-3 py-1.5 text-xs font-bold transition-colors ${filterTab === 'High' ? 'bg-coral !text-white shadow-2xs' : 'bg-coral-soft text-coral hover:bg-coral/20'
+              }`}
           >
             Prioritas Tinggi
           </button>
           <button
             type="button"
             onClick={() => setFilterTab('Medium')}
-            className={`rounded-xl px-3 py-1.5 text-xs font-bold transition-colors ${
-              filterTab === 'Medium' ? 'bg-blue !text-white shadow-2xs' : 'bg-blue-soft text-blue hover:bg-blue/20'
-            }`}
+            className={`rounded-xl px-3 py-1.5 text-xs font-bold transition-colors ${filterTab === 'Medium' ? 'bg-blue !text-white shadow-2xs' : 'bg-blue-soft text-blue hover:bg-blue/20'
+              }`}
           >
             Sedang
           </button>
           <button
             type="button"
             onClick={() => setFilterTab('Low')}
-            className={`rounded-xl px-3 py-1.5 text-xs font-bold transition-colors ${
-              filterTab === 'Low' ? 'bg-ink !text-white shadow-2xs' : 'bg-paper text-muted hover:bg-black/5 hover:text-ink'
-            }`}
+            className={`rounded-xl px-3 py-1.5 text-xs font-bold transition-colors ${filterTab === 'Low' ? 'bg-ink !text-white shadow-2xs' : 'bg-paper text-muted hover:bg-black/5 hover:text-ink'
+              }`}
           >
             Rendah
           </button>
@@ -391,13 +386,12 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
                   {/* Top: Priority Pill + Delete Button */}
                   <div className="flex items-center justify-between mb-3">
                     <span
-                      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold ${
-                        item.priority === 'High'
+                      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold ${item.priority === 'High'
                           ? 'bg-coral-soft text-coral'
                           : item.priority === 'Medium'
-                          ? 'bg-blue-soft text-blue'
-                          : 'bg-black/5 text-muted'
-                      }`}
+                            ? 'bg-blue-soft text-blue'
+                            : 'bg-black/5 text-muted'
+                        }`}
                     >
                       Prioritas {item.priority === 'High' ? 'Tinggi' : item.priority === 'Medium' ? 'Sedang' : 'Rendah'}
                     </span>
@@ -454,7 +448,7 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
                       onClick={() => checkout(item)}
                       className="inline-flex items-center gap-1.5 rounded-xl bg-ink px-3.5 py-2 text-xs font-bold !text-white shadow-2xs hover:bg-ink/90 active:scale-95 transition-all cursor-pointer"
                     >
-                      <Check size={14} className="text-[#BEE6CF]" /> Sudah Beli
+                      <Check size={14} className="text-[#BEE6CF]" /> Terbeli
                     </button>
                   </div>
                 </div>
@@ -500,9 +494,9 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
                 inputMode="numeric"
                 required
                 value={price}
-                onChange={e => setPrice(e.target.value)}
+                onChange={e => setPrice(formatRupiahInput(e.target.value))}
                 placeholder="Contoh: 750.000"
-                className="rounded-xl border border-line bg-paper px-3.5 py-2.5 text-xs text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
+                className="rounded-xl border border-line bg-paper px-3.5 py-2.5 text-xs text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green font-mono font-medium"
               />
             </label>
 
@@ -512,27 +506,24 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
                 <button
                   type="button"
                   onClick={() => setPriority('High')}
-                  className={`rounded-xl border py-2 text-xs font-bold transition-all ${
-                    priority === 'High' ? 'border-coral bg-coral text-white shadow-2xs' : 'border-line bg-paper text-muted hover:bg-coral-soft'
-                  }`}
+                  className={`rounded-xl border py-2 text-xs font-bold transition-all ${priority === 'High' ? 'border-coral bg-coral text-white shadow-2xs' : 'border-line bg-paper text-muted hover:bg-coral-soft'
+                    }`}
                 >
                   Tinggi
                 </button>
                 <button
                   type="button"
                   onClick={() => setPriority('Medium')}
-                  className={`rounded-xl border py-2 text-xs font-bold transition-all ${
-                    priority === 'Medium' ? 'border-blue bg-blue text-white shadow-2xs' : 'border-line bg-paper text-muted hover:bg-blue-soft'
-                  }`}
+                  className={`rounded-xl border py-2 text-xs font-bold transition-all ${priority === 'Medium' ? 'border-blue bg-blue text-white shadow-2xs' : 'border-line bg-paper text-muted hover:bg-blue-soft'
+                    }`}
                 >
                   Sedang
                 </button>
                 <button
                   type="button"
                   onClick={() => setPriority('Low')}
-                  className={`rounded-xl border py-2 text-xs font-bold transition-all ${
-                    priority === 'Low' ? 'border-ink bg-ink text-white shadow-2xs' : 'border-line bg-paper text-muted hover:bg-black/5'
-                  }`}
+                  className={`rounded-xl border py-2 text-xs font-bold transition-all ${priority === 'Low' ? 'border-ink bg-ink text-white shadow-2xs' : 'border-line bg-paper text-muted hover:bg-black/5'
+                    }`}
                 >
                   Rendah
                 </button>

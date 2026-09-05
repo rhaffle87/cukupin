@@ -340,12 +340,15 @@ export function MonthlyExpenseTemplate({
                   ))}
               </tbody>
               <tfoot>
-                <tr className="border-t-2 border-[#111827] bg-[#F3F4F6] font-bold text-[11px]">
-                  <td colSpan={4} className="border-r border-[#111827] px-3 py-2 text-right uppercase tracking-wider">
+                <tr className="border-t-2 border-[#111827] bg-[#F3F4F6] font-bold text-[11px] align-middle">
+                  <td colSpan={4} className="border-r border-[#111827] px-3 py-2.5 text-right uppercase tracking-wider text-[10px]">
                     Total Pengeluaran Bulan Ini
                   </td>
-                  <td colSpan={2} className="px-3 py-2 text-right font-mono text-[13px] text-[#DC2626]">
+                  <td className="border-r border-[#111827] px-3 py-2.5 text-right font-mono text-[12px] text-[#DC2626]">
                     {currency(stats.expense)}
+                  </td>
+                  <td className="px-3 py-2.5 text-right font-mono text-[12px] text-[#111827]">
+                    {currency(runningTransactions.length > 0 ? runningTransactions[runningTransactions.length - 1].runningTotal : 0)}
                   </td>
                 </tr>
               </tfoot>

@@ -23,7 +23,7 @@ export function Modal({ title, onClose, children }: ModalProps) {
             <X size={18} />
           </button>
         </div>
-        <div className="overflow-y-auto pr-1 -mr-1 flex-1 overscroll-contain">
+        <div className="overflow-y-auto pr-2.5 pl-0.5 flex-1 overscroll-contain custom-scrollbar">
           {children}
         </div>
       </div>

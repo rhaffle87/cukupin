@@ -10,7 +10,7 @@ import { Modal } from '@/components/ui/Modal'
 import { useFinanceData } from '@/hooks/useFinanceData'
 import { currency, isoDate, shortCurrency } from '@/lib/finance'
 import confetti from 'canvas-confetti'
-import { goalSchema, sanitizeNumericInput } from '@/lib/validations/finance'
+import { formatRupiahInput, goalSchema, sanitizeNumericInput } from '@/lib/validations/finance'
 
 interface GoalsViewProps {
   supabase: SupabaseClient | null
@@ -453,7 +453,15 @@ export function GoalsView({ supabase, data, userId }: GoalsViewProps) {
             </label>
             <label>
               Nominal yang ditargetkan (Rp)
-              <input type="number" required min="1" value={target} onChange={e => setTarget(e.target.value)} placeholder="0" />
+              <input
+                type="text"
+                inputMode="numeric"
+                required
+                value={target}
+                onChange={e => setTarget(formatRupiahInput(e.target.value))}
+                placeholder="0"
+                className="font-mono font-medium"
+              />
             </label>
             <button className="button primary wide cursor-pointer mt-2">Simpan target</button>
           </form>
@@ -468,7 +476,15 @@ export function GoalsView({ supabase, data, userId }: GoalsViewProps) {
             </p>
             <label>
               Nominal tambahan (Rp)
-              <input type="number" required min="1" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0" />
+              <input
+                type="text"
+                inputMode="numeric"
+                required
+                value={amount}
+                onChange={e => setAmount(formatRupiahInput(e.target.value))}
+                placeholder="0"
+                className="font-mono font-medium"
+              />
             </label>
             <label className="flex flex-row items-center gap-2 cursor-pointer text-xs font-semibold text-ink pt-1">
               <input
