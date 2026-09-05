@@ -6,29 +6,29 @@ import { RegisterServiceWorker } from '@/components/pwa/RegisterServiceWorker'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'cukupin: Catat santai, tahu arah uangmu',
+  title: 'Cukupin: Catat santai, tahu arah uangmu',
   description: 'Catat pengeluaran harian, pantau uang masuk-keluar, dan atur keuangan dengan santai.',
-  applicationName: 'cukupin',
-  authors: [{ name: 'cukupin' }],
+  applicationName: 'Cukupin',
+  authors: [{ name: 'Cukupin' }],
   generator: 'v0.app',
   metadataBase: new URL('https://cukupin.app'),
   openGraph: {
-    title: 'cukupin: Catat santai, tahu arah uangmu',
+    title: 'Cukupin: Catat santai, tahu arah uangmu',
     description: 'Catat pengeluaran harian, pantau uang masuk-keluar, dan atur keuangan dengan santai.',
     url: 'https://cukupin.app',
-    siteName: 'cukupin',
+    siteName: 'Cukupin',
     locale: 'id_ID',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'cukupin: Catat santai, tahu arah uangmu',
+    title: 'Cukupin: Catat santai, tahu arah uangmu',
     description: 'Catat pengeluaran harian, pantau uang masuk-keluar, dan atur keuangan dengan santai.',
   },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'cukupin',
+    title: 'Cukupin',
   },
   icons: {
     icon: [

@@ -68,7 +68,7 @@ export default function PrivacyPolicyPage() {
       </main>
 
       <footer className="landing-footer">
-        <p>&copy; {new Date().getFullYear()} cukupin. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} Cukupin. All rights reserved.</p>
       </footer>
 
       <style dangerouslySetInnerHTML={{ __html: `

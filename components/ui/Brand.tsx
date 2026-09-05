@@ -9,7 +9,7 @@ export function Brand({ compact = false }: { compact?: boolean }) {
       </div>
       {!compact && (
         <div className="flex flex-col">
-          <strong className="font-display text-[20px] leading-none tracking-tight">cukupin</strong>
+          <strong className="font-display text-[20px] leading-none tracking-tight">Cukupin</strong>
           <small className="mt-[3px] text-[9px] font-medium tracking-widest text-muted uppercase">catat santai</small>
         </div>
       )}

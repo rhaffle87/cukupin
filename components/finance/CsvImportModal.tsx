@@ -140,7 +140,17 @@ export function CsvImportModal({ supabase, userId, onClose, onSuccess }: CsvImpo
       payment_method: r.payment_method || null,
     }))
 
-    const { error } = await supabase.from('transactions').insert(payloads)
+    let { error } = await supabase.from('transactions').insert(payloads)
+
+    if (error && (error.message?.includes('payment_method') || (error as any).code === 'PGRST204')) {
+      const fallbackPayloads = payloads.map(({ payment_method, ...rest }) => ({
+        ...rest,
+        note: payment_method ? (rest.note ? `${rest.note} [Metode: ${payment_method}]` : `[Metode: ${payment_method}]`) : rest.note,
+      }))
+      const resRetry = await supabase.from('transactions').insert(fallbackPayloads)
+      error = resRetry.error
+    }
+
     setLoading(false)
 
     if (error) {

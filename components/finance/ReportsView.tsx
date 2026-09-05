@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import { ArrowDownLeft, ArrowUpRight, ChevronLeft, ChevronRight, Download, FileSpreadsheet, FileText, PieChart, TrendingDown, TrendingUp, Wallet } from 'lucide-react'
+import { ArrowDownLeft, ArrowUpRight, ChevronLeft, ChevronRight, FileSpreadsheet, FileText, PieChart, TrendingDown, TrendingUp, Wallet } from 'lucide-react'
 import { toast } from 'sonner'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { StatCard } from '@/components/ui/StatCard'
@@ -8,7 +8,6 @@ import { TransactionRow } from './TransactionRow'
 import { useFinanceData } from '@/hooks/useFinanceData'
 import { budgetRule503020, comparator, currency, isoDate, monthBounds, paymentMethodBreakdown, totals } from '@/lib/finance'
 import { MonthlyExpenseTemplate } from './MonthlyExpenseTemplate'
-import { exportUnifiedPdf } from '@/lib/pdfExport'
 
 export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> }) {
   const [showTemplate, setShowTemplate] = useState(false)
@@ -43,34 +42,6 @@ export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> 
     setTo(isoDate(end))
   }
 
-  async function exportPdf() {
-    if (!filtered.length) {
-      toast.error('Tidak ada transaksi pada periode ini untuk diekspor.')
-      return
-    }
-    const toastId = toast.loading('Menyiapkan laporan PDF resmi...')
-    try {
-      await exportUnifiedPdf({
-        title: 'LAPORAN KEUANGAN CUKUPIN',
-        periodLabel: `${from} s/d ${to}`,
-        transactions: filtered,
-        stats: {
-          income: stats.income,
-          expense: stats.expense,
-          balance: stats.balance,
-          count: filtered.length,
-        },
-        filename: `laporan-cukupin-${from}-sd-${to}.pdf`,
-      })
-      toast.dismiss(toastId)
-      toast.success('Laporan PDF resmi berhasil diunduh.')
-    } catch (err) {
-      toast.dismiss(toastId)
-      toast.error('Gagal membuat PDF.')
-      console.error(err)
-    }
-  }
-
   return (
     <>
       <PageHeader
@@ -78,20 +49,12 @@ export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> 
         title="Laporan"
         subtitle="Cek ringkasan dan perbandingan pengeluaranmu."
         action={
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              onClick={() => setShowTemplate(true)}
-              className="inline-flex items-center gap-2 rounded-xl border border-line bg-card px-3.5 py-2 text-xs font-bold text-ink shadow-xs transition-all hover:bg-[#EFF3F0] hover:text-green active:scale-95"
-            >
-              <FileSpreadsheet size={15} className="text-green" /> Template Bulanan
-            </button>
-            <button
-              onClick={exportPdf}
-              className="inline-flex items-center gap-2 rounded-xl bg-ink px-4 py-2 text-xs font-bold !text-white shadow-sm transition-all hover:bg-ink/90 active:scale-95"
-            >
-              <Download size={15} /> Export PDF
-            </button>
-          </div>
+          <button
+            onClick={() => setShowTemplate(true)}
+            className="inline-flex items-center gap-2 rounded-xl bg-ink px-4 py-2 text-xs font-bold !text-white shadow-sm transition-all hover:bg-ink/90 active:scale-95 cursor-pointer"
+          >
+            <FileSpreadsheet size={15} className="text-green" /> Lihat & Unduh Laporan
+          </button>
         }
       />
       
@@ -299,6 +262,7 @@ export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> 
       {showTemplate && (
         <MonthlyExpenseTemplate
           transactions={data.transactions}
+          defaultMonth={from.slice(0, 7)}
           onClose={() => setShowTemplate(false)}
         />
       )}

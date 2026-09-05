@@ -150,7 +150,7 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
       return
     }
 
-    const txRes = await supabase.from('transactions').insert({
+    let txRes = await supabase.from('transactions').insert({
       user_id: userId,
       type: 'expense',
       description: item.name,
@@ -160,6 +160,18 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
       note: 'Dibeli dari Wishlist',
       payment_method: 'Transfer Bank',
     }).select().single()
+
+    if (txRes.error && (txRes.error.message?.includes('payment_method') || txRes.error.code === 'PGRST204')) {
+      txRes = await supabase.from('transactions').insert({
+        user_id: userId,
+        type: 'expense',
+        description: item.name,
+        amount: Number(item.price),
+        category: 'Shopping',
+        transaction_date: isoDate(new Date()),
+        note: 'Dibeli dari Wishlist [Metode: Transfer Bank]',
+      }).select().single()
+    }
 
     if (txRes.error) {
       toast.error('Gagal mencatat transaksi: ' + txRes.error.message)

@@ -190,7 +190,7 @@ export function GoalsView({ supabase, data, userId }: GoalsViewProps) {
       data.setGoals(prevGoals)
     } else {
       if (recordAsExpense && userId) {
-        await supabase.from('transactions').insert({
+        const { error: gTxErr } = await supabase.from('transactions').insert({
           user_id: userId,
           type: 'expense',
           amount: numericAdd,
@@ -200,6 +200,17 @@ export function GoalsView({ supabase, data, userId }: GoalsViewProps) {
           note: `#tabungan Alokasi tabungan untuk ${adding.name}`,
           payment_method: 'Transfer Bank',
         })
+        if (gTxErr && (gTxErr.message?.includes('payment_method') || gTxErr.code === 'PGRST204')) {
+          await supabase.from('transactions').insert({
+            user_id: userId,
+            type: 'expense',
+            amount: numericAdd,
+            category: 'Bills',
+            description: `Alokasi target: ${adding.name}`,
+            transaction_date: isoDate(new Date()),
+            note: `#tabungan Alokasi tabungan untuk ${adding.name} [Metode: Transfer Bank]`,
+          })
+        }
       }
 
       if (isCompleted) {

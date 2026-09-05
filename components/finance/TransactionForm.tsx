@@ -149,9 +149,26 @@ export function TransactionForm({ supabase, userId, initial, onDone }: Transacti
       return
     }
 
-    const result = initial
+    let result = initial
       ? await supabase.from('transactions').update(payload).eq('id', initial.id).select().single()
       : await supabase.from('transactions').insert(payload).select().single()
+
+    // Resilient fallback if remote Supabase schema has not run migration for payment_method column
+    if (result.error && (result.error.message?.includes('payment_method') || result.error.code === 'PGRST204')) {
+      const { payment_method, ...fallbackPayload } = payload as any
+      const mergedNote = payment_method
+        ? (fallbackPayload.note ? `${fallbackPayload.note} [Metode: ${payment_method}]` : `[Metode: ${payment_method}]`)
+        : fallbackPayload.note
+
+      const retryPayload = {
+        ...fallbackPayload,
+        note: mergedNote || null,
+      }
+
+      result = initial
+        ? await supabase.from('transactions').update(retryPayload).eq('id', initial.id).select().single()
+        : await supabase.from('transactions').insert(retryPayload).select().single()
+    }
 
     setBusy(false)
 

@@ -6,6 +6,7 @@ import { Brand } from '@/components/ui/Brand'
 import {
   ArrowDown,
   ArrowRight,
+  ArrowUp,
   Check,
   ChevronDown,
   Clock,
@@ -516,27 +517,145 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Comprehensive Footer */}
-      <footer className="border-t border-line/60 bg-paper px-6 py-10 md:px-12 text-xs text-muted">
-        <div className="mx-auto max-w-5xl flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div className="flex flex-col items-center sm:items-start gap-1">
-            <Brand compact />
-            <p className="text-[11px] text-muted mt-1">
-              Catat santai, tahu arah uangmu. Tanpa rumus rumit.
+      {/* Revamped Comprehensive Footer */}
+      <footer className="border-t border-line/80 bg-[#FAFAF8] text-xs text-muted relative overflow-hidden">
+        {/* Subtle accent bar */}
+        <div className="h-0.5 w-full bg-gradient-to-r from-transparent via-green/30 to-transparent" />
+
+        <div className="mx-auto max-w-6xl px-6 pt-14 pb-12 sm:pt-16 sm:pb-14 md:px-12">
+          {/* Main 4-Column Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-8 pb-12 border-b border-line/60">
+            {/* Col 1: Brand & Mission */}
+            <div className="lg:col-span-5 flex flex-col items-start gap-4">
+              <Brand />
+              <p className="text-xs leading-relaxed text-muted max-w-sm">
+                Pencatatan keuangan mandiri tanpa rumus rumit, tanpa akses rekening bank, dan 100% bebas biaya. Dirancang untuk membantu kamu mengontrol pengeluaran dengan tenang setiap hari.
+              </p>
+              
+              {/* Trust Badges */}
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-card px-3 py-1 text-[11px] font-medium text-ink shadow-2xs">
+                  <ShieldCheck size={13} className="text-green" /> 100% Mandiri & Terenkripsi
+                </span>
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-card px-3 py-1 text-[11px] font-medium text-ink shadow-2xs">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                  </span>
+                  PWA Siap Offline
+                </span>
+              </div>
+            </div>
+
+            {/* Col 2: Navigasi Cepat */}
+            <div className="lg:col-span-2">
+              <h4 className="font-display text-xs font-bold text-ink uppercase tracking-wider mb-4">
+                Navigasi
+              </h4>
+              <ul className="space-y-2.5 text-xs">
+                <li>
+                  <a href="#masalah" className="text-muted hover:text-ink transition-colors focus-visible:ring-2 focus-visible:ring-green rounded">
+                    Masalah Keuangan
+                  </a>
+                </li>
+                <li>
+                  <a href="#fitur" className="text-muted hover:text-ink transition-colors focus-visible:ring-2 focus-visible:ring-green rounded">
+                    Fitur Utama
+                  </a>
+                </li>
+                <li>
+                  <a href="#cara-kerja" className="text-muted hover:text-ink transition-colors focus-visible:ring-2 focus-visible:ring-green rounded">
+                    Cara Kerja
+                  </a>
+                </li>
+                <li>
+                  <a href="#perbandingan" className="text-muted hover:text-ink transition-colors focus-visible:ring-2 focus-visible:ring-green rounded">
+                    Perbandingan Jujur
+                  </a>
+                </li>
+                <li>
+                  <a href="#faq" className="text-muted hover:text-ink transition-colors focus-visible:ring-2 focus-visible:ring-green rounded">
+                    Tanya Jawab (FAQ)
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            {/* Col 3: Fitur Unggulan */}
+            <div className="lg:col-span-3">
+              <h4 className="font-display text-xs font-bold text-ink uppercase tracking-wider mb-4">
+                Fitur Unggulan
+              </h4>
+              <ul className="space-y-2.5 text-xs">
+                <li className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-green" />
+                  <span className="text-muted">Budget Harian Aman</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-blue" />
+                  <span className="text-muted">Deteksi Kategori Otomatis</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-coral" />
+                  <span className="text-muted">Wishlist Anti-Impulsif</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-green" />
+                  <span className="text-muted">Template Laporan Bulanan</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#89938A]" />
+                  <span className="text-muted">Cadangan Data JSON Lokal</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Col 4: Keamanan & Legalitas */}
+            <div className="lg:col-span-2">
+              <h4 className="font-display text-xs font-bold text-ink uppercase tracking-wider mb-4">
+                Legal & Privasi
+              </h4>
+              <ul className="space-y-2.5 text-xs">
+                <li>
+                  <Link href="/legal/privacy" className="text-muted hover:text-ink transition-colors focus-visible:ring-2 focus-visible:ring-green rounded">
+                    Kebijakan Privasi
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/legal/terms" className="text-muted hover:text-ink transition-colors focus-visible:ring-2 focus-visible:ring-green rounded">
+                    Syarat & Ketentuan
+                  </Link>
+                </li>
+                <li>
+                  <span className="text-muted">Tanpa Akses Bank</span>
+                </li>
+                <li className="pt-1">
+                  <div className="rounded-xl border border-line bg-card p-3 shadow-2xs">
+                    <p className="text-[10px] font-bold text-ink uppercase tracking-wider">Kontak & Bantuan</p>
+                    <a href="mailto:halo@cukupin.app" className="text-[11px] text-green font-medium hover:underline block mt-0.5">
+                      halo@cukupin.app
+                    </a>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Bottom Bar */}
+          <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-muted">
+            <p>&copy; {new Date().getFullYear()} Cukupin. Hak Cipta Dilindungi.</p>
+            <p className="text-center sm:text-left text-[11px]">
+              Dibuat dengan cermat untuk ketenangan finansial harian.
             </p>
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="inline-flex items-center gap-1.5 text-muted hover:text-ink transition-colors cursor-pointer group"
+              aria-label="Kembali ke bagian atas halaman"
+            >
+              <span>Kembali ke atas</span>
+              <ArrowUp size={13} className="transition-transform duration-200 group-hover:-translate-y-0.5" />
+            </button>
           </div>
-          <div className="flex flex-wrap items-center justify-center gap-6 font-medium">
-            <a href="#masalah" className="hover:text-ink transition-colors focus-visible:ring-2 focus-visible:ring-green rounded-md px-1">Masalah</a>
-            <a href="#fitur" className="hover:text-ink transition-colors focus-visible:ring-2 focus-visible:ring-green rounded-md px-1">Fitur</a>
-            <a href="#perbandingan" className="hover:text-ink transition-colors focus-visible:ring-2 focus-visible:ring-green rounded-md px-1">Perbandingan</a>
-            <a href="#faq" className="hover:text-ink transition-colors focus-visible:ring-2 focus-visible:ring-green rounded-md px-1">FAQ</a>
-            <Link href="/legal/privacy" className="hover:text-ink transition-colors focus-visible:ring-2 focus-visible:ring-green rounded-md px-1">Kebijakan Privasi</Link>
-            <Link href="/legal/terms" className="hover:text-ink transition-colors focus-visible:ring-2 focus-visible:ring-green rounded-md px-1">Syarat & Ketentuan</Link>
-          </div>
-        </div>
-        <div className="mx-auto max-w-5xl mt-8 pt-6 border-t border-line/40 text-center sm:text-left text-[11px] text-muted flex flex-col sm:flex-row items-center justify-between gap-2">
-          <p>&copy; {new Date().getFullYear()} cukupin. Hak cipta dilindungi.</p>
-          <p className="text-[10px]">Pencatatan keuangan mandiri tanpa repot.</p>
         </div>
       </footer>
     </div>

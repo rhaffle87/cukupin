@@ -87,31 +87,30 @@ export async function exportUnifiedPdf({
   container.innerHTML = `
     <div style="text-align: center; margin-bottom: 24px;">
       <div style="font-size: 11px; font-weight: 700; letter-spacing: 2px; color: #4B5563; text-transform: uppercase;">
-        PERIODE ✦ ${periodLabel.toUpperCase()} ✦
+        MONTH OF ✦ ${periodLabel.toUpperCase()} ✦
       </div>
-      <h1 style="margin: 4px 0 0 0; font-size: 24px; font-weight: 900; letter-spacing: 1px; color: #111827; text-transform: uppercase;">
-        ${title}
+      <h1 style="margin: 4px 0 0 0; font-size: 24px; font-weight: 900; letter-spacing: 1px; color: #111827; text-transform: uppercase; font-family: Georgia, Cambria, 'Times New Roman', Times, serif;">
+        MONTHLY EXPENSE TRACKER
       </h1>
-      <p style="margin: 4px 0 0 0; font-size: 10px; color: #6B7280;">Cukupin · Quiet Ledger Financial Statement</p>
     </div>
 
     <!-- Summary Box -->
     <div style="display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid #D1D5DB; background-color: #F9FAFB; border-radius: 8px; margin-bottom: 24px; font-size: 11px; overflow: hidden;">
       <div style="padding: 12px 14px; border-right: 1px solid #E5E7EB;">
-        <span style="display: block; font-size: 9px; text-transform: uppercase; color: #6B7280; font-weight: 700; letter-spacing: 0.5px;">Total Pemasukan</span>
+        <span style="display: block; font-size: 9px; text-transform: uppercase; color: #6B7280; font-weight: 700; letter-spacing: 0.5px;">TOTAL ANGGARAN/MASUK</span>
         <strong style="display: block; margin-top: 4px; font-size: 13px; color: #15803D; font-family: monospace; font-variant-numeric: tabular-nums;">${currency(income)}</strong>
       </div>
       <div style="padding: 12px 14px; border-right: 1px solid #E5E7EB;">
-        <span style="display: block; font-size: 9px; text-transform: uppercase; color: #6B7280; font-weight: 700; letter-spacing: 0.5px;">Total Pengeluaran</span>
+        <span style="display: block; font-size: 9px; text-transform: uppercase; color: #6B7280; font-weight: 700; letter-spacing: 0.5px;">TOTAL PENGELUARAN</span>
         <strong style="display: block; margin-top: 4px; font-size: 13px; color: #DC2626; font-family: monospace; font-variant-numeric: tabular-nums;">${currency(expense)}</strong>
       </div>
       <div style="padding: 12px 14px; border-right: 1px solid #E5E7EB;">
-        <span style="display: block; font-size: 9px; text-transform: uppercase; color: #6B7280; font-weight: 700; letter-spacing: 0.5px;">Sisa Saldo</span>
+        <span style="display: block; font-size: 9px; text-transform: uppercase; color: #6B7280; font-weight: 700; letter-spacing: 0.5px;">SISA BERSIH</span>
         <strong style="display: block; margin-top: 4px; font-size: 13px; color: #1D4ED8; font-family: monospace; font-variant-numeric: tabular-nums;">${currency(balance)}</strong>
       </div>
       <div style="padding: 12px 14px;">
-        <span style="display: block; font-size: 9px; text-transform: uppercase; color: #6B7280; font-weight: 700; letter-spacing: 0.5px;">Total Transaksi</span>
-        <strong style="display: block; margin-top: 4px; font-size: 13px; color: #111827;">${count} Catatan</strong>
+        <span style="display: block; font-size: 9px; text-transform: uppercase; color: #6B7280; font-weight: 700; letter-spacing: 0.5px;">TOTAL CATATAN</span>
+        <strong style="display: block; margin-top: 4px; font-size: 13px; color: #111827;">${count} Transaksi</strong>
       </div>
     </div>
 
@@ -119,12 +118,12 @@ export async function exportUnifiedPdf({
     <table style="width: 100%; border-collapse: collapse; font-size: 10px; border: 1px solid #111827;">
       <thead>
         <tr style="background-color: #F3F4F6; border-bottom: 1px solid #111827; text-align: left; font-weight: 700; text-transform: uppercase; vertical-align: middle;">
-          <th style="padding: 8px 10px; border-right: 1px solid #111827; width: 85px; vertical-align: middle;">Tanggal</th>
-          <th style="padding: 8px 10px; border-right: 1px solid #111827; width: 105px; vertical-align: middle;">Metode</th>
-          <th style="padding: 8px 10px; border-right: 1px solid #111827; width: 85px; vertical-align: middle;">Kategori</th>
-          <th style="padding: 8px 10px; border-right: 1px solid #111827; vertical-align: middle;">Deskripsi</th>
-          <th style="padding: 8px 10px; border-right: 1px solid #111827; text-align: right; width: 110px; vertical-align: middle;">Jumlah</th>
-          <th style="padding: 8px 10px; text-align: right; width: 125px; vertical-align: middle; white-space: nowrap;">Akumulasi Belanja</th>
+          <th style="padding: 8px 10px; border-right: 1px solid #111827; width: 95px; vertical-align: middle;">DATE OF PAYMENT</th>
+          <th style="padding: 8px 10px; border-right: 1px solid #111827; width: 115px; vertical-align: middle;">PAYMENT METHOD</th>
+          <th style="padding: 8px 10px; border-right: 1px solid #111827; width: 95px; vertical-align: middle;">PAID TO</th>
+          <th style="padding: 8px 10px; border-right: 1px solid #111827; vertical-align: middle;">DESCRIPTION</th>
+          <th style="padding: 8px 10px; border-right: 1px solid #111827; text-align: right; width: 110px; vertical-align: middle;">AMOUNT PAID</th>
+          <th style="padding: 8px 10px; text-align: right; width: 115px; vertical-align: middle; white-space: nowrap;">RUNNING TOTAL</th>
         </tr>
       </thead>
       <tbody>
@@ -136,13 +135,13 @@ export async function exportUnifiedPdf({
           <tr style="border-bottom: 1px solid #E5E7EB; background-color: ${idx % 2 === 1 ? '#F9FAFB' : '#FFFFFF'}; vertical-align: middle;">
             <td style="padding: 6px 10px; border-right: 1px solid #111827; font-family: monospace; vertical-align: middle;">${tx.transaction_date}</td>
             <td style="padding: 6px 10px; border-right: 1px solid #111827; color: #4B5563; vertical-align: middle;">${tx.cleanPaymentMethod}</td>
-            <td style="padding: 6px 10px; border-right: 1px solid #111827; font-weight: 500; vertical-align: middle;">${tx.category}</td>
+            <td style="padding: 6px 10px; border-right: 1px solid #111827; font-weight: 500; vertical-align: middle;">${tx.category || 'General'}</td>
             <td style="padding: 6px 10px; border-right: 1px solid #111827; color: #1F2937; vertical-align: middle;">
               <span style="vertical-align: middle;">${tx.description || '-'}</span>
-              ${tx.type === 'income' ? '<span style="display: inline-block; vertical-align: middle; margin-left: 6px; padding: 1px 5px; background: #D1FAE5; color: #065F46; font-size: 8px; font-weight: 700; border-radius: 3px; line-height: 1.2;">+ Masuk</span>' : ''}
+              ${tx.type === 'income' ? '<span style="display: inline-block; vertical-align: middle; margin-left: 6px; padding: 1px 5px; background: #D1FAE5; color: #065F46; font-size: 8px; font-weight: 700; border-radius: 3px; line-height: 1.2;">Pemasukan</span>' : ''}
             </td>
-            <td style="padding: 6px 10px; border-right: 1px solid #111827; text-align: right; font-family: monospace; font-weight: 600; font-variant-numeric: tabular-nums; vertical-align: middle; color: ${tx.type === 'income' ? '#15803D' : '#111827'};">
-              ${tx.type === 'income' ? '+' : '-'} ${currency(Number(tx.amount))}
+            <td style="padding: 6px 10px; border-right: 1px solid #111827; text-align: right; font-family: monospace; font-weight: 500; font-variant-numeric: tabular-nums; vertical-align: middle; color: #111827;">
+              ${currency(Number(tx.amount))}
             </td>
             <td style="padding: 6px 10px; text-align: right; font-family: monospace; font-weight: 700; font-variant-numeric: tabular-nums; vertical-align: middle; color: #111827;">
               ${currency(tx.runningTotal)}
@@ -158,7 +157,7 @@ export async function exportUnifiedPdf({
       </tbody>
       <tfoot>
         <tr style="border-top: 2px solid #111827; background-color: #F3F4F6; font-weight: 700; vertical-align: middle;">
-          <td colspan="4" style="padding: 8px 10px; border-right: 1px solid #111827; text-align: right; text-transform: uppercase; font-size: 9px; letter-spacing: 0.5px; vertical-align: middle;">Total Pengeluaran Periode Ini</td>
+          <td colspan="4" style="padding: 8px 10px; border-right: 1px solid #111827; text-align: right; text-transform: uppercase; font-size: 9px; letter-spacing: 0.5px; vertical-align: middle;">TOTAL PENGELUARAN BULAN INI</td>
           <td style="padding: 8px 10px; border-right: 1px solid #111827; text-align: right; font-family: monospace; font-size: 11px; font-weight: 700; color: #DC2626; font-variant-numeric: tabular-nums; vertical-align: middle;">${currency(expense)}</td>
           <td style="padding: 8px 10px; text-align: right; font-family: monospace; font-size: 11px; font-weight: 700; color: #111827; font-variant-numeric: tabular-nums; vertical-align: middle;">${currency(runningList.length > 0 ? runningList[runningList.length - 1].runningTotal : 0)}</td>
         </tr>

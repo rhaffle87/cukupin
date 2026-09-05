@@ -5,8 +5,8 @@ export function JsonLd() {
     {
       '@context': 'https://schema.org',
       '@type': 'WebApplication',
-      name: 'cukupin',
-      alternateName: 'cukupin app',
+      name: 'Cukupin',
+      alternateName: 'Cukupin App',
       url: 'https://cukupin.app',
       applicationCategory: 'FinanceApplication',
       operatingSystem: 'All',
