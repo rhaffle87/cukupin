@@ -19,9 +19,5 @@ export default function DashboardPage() {
 
   const financeData = useFinanceData(supabase, user?.id)
 
-  return (
-    <div className="view-content">
-      <DashboardView data={financeData} user={user} />
-    </div>
-  )
+  return <DashboardView data={financeData} user={user} />
 }

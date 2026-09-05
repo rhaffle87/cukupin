@@ -1,10 +1,23 @@
+'use client'
+
+import React, { useMemo, useEffect, useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
+import { useFinanceData } from '@/hooks/useFinanceData'
+import { WishlistView } from '@/components/finance/WishlistView'
+
 export default function WishlistPage() {
-  return (
-    <div className="flex h-full items-center justify-center">
-      <div className="text-center">
-        <h1 className="font-display text-3xl font-bold text-ink">Keinginan</h1>
-        <p className="mt-2 text-muted">Halaman keinginan sedang dalam pengembangan.</p>
-      </div>
-    </div>
-  )
+  const supabase = useMemo(() => createClient(), [])
+  const [user, setUser] = useState<{ id: string; email?: string } | null>(null)
+  
+  useEffect(() => {
+    supabase?.auth.getUser().then(({ data }) => {
+      if (data.user) {
+        setUser({ id: data.user.id, email: data.user.email })
+      }
+    })
+  }, [supabase])
+
+  const financeData = useFinanceData(supabase, user?.id)
+
+  return <WishlistView supabase={supabase} data={financeData} userId={user?.id} />
 }
