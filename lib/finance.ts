@@ -4,7 +4,12 @@ import type { Transaction } from '@/lib/database.types'
 export const currency = (value: number) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value || 0)
 export const shortCurrency = (value: number) => value >= 1000000 ? `Rp ${(value / 1000000).toFixed(1)} jt` : value >= 1000 ? `Rp ${(value / 1000).toFixed(0)} rb` : currency(value)
 export const monthLabel = (date = new Date()) => new Intl.DateTimeFormat('id-ID', { month: 'long', year: 'numeric' }).format(date)
-export const isoDate = (date: Date) => date.toISOString().slice(0, 10)
+export const isoDate = (date: Date) => {
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  const d = String(date.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
+}
 
 export function monthBounds(offset = 0) {
   const now = new Date()

@@ -103,7 +103,7 @@ export function DashboardView({ data, user }: DashboardViewProps) {
     return {
       monthTx: tx,
       stats: totals(tx),
-      series: dailySeries(tx),
+      series: dailySeries(data.transactions),
       breakdown: categoryBreakdown(tx)
     }
   }, [data.transactions])
