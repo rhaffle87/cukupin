@@ -12,9 +12,9 @@ export default function LandingPage() {
           <Link href="/auth/login" className="text-sm font-semibold text-muted hover:text-ink transition-colors">
             Masuk
           </Link>
-          <Link 
-            href="/auth/login" 
-            className="flex items-center justify-center rounded-xl bg-ink px-4 py-2 text-sm font-bold text-white shadow-lg shadow-ink/10 transition-all hover:scale-[0.98] hover:bg-ink/90 active:scale-95"
+          <Link
+            href="/auth/login"
+            className="flex items-center justify-center rounded-xl bg-ink px-4 py-2 text-sm font-bold !text-white shadow-lg shadow-ink/10 transition-all hover:scale-[0.98] hover:bg-ink/90 active:scale-95"
           >
             Daftar
           </Link>
@@ -26,30 +26,30 @@ export default function LandingPage() {
         <section className="relative flex flex-col items-center justify-center overflow-hidden px-6 pb-20 pt-24 text-center md:pb-32 md:pt-32">
           {/* Background Decorative Blur */}
           <div className="absolute left-1/2 top-1/2 -z-10 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-green-soft/50 blur-[100px]" />
-          
+
           <span className="mb-6 flex items-center gap-2 rounded-full border border-green/20 bg-green-soft px-4 py-1.5 text-[10px] font-bold tracking-widest text-green shadow-sm uppercase">
             <Sparkles size={12} /> Personal Finance, Simplified
           </span>
-          
+
           <h1 className="max-w-4xl font-display text-[2.5rem] font-bold leading-[1.05] tracking-tight text-ink md:text-[4.5rem]">
             Yang penting bukan banyaknya.<br />
             <em className="text-green not-italic">Yang penting cukup.</em>
           </h1>
-          
+
           <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-muted md:text-xl">
             Cukupin membantu kamu melihat arus uang dengan lebih jernih, satu bulan demi satu bulan, tanpa rasa bersalah.
           </p>
-          
+
           <div className="mt-10 flex flex-col items-center gap-6 sm:flex-row">
-            <Link 
-              href="/auth/login" 
-              className="group flex h-14 items-center justify-center gap-2 rounded-2xl bg-ink px-8 text-base font-bold text-white shadow-xl shadow-ink/15 transition-all hover:-translate-y-0.5 hover:bg-ink/90 active:translate-y-0"
+            <Link
+              href="/auth/login"
+              className="group flex h-14 items-center justify-center gap-2 rounded-2xl bg-ink px-8 text-base font-bold !text-white shadow-xl shadow-ink/15 transition-all hover:-translate-y-0.5 hover:bg-ink/90 active:translate-y-0"
             >
               Mulai ruang uangmu — Gratis
               <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
-          
+
           <div className="mt-16 flex flex-col items-center justify-center gap-4 text-sm text-muted sm:flex-row sm:gap-6">
             <div className="flex -space-x-3">
               {['R', 'S', 'A', 'M'].map((letter, i) => (
@@ -61,43 +61,6 @@ export default function LandingPage() {
             <p>
               Bergabunglah dengan <strong className="text-ink">ratusan pengguna</strong> lainnya<br className="hidden sm:block" /> yang telah beralih ke pencatatan yang menenangkan.
             </p>
-          </div>
-        </section>
-
-        {/* Features Preview */}
-        <section className="bg-white/50 px-6 py-24 border-t border-line/40">
-          <div className="mx-auto max-w-6xl">
-            <div className="grid gap-8 md:grid-cols-3">
-              <div className="flex flex-col gap-4 rounded-3xl bg-card p-8 shadow-sm border border-line/50 transition-transform hover:-translate-y-1">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-green-soft text-green">
-                  <PieChart size={24} />
-                </div>
-                <h3 className="font-display text-xl font-bold">Kategori Jelas</h3>
-                <p className="text-sm leading-relaxed text-muted">
-                  Bukan hanya sekadar angka, tapi tahu persis ke mana perginya uangmu bulan ini.
-                </p>
-              </div>
-              
-              <div className="flex flex-col gap-4 rounded-3xl bg-card p-8 shadow-sm border border-line/50 transition-transform hover:-translate-y-1">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-soft text-blue">
-                  <ShieldCheck size={24} />
-                </div>
-                <h3 className="font-display text-xl font-bold">Keamanan Data</h3>
-                <p className="text-sm leading-relaxed text-muted">
-                  Data keuanganmu tersimpan dengan aman. Kamu memegang penuh kendali atas privasimu.
-                </p>
-              </div>
-
-              <div className="flex flex-col gap-4 rounded-3xl bg-card p-8 shadow-sm border border-line/50 transition-transform hover:-translate-y-1">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-coral-soft text-coral">
-                  <Sparkles size={24} />
-                </div>
-                <h3 className="font-display text-xl font-bold">Bebas Stres</h3>
-                <p className="text-sm leading-relaxed text-muted">
-                  Tanpa budget yang kaku. Fokuslah pada apa yang cukup untukmu hari ini.
-                </p>
-              </div>
-            </div>
           </div>
         </section>
       </main>

@@ -1,23 +1,10 @@
 'use client'
 
-import React, { useMemo, useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import { useFinanceData } from '@/hooks/useFinanceData'
+import React from 'react'
+import { useFinance } from '@/context/FinanceContext'
 import { ReportsView } from '@/components/finance/ReportsView'
 
 export default function ReportsPage() {
-  const supabase = useMemo(() => createClient(), [])
-  const [user, setUser] = useState<{ id: string; email?: string } | null>(null)
-  
-  useEffect(() => {
-    supabase?.auth.getUser().then(({ data }) => {
-      if (data.user) {
-        setUser({ id: data.user.id, email: data.user.email })
-      }
-    })
-  }, [supabase])
-
-  const financeData = useFinanceData(supabase, user?.id)
-
-  return <ReportsView data={financeData} />
+  const finance = useFinance()
+  return <ReportsView data={finance} />
 }

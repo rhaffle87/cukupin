@@ -1,13 +1,14 @@
 import React, { useMemo, useState } from 'react'
 import type { Transaction } from '@/lib/database.types'
 import { SupabaseClient } from '@supabase/supabase-js'
-import { CalendarDays, Plus, Receipt, X } from 'lucide-react'
+import { CalendarDays, FileSpreadsheet, Plus, Receipt, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { Modal } from '@/components/ui/Modal'
 import { TransactionRow } from './TransactionRow'
 import { TransactionForm } from './TransactionForm'
+import { MonthlyExpenseTemplate } from './MonthlyExpenseTemplate'
 import { useFinanceData } from '@/hooks/useFinanceData'
 
 const categories = ['Food', 'Transport', 'Bills', 'Shopping', 'Health', 'Salary', 'Freelance', 'Other']
@@ -21,6 +22,7 @@ interface TransactionsViewProps {
 export function TransactionsView({ supabase, data, userId }: TransactionsViewProps) {
   const [editing, setEditing] = useState<Transaction | undefined>()
   const [showForm, setShowForm] = useState(false)
+  const [showExportTemplate, setShowExportTemplate] = useState(false)
   
   const [query, setQuery] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('Semua kategori')
@@ -62,9 +64,14 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
         title="Transaksi"
         subtitle="Satu catatan kecil hari ini, satu gambaran besar di akhir bulan."
         action={
-          <button className="button primary" onClick={() => { setEditing(undefined); setShowForm(true) }}>
-            <Plus size={17} /> Transaksi baru
-          </button>
+          <div className="flex items-center gap-2">
+            <button className="button secondary" onClick={() => setShowExportTemplate(true)}>
+              <FileSpreadsheet size={16} /> Format Bulanan
+            </button>
+            <button className="button primary" onClick={() => { setEditing(undefined); setShowForm(true) }}>
+              <Plus size={16} /> Transaksi baru
+            </button>
+          </div>
         }
       />
       
@@ -181,6 +188,13 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
             onDone={() => { setShowForm(false); data.refresh() }}
           />
         </Modal>
+      )}
+
+      {showExportTemplate && (
+        <MonthlyExpenseTemplate
+          transactions={data.transactions}
+          onClose={() => setShowExportTemplate(false)}
+        />
       )}
     </>
   )

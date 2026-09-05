@@ -27,10 +27,13 @@ const colors = ['#3E8F68', '#315DCB', '#D98362', '#8E9A8B', '#1E3249']
 function DashboardSkeleton() {
   return (
     <div className="flex flex-col gap-4 animate-pulse" aria-label="Memuat ringkasan keuangan">
-      <div className="relative flex h-[300px] flex-col overflow-hidden rounded-[24px] bg-ink p-6 md:h-[250px] md:p-11">
-        <div className="mt-6 h-[22px] w-[75%] rounded-full bg-white/20 md:w-[38%]" />
-        <div className="mt-4 h-[10px] w-[58%] rounded-full bg-white/20 md:w-[25%]" />
-        <div className="absolute bottom-4 right-4 h-[90px] w-[175px] rounded-[15px] bg-white/10 md:top-10 md:right-11 md:h-[130px] md:w-[240px]" />
+      <div className="relative flex h-[300px] flex-col justify-between overflow-hidden rounded-[24px] bg-ink p-6 md:h-[250px] md:flex-row md:items-center md:p-11">
+        <div className="flex-1">
+          <div className="h-[10px] w-[120px] rounded-full bg-white/20" />
+          <div className="mt-4 h-[32px] w-[75%] rounded-full bg-white/20 md:w-[48%]" />
+          <div className="mt-4 h-[12px] w-[58%] rounded-full bg-white/20 md:w-[35%]" />
+        </div>
+        <div className="h-[140px] w-full rounded-[22px] border border-white/10 bg-white/5 md:h-[175px] md:w-[280px]" />
       </div>
       <div className="grid grid-cols-3 gap-2 md:gap-3">
         {[1, 2, 3].map(i => (
@@ -114,26 +117,34 @@ export function DashboardView({ data, user }: DashboardViewProps) {
 
   return (
     <>
-      <div className="relative mb-4 flex min-h-[300px] flex-col justify-between gap-6 overflow-hidden rounded-[24px] bg-ink p-7 text-white md:min-h-[250px] md:flex-row md:p-11 animate-in slide-in-from-bottom-2 duration-500">
-        <div className="absolute -right-24 -top-24 h-[330px] w-[330px] rounded-full border border-white/10 shadow-[0_0_0_26px_rgba(255,255,255,0.025),0_0_0_52px_rgba(255,255,255,0.02)]" />
+      <div className="relative mb-4 flex min-h-[270px] flex-col justify-between gap-6 overflow-hidden rounded-[24px] bg-ink p-7 text-white md:min-h-[250px] md:flex-row md:items-center md:p-11 animate-in slide-in-from-bottom-2 duration-500">
+        {/* Layered concentric rings in the background */}
+        <div className="pointer-events-none absolute -right-20 -top-24 h-[420px] w-[420px] rounded-full border border-white/10 shadow-[0_0_0_32px_rgba(255,255,255,0.022),0_0_0_72px_rgba(255,255,255,0.016)]" />
+        <div className="pointer-events-none absolute right-10 -bottom-24 h-[240px] w-[240px] rounded-full border border-white/5" />
         
-        <div className="relative z-10">
+        <div className="relative z-10 max-w-[500px]">
           <p className="text-[10px] font-bold tracking-widest text-[#B9C6BD] uppercase">{monthLabel().toUpperCase()}</p>
           <h1 className="mt-2.5 font-display text-[2.45rem] font-bold leading-tight tracking-tight md:text-[clamp(2.1rem,4vw,3.55rem)]">
             Halo, {firstName}.<br />
             <em className="text-[#BEE6CF] not-italic">Yuk lihat keadaanmu.</em>
           </h1>
-          <p className="mt-5 max-w-[280px] text-xs leading-relaxed text-[#C0CBC4] md:max-w-[420px]">
+          <p className="mt-5 max-w-[320px] text-xs leading-relaxed text-[#C0CBC4] md:max-w-[420px]">
             Sedikit kejelasan hari ini bisa bikin keputusan besok terasa lebih ringan.
           </p>
         </div>
         
-        <div className="absolute bottom-4 right-4 z-10 flex h-[90px] w-[175px] items-end justify-end md:static md:w-[240px] md:self-stretch">
-          <img src="/manus-storage/cukupin-texture-1_8ebb966d.png" alt="" className="absolute inset-0 h-full w-full rounded-2xl object-cover opacity-15 mix-blend-overlay" />
-          <div className="relative p-1.5 text-right md:p-3.5">
-            <span className="block text-[10px] font-bold tracking-widest text-[#B9C6BD] uppercase">{stats.balance >= 0 ? 'Ruang masih ada' : 'Perlu perhatian'}</span>
-            <strong className="my-1.5 block font-display text-[23px] text-[#BEE6CF] md:text-[31px]">{shortCurrency(Math.abs(stats.balance))}</strong>
-            <small className="block text-[11px] text-[#BAC9C0]">{stats.balance >= 0 ? 'sisa saldo bulan ini' : 'selisih pengeluaran'}</small>
+        {/* Right Balance Card container matching Image 2 */}
+        <div className="relative z-10 flex min-h-[140px] w-full flex-col justify-center rounded-[22px] border border-white/10 bg-white/[0.04] p-6 shadow-[0_12px_32px_rgba(0,0,0,0.18)] backdrop-blur-md md:h-[180px] md:w-[280px]">
+          <div className="flex flex-col items-end text-right">
+            <span className="block text-[10px] font-bold tracking-widest text-[#B9C6BD] uppercase">
+              {stats.balance >= 0 ? 'RUANG MASIH ADA' : 'PERLU PERHATIAN'}
+            </span>
+            <strong className="my-2 block font-display text-[32px] md:text-[38px] font-bold leading-none tracking-tight text-[#BEE6CF]">
+              {shortCurrency(Math.abs(stats.balance))}
+            </strong>
+            <small className="block text-[11px] text-[#BAC9C0]">
+              {stats.balance >= 0 ? 'sisa saldo bulan ini' : 'selisih pengeluaran'}
+            </small>
           </div>
         </div>
       </div>

@@ -6,6 +6,8 @@ import { createClient } from '@/lib/supabase/client'
 import { AppShell } from '@/components/layout/AppShell'
 import { Brand } from '@/components/ui/Brand'
 
+import { FinanceProvider } from '@/context/FinanceContext'
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const supabase = useMemo(() => createClient(), [])
@@ -55,13 +57,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <AppShell
-      user={user}
-      onSignOut={async () => {
-        await supabase?.auth.signOut()
-      }}
-    >
-      {children}
-    </AppShell>
+    <FinanceProvider supabase={supabase} user={user}>
+      <AppShell
+        user={user}
+        onSignOut={async () => {
+          await supabase?.auth.signOut()
+        }}
+      >
+        {children}
+      </AppShell>
+    </FinanceProvider>
   )
 }

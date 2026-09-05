@@ -1,0 +1,434 @@
+'use client'
+
+import React, { useMemo, useState } from 'react'
+import type { Transaction } from '@/lib/database.types'
+import { currency, shortCurrency } from '@/lib/finance'
+import { Download, FileSpreadsheet, Printer, X } from 'lucide-react'
+import { toast } from 'sonner'
+
+interface MonthlyExpenseTemplateProps {
+  transactions: Transaction[]
+  userEmail?: string
+  defaultMonth?: string // YYYY-MM
+  onClose: () => void
+}
+
+export function MonthlyExpenseTemplate({
+  transactions,
+  userEmail,
+  defaultMonth,
+  onClose,
+}: MonthlyExpenseTemplateProps) {
+  const currentDate = new Date()
+  const initialMonth = defaultMonth || `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`
+  const [selectedMonth, setSelectedMonth] = useState(initialMonth)
+
+  // Filter transactions by selected month
+  const { monthTx, monthName, yearName, stats, runningTransactions, categoryTotals } = useMemo(() => {
+    const [yearStr, monthStr] = selectedMonth.split('-')
+    const year = parseInt(yearStr, 10)
+    const month = parseInt(monthStr, 10) - 1
+    const dateObj = new Date(year, month, 1)
+
+    const mName = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(dateObj).toUpperCase()
+    const yName = year.toString()
+
+    const prefix = `${selectedMonth}-`
+    // Sort chronologically ascending for the running total calculation
+    const filtered = transactions
+      .filter(t => t.transaction_date.startsWith(prefix))
+      .sort((a, b) => a.transaction_date.localeCompare(b.transaction_date) || a.created_at.localeCompare(b.created_at))
+
+    let running = 0
+    const runningList = filtered.map(t => {
+      const amt = Number(t.amount)
+      if (t.type === 'expense') {
+        running += amt
+      }
+      // Infer payment method from note or category if available
+      let paymentMethod = 'Bank Transfer'
+      const noteLower = (t.note || '').toLowerCase()
+      if (noteLower.includes('cash') || noteLower.includes('tunai')) paymentMethod = 'Cash'
+      else if (noteLower.includes('qris')) paymentMethod = 'QRIS'
+      else if (noteLower.includes('kartu') || noteLower.includes('card')) paymentMethod = 'Debit/Credit'
+      else if (noteLower.includes('gopay') || noteLower.includes('ovo') || noteLower.includes('dana')) paymentMethod = 'E-Wallet'
+      else if (t.category === 'Food' || t.category === 'Shopping') paymentMethod = 'QRIS / Cash'
+
+      return {
+        ...t,
+        paymentMethod,
+        paidTo: t.category || 'General',
+        runningTotal: running,
+      }
+    })
+
+    const income = filtered.filter(t => t.type === 'income').reduce((acc, t) => acc + Number(t.amount), 0)
+    const expense = filtered.filter(t => t.type === 'expense').reduce((acc, t) => acc + Number(t.amount), 0)
+    const balance = income - expense
+
+    // Category breakdown
+    const catMap: Record<string, number> = {}
+    filtered.filter(t => t.type === 'expense').forEach(t => {
+      catMap[t.category] = (catMap[t.category] || 0) + Number(t.amount)
+    })
+    const catSorted = Object.entries(catMap).sort((a, b) => b[1] - a[1])
+
+    return {
+      monthTx: filtered,
+      monthName: mName,
+      yearName: yName,
+      stats: { income, expense, balance, count: filtered.length },
+      runningTransactions: runningList,
+      categoryTotals: catSorted,
+    }
+  }, [transactions, selectedMonth])
+
+  // Print function
+  const handlePrint = () => {
+    window.print()
+  }
+
+  // Export CSV
+  const handleExportCsv = () => {
+    if (!runningTransactions.length) {
+      toast.error('Tidak ada transaksi di bulan ini untuk di-export.')
+      return
+    }
+
+    const headers = ['Date', 'Payment Method', 'Paid To / Category', 'Description', 'Type', 'Amount (IDR)', 'Running Expense Total (IDR)']
+    const rows = runningTransactions.map(t => [
+      t.transaction_date,
+      `"${t.paymentMethod}"`,
+      `"${t.paidTo}"`,
+      `"${t.description.replace(/"/g, '""')}"`,
+      t.type,
+      t.amount,
+      t.runningTotal,
+    ])
+
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n')
+    const encodedUri = encodeURI(csvContent)
+    const link = document.createElement('a')
+    link.setAttribute('href', encodedUri)
+    link.setAttribute('download', `monthly-expense-tracker-${selectedMonth}.csv`)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    toast.success('File CSV berhasil diunduh.')
+  }
+
+  // Export PDF using jspdf
+  const handleExportPdf = async () => {
+    try {
+      const { jsPDF } = await import('jspdf')
+      const doc = new jsPDF('p', 'mm', 'a4')
+
+      // Styling parameters
+      doc.setFont('helvetica', 'normal')
+      doc.setTextColor(30, 50, 73)
+
+      // Header Sparkle title
+      doc.setFontSize(10)
+      doc.text(`MONTH OF  *  ${monthName} ${yearName}  *`, 105, 18, { align: 'center' })
+
+      doc.setFontSize(20)
+      doc.setFont('helvetica', 'bold')
+      doc.text('MONTHLY EXPENSE TRACKER', 105, 27, { align: 'center' })
+
+      // Line separator
+      doc.setDrawColor(200, 200, 200)
+      doc.line(14, 32, 196, 32)
+
+      // Meta row
+      doc.setFontSize(9)
+      doc.setFont('helvetica', 'normal')
+      doc.text(`Account: ${userEmail || 'Personal Account'}`, 14, 38)
+      doc.text(`Currency: IDR (Rp)`, 85, 38)
+      doc.text(`Generated: ${new Date().toLocaleDateString('id-ID')}`, 196, 38, { align: 'right' })
+
+      // Summary KPIs Box
+      doc.setFillColor(247, 246, 240)
+      doc.roundedRect(14, 43, 182, 16, 2, 2, 'F')
+      doc.setFontSize(8)
+      doc.text('TOTAL INCOME', 20, 48)
+      doc.text('TOTAL EXPENSE', 70, 48)
+      doc.text('NET SAVINGS', 120, 48)
+      doc.text('TRANSACTIONS', 170, 48)
+
+      doc.setFontSize(10)
+      doc.setFont('helvetica', 'bold')
+      doc.text(currency(stats.income), 20, 54)
+      doc.text(currency(stats.expense), 70, 54)
+      doc.text(currency(stats.balance), 120, 54)
+      doc.text(`${stats.count} items`, 170, 54)
+
+      // Table Header
+      let y = 68
+      doc.setFillColor(255, 255, 255)
+      doc.setDrawColor(50, 50, 50)
+      doc.setLineWidth(0.3)
+
+      doc.setFontSize(8)
+      doc.setFont('helvetica', 'bold')
+      doc.rect(14, y - 4, 182, 8)
+      doc.text('DATE', 16, y)
+      doc.text('PAYMENT METHOD', 42, y)
+      doc.text('PAID TO', 80, y)
+      doc.text('DESCRIPTION', 112, y)
+      doc.text('AMOUNT', 162, y, { align: 'right' })
+      doc.text('RUNNING TOTAL', 194, y, { align: 'right' })
+
+      y += 8
+      doc.setFont('helvetica', 'normal')
+      doc.setFontSize(8)
+
+      if (runningTransactions.length === 0) {
+        doc.text('No expense records found for this month.', 105, y + 10, { align: 'center' })
+      } else {
+        runningTransactions.slice(0, 24).forEach((t) => {
+          doc.rect(14, y - 4, 182, 7)
+          doc.text(t.transaction_date, 16, y)
+          doc.text(t.paymentMethod.slice(0, 18), 42, y)
+          doc.text(t.paidTo.slice(0, 15), 80, y)
+          doc.text(t.description.slice(0, 24), 112, y)
+          doc.text(currency(Number(t.amount)), 162, y, { align: 'right' })
+          doc.text(currency(t.runningTotal), 194, y, { align: 'right' })
+          y += 7
+        })
+      }
+
+      // Footer
+      doc.setFontSize(8)
+      doc.setTextColor(120, 120, 120)
+      doc.text('Cukupin Ledger Template - Clean, deterministic personal finance.', 105, 285, { align: 'center' })
+
+      doc.save(`monthly-expense-tracker-${selectedMonth}.pdf`)
+      toast.success('Laporan PDF berhasil disimpan.')
+    } catch (err) {
+      console.error(err)
+      toast.error('Gagal mengekspor PDF.')
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-2 backdrop-blur-sm sm:p-4 overflow-y-auto">
+      {/* Modal / Sheet Container */}
+      <div className="relative my-auto flex w-full max-w-4xl flex-col rounded-[24px] border border-line bg-card shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+        
+        {/* Top Action Toolbar (Hidden during print) */}
+        <div className="print:hidden flex flex-wrap items-center justify-between gap-3 border-b border-line bg-paper px-6 py-4">
+          <div className="flex items-center gap-3">
+            <span className="font-display text-lg font-bold text-ink">Template Export</span>
+            <div className="flex items-center gap-2">
+              <label htmlFor="month-select" className="text-xs font-medium text-muted">Bulan:</label>
+              <input
+                id="month-select"
+                type="month"
+                value={selectedMonth}
+                onChange={e => setSelectedMonth(e.target.value)}
+                className="rounded-lg border border-line bg-card px-3 py-1.5 text-xs font-bold text-ink outline-none focus:border-blue"
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handlePrint}
+              className="inline-flex items-center gap-1.5 rounded-xl bg-ink px-3.5 py-2 text-xs font-bold text-white shadow-sm hover:bg-[#2A4360] transition-colors"
+            >
+              <Printer size={15} /> Cetak / Print
+            </button>
+            <button
+              onClick={handleExportPdf}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-line bg-card px-3.5 py-2 text-xs font-bold text-ink hover:bg-paper transition-colors"
+            >
+              <Download size={15} /> Download PDF
+            </button>
+            <button
+              onClick={handleExportCsv}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-line bg-card px-3.5 py-2 text-xs font-bold text-ink hover:bg-paper transition-colors"
+            >
+              <FileSpreadsheet size={15} /> CSV
+            </button>
+            <button
+              onClick={onClose}
+              className="rounded-xl p-2 text-muted hover:bg-line/50 hover:text-ink transition-colors ml-1"
+              aria-label="Tutup modal"
+            >
+              <X size={18} />
+            </button>
+          </div>
+        </div>
+
+        {/* Printable Sheet Viewport - This matches Image 3 exactly */}
+        <div className="max-h-[82vh] overflow-y-auto p-6 md:p-10 bg-white text-[#111827] print:max-h-none print:overflow-visible print:p-0">
+          
+          {/* Header Block matching Image 3 */}
+          <div className="mb-6 text-center">
+            <div className="flex items-center justify-center gap-2 text-[12px] font-semibold tracking-widest text-[#4B5563] uppercase">
+              <span>MONTH OF</span>
+              <span className="text-[#1E3249]">✦</span>
+              <span className="font-bold text-[#111827]">{monthName} {yearName}</span>
+              <span className="text-[#1E3249]">✦</span>
+            </div>
+            <h1 className="mt-1 font-display text-2xl md:text-3xl font-extrabold tracking-wider text-[#111827] uppercase">
+              MONTHLY EXPENSE TRACKER
+            </h1>
+          </div>
+
+          {/* Statement Metadata & Quick KPI Strip */}
+          <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4 rounded-xl border border-[#D1D5DB] bg-[#F9FAFB] p-3 text-xs">
+            <div>
+              <span className="block text-[10px] uppercase tracking-wider text-[#6B7280]">Total Anggaran/Masuk</span>
+              <strong className="text-[13px] font-bold text-[#15803D]">{currency(stats.income)}</strong>
+            </div>
+            <div>
+              <span className="block text-[10px] uppercase tracking-wider text-[#6B7280]">Total Pengeluaran</span>
+              <strong className="text-[13px] font-bold text-[#DC2626]">{currency(stats.expense)}</strong>
+            </div>
+            <div>
+              <span className="block text-[10px] uppercase tracking-wider text-[#6B7280]">Sisa Bersih</span>
+              <strong className="text-[13px] font-bold text-[#1D4ED8]">{currency(stats.balance)}</strong>
+            </div>
+            <div>
+              <span className="block text-[10px] uppercase tracking-wider text-[#6B7280]">Total Catatan</span>
+              <strong className="text-[13px] font-bold text-[#111827]">{stats.count} Transaksi</strong>
+            </div>
+          </div>
+
+          {/* The Ledger Table matching Image 3 structure */}
+          <div className="overflow-x-auto border border-[#111827]">
+            <table className="w-full border-collapse text-left text-xs">
+              <thead>
+                <tr className="border-b border-[#111827] bg-[#F3F4F6] text-[10px] font-bold uppercase tracking-wider text-[#111827]">
+                  <th className="border-r border-[#111827] px-3 py-2.5 w-[110px]">DATE OF PAYMENT</th>
+                  <th className="border-r border-[#111827] px-3 py-2.5 w-[130px]">PAYMENT METHOD</th>
+                  <th className="border-r border-[#111827] px-3 py-2.5 w-[120px]">PAID TO</th>
+                  <th className="border-r border-[#111827] px-3 py-2.5 min-w-[160px]">DESCRIPTION</th>
+                  <th className="border-r border-[#111827] px-3 py-2.5 text-right w-[115px]">AMOUNT PAID</th>
+                  <th className="px-3 py-2.5 text-right w-[125px]">RUNNING TOTAL</th>
+                </tr>
+              </thead>
+              <tbody>
+                {runningTransactions.length > 0 ? (
+                  runningTransactions.map((tx, idx) => (
+                    <tr
+                      key={tx.id}
+                      className={`border-b border-[#E5E7EB] transition-colors ${
+                        idx % 2 === 1 ? 'bg-[#F9FAFB]' : 'bg-white'
+                      }`}
+                    >
+                      <td className="border-r border-[#111827] px-3 py-2 font-mono text-[11px] whitespace-nowrap">
+                        {tx.transaction_date}
+                      </td>
+                      <td className="border-r border-[#111827] px-3 py-2 text-[#4B5563]">
+                        {tx.paymentMethod}
+                      </td>
+                      <td className="border-r border-[#111827] px-3 py-2 font-medium">
+                        {tx.paidTo}
+                      </td>
+                      <td className="border-r border-[#111827] px-3 py-2 text-[#374151]">
+                        {tx.description}
+                        {tx.type === 'income' && (
+                          <span className="ml-2 inline-block rounded bg-emerald-100 px-1.5 py-0.5 text-[9px] font-bold text-emerald-800">
+                            Pemasukan
+                          </span>
+                        )}
+                      </td>
+                      <td className="border-r border-[#111827] px-3 py-2 text-right font-mono font-medium">
+                        {currency(Number(tx.amount))}
+                      </td>
+                      <td className="px-3 py-2 text-right font-mono font-bold text-[#111827]">
+                        {currency(tx.runningTotal)}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={6} className="py-12 text-center text-[#6B7280]">
+                      Belum ada transaksi yang tercatat pada bulan {monthName} {yearName}.
+                    </td>
+                  </tr>
+                )}
+                {/* Empty filler rows to maintain that clean classic ledger look if few rows */}
+                {runningTransactions.length > 0 && runningTransactions.length < 10 &&
+                  Array.from({ length: 10 - runningTransactions.length }).map((_, i) => (
+                    <tr key={`filler-${i}`} className="border-b border-[#E5E7EB] h-7">
+                      <td className="border-r border-[#111827] px-3" />
+                      <td className="border-r border-[#111827] px-3" />
+                      <td className="border-r border-[#111827] px-3" />
+                      <td className="border-r border-[#111827] px-3" />
+                      <td className="border-r border-[#111827] px-3" />
+                      <td className="px-3" />
+                    </tr>
+                  ))}
+              </tbody>
+              <tfoot>
+                <tr className="border-t-2 border-[#111827] bg-[#F3F4F6] font-bold text-[11px]">
+                  <td colSpan={4} className="border-r border-[#111827] px-3 py-2 text-right uppercase tracking-wider">
+                    Total Pengeluaran Bulan Ini
+                  </td>
+                  <td colSpan={2} className="px-3 py-2 text-right font-mono text-[13px] text-[#DC2626]">
+                    {currency(stats.expense)}
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          {/* Extra Details: Top Categories & Notes Section */}
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-[#D1D5DB] text-xs">
+            {/* Category Breakdown list */}
+            <div>
+              <h3 className="font-bold text-[11px] tracking-wider uppercase text-[#374151] mb-2">
+                Rincian Kategori Pengeluaran
+              </h3>
+              {categoryTotals.length > 0 ? (
+                <div className="space-y-1.5">
+                  {categoryTotals.map(([cat, val]) => {
+                    const percent = stats.expense > 0 ? ((val / stats.expense) * 100).toFixed(1) : '0'
+                    return (
+                      <div key={cat} className="flex items-center justify-between py-0.5 border-b border-gray-100">
+                        <span className="text-[#4B5563]">{cat}</span>
+                        <div className="flex items-center gap-3">
+                          <span className="text-[10px] text-gray-400">{percent}%</span>
+                          <strong className="font-mono">{currency(val)}</strong>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              ) : (
+                <p className="text-gray-400">Tidak ada kategori.</p>
+              )}
+            </div>
+
+            {/* Notes & Verification Stamp */}
+            <div className="flex flex-col justify-between rounded-lg border border-dashed border-[#D1D5DB] p-4 bg-[#F9FAFB]">
+              <div>
+                <h3 className="font-bold text-[11px] tracking-wider uppercase text-[#374151] mb-1">
+                  Catatan & Rekonsiliasi
+                </h3>
+                <p className="text-[11px] text-[#6B7280] leading-relaxed">
+                  Laporan keuangan bulanan ini diekspor secara otomatis melalui Cukupin (Quiet Ledger). Data dihitung secara deterministik tanpa manipulasi eksternal.
+                </p>
+              </div>
+              <div className="mt-6 flex items-end justify-between border-t border-gray-200 pt-3">
+                <div className="text-[9px] text-[#9CA3AF]">
+                  Status: Terverifikasi Sistem<br />
+                  Generated by {userEmail || 'Cukupin User'}
+                </div>
+                <div className="text-center">
+                  <div className="h-6 border-b border-gray-400 w-28 mb-1" />
+                  <span className="text-[9px] uppercase tracking-wider text-[#6B7280]">Tanda Tangan / Review</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  )
+}

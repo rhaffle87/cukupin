@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import { ArrowDownLeft, ArrowUpRight, Download, FileText, TrendingDown, TrendingUp, Wallet } from 'lucide-react'
+import { ArrowDownLeft, ArrowUpRight, Download, FileSpreadsheet, FileText, TrendingDown, TrendingUp, Wallet } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { toast } from 'sonner'
 import { PageHeader } from '@/components/ui/PageHeader'
@@ -8,8 +8,10 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { TransactionRow } from './TransactionRow'
 import { useFinanceData } from '@/hooks/useFinanceData'
 import { comparator, currency, monthBounds, totals } from '@/lib/finance'
+import { MonthlyExpenseTemplate } from './MonthlyExpenseTemplate'
 
 export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> }) {
+  const [showTemplate, setShowTemplate] = useState(false)
   const [from, setFrom] = useState(monthBounds().start)
   const [to, setTo] = useState(monthBounds().end)
 
@@ -58,9 +60,14 @@ export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> 
         title="Laporan"
         subtitle="Pahami pola, bukan sekadar angka."
         action={
-          <button className="button primary" onClick={exportPdf}>
-            <Download size={17} /> Export PDF
-          </button>
+          <div className="flex items-center gap-2">
+            <button className="button secondary" onClick={() => setShowTemplate(true)}>
+              <FileSpreadsheet size={16} /> Template Bulanan
+            </button>
+            <button className="button primary" onClick={exportPdf}>
+              <Download size={16} /> Export Ringkas
+            </button>
+          </div>
         }
       />
       
@@ -139,6 +146,13 @@ export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> 
           <EmptyState icon={FileText} title="Tidak ada transaksi" body="Coba ubah rentang tanggal laporan." />
         )}
       </section>
+
+      {showTemplate && (
+        <MonthlyExpenseTemplate
+          transactions={data.transactions}
+          onClose={() => setShowTemplate(false)}
+        />
+      )}
     </>
   )
 }
