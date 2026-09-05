@@ -7,7 +7,7 @@ import { PageHeader } from '@/components/ui/PageHeader'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { Modal } from '@/components/ui/Modal'
 import { useFinanceData } from '@/hooks/useFinanceData'
-import { currency } from '@/lib/finance'
+import { currency, isoDate } from '@/lib/finance'
 
 interface GoalsViewProps {
   supabase: SupabaseClient | null
@@ -24,6 +24,7 @@ export function GoalsView({ supabase, data, userId }: GoalsViewProps) {
   const [target, setTarget] = useState('')
   const [adding, setAdding] = useState<SavingGoal | null>(null)
   const [amount, setAmount] = useState('')
+  const [recordAsExpense, setRecordAsExpense] = useState(true)
 
   function triggerCelebration() {
     try {
@@ -100,11 +101,24 @@ export function GoalsView({ supabase, data, userId }: GoalsViewProps) {
       toast.error(result.error.message)
       data.setGoals(prevGoals)
     } else {
+      if (recordAsExpense && userId) {
+        await supabase.from('transactions').insert({
+          user_id: userId,
+          type: 'expense',
+          amount: numericAdd,
+          category: 'Bills',
+          description: `Alokasi target: ${adding.name}`,
+          transaction_date: isoDate(new Date()),
+          note: `#tabungan Alokasi tabungan untuk ${adding.name}`,
+          payment_method: 'Transfer Bank',
+        })
+      }
+
       if (isCompleted) {
         triggerCelebration()
         toast.success('Hore! Target tabunganmu sudah tercapai!')
       } else {
-        toast.success('Dana berhasil ditambahkan.')
+        toast.success(recordAsExpense ? 'Dana ditambahkan & dicatat ke pengeluaran.' : 'Dana berhasil ditambahkan.')
       }
       setAdding(null)
       setAmount('')
@@ -220,7 +234,16 @@ export function GoalsView({ supabase, data, userId }: GoalsViewProps) {
               Nominal tambahan
               <input type="number" required min="1" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0" />
             </label>
-            <button className="button primary wide">Tambahkan dana</button>
+            <label className="flex flex-row items-center gap-2 cursor-pointer text-xs font-semibold text-ink pt-1">
+              <input
+                type="checkbox"
+                checked={recordAsExpense}
+                onChange={e => setRecordAsExpense(e.target.checked)}
+                className="h-4 w-4 rounded border-line text-green focus:ring-green cursor-pointer"
+              />
+              <span>Catat otomatis sebagai pengeluaran di transaksi</span>
+            </label>
+            <button className="button primary wide mt-2">Tambahkan dana</button>
           </form>
         </Modal>
       )}

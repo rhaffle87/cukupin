@@ -102,3 +102,25 @@ export function budgetRule503020(transactions: Transaction[]) {
     wantsPct,
   }
 }
+
+/**
+ * Breakdown of expenses by payment method.
+ */
+export function paymentMethodBreakdown(transactions: Transaction[]) {
+  const expenses = transactions.filter(t => t.type === 'expense')
+  const total = expenses.reduce((sum, t) => sum + Number(t.amount), 0)
+
+  const map: Record<string, number> = {}
+  for (const t of expenses) {
+    const method = t.payment_method || 'Lainnya / Tidak Ditentukan'
+    map[method] = (map[method] || 0) + Number(t.amount)
+  }
+
+  return Object.entries(map)
+    .map(([method, amount]) => ({
+      method,
+      amount,
+      percentage: total > 0 ? Math.round((amount / total) * 100) : 0,
+    }))
+    .sort((a, b) => b.amount - a.amount)
+}

@@ -1,12 +1,12 @@
 import React, { useMemo, useState } from 'react'
-import { ArrowDownLeft, ArrowUpRight, Download, FileSpreadsheet, FileText, PieChart, TrendingDown, TrendingUp, Wallet } from 'lucide-react'
+import { ArrowDownLeft, ArrowUpRight, ChevronLeft, ChevronRight, Download, FileSpreadsheet, FileText, PieChart, TrendingDown, TrendingUp, Wallet } from 'lucide-react'
 import { toast } from 'sonner'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { StatCard } from '@/components/ui/StatCard'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { TransactionRow } from './TransactionRow'
 import { useFinanceData } from '@/hooks/useFinanceData'
-import { budgetRule503020, comparator, currency, monthBounds, totals } from '@/lib/finance'
+import { budgetRule503020, comparator, currency, isoDate, monthBounds, paymentMethodBreakdown, totals } from '@/lib/finance'
 import { MonthlyExpenseTemplate } from './MonthlyExpenseTemplate'
 
 export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> }) {
@@ -14,7 +14,7 @@ export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> 
   const [from, setFrom] = useState(monthBounds().start)
   const [to, setTo] = useState(monthBounds().end)
 
-  const { filtered, stats, comp, rule503020 } = useMemo(() => {
+  const { filtered, stats, comp, rule503020, paymentMethods } = useMemo(() => {
     const f = data.transactions.filter(t => t.transaction_date >= from && t.transaction_date <= to)
     const s = totals(f)
     const c = comparator(
@@ -22,8 +22,25 @@ export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> 
       data.transactions.filter(t => t.transaction_date >= monthBounds(-1).start && t.transaction_date <= monthBounds(-1).end)
     )
     const b50 = budgetRule503020(f)
-    return { filtered: f, stats: s, comp: c, rule503020: b50 }
+    const pm = paymentMethodBreakdown(f)
+    return { filtered: f, stats: s, comp: c, rule503020: b50, paymentMethods: pm }
   }, [data.transactions, from, to])
+
+  function stepMonth(direction: -1 | 1) {
+    let refDate = new Date()
+    if (from) {
+      const [y, m] = from.split('-').map(Number)
+      if (!isNaN(y) && !isNaN(m)) {
+        refDate = new Date(y, m - 1 + direction, 1)
+      }
+    } else {
+      refDate = new Date(refDate.getFullYear(), refDate.getMonth() + direction, 1)
+    }
+    const start = new Date(refDate.getFullYear(), refDate.getMonth(), 1)
+    const end = new Date(refDate.getFullYear(), refDate.getMonth() + 1, 0)
+    setFrom(isoDate(start))
+    setTo(isoDate(end))
+  }
 
   function exportPdf() {
     import('jspdf').then(({ jsPDF }) => {
@@ -85,7 +102,16 @@ export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> 
           </p>
           <strong className="mt-1 block font-display text-lg font-bold text-ink">Pilih periode laporan</strong>
         </div>
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => stepMonth(-1)}
+            title="Bulan Sebelumnya"
+            className="self-end mb-1 rounded-lg border border-line bg-paper p-2 text-muted hover:bg-black/5 hover:text-ink transition-colors cursor-pointer"
+            aria-label="Bulan Sebelumnya"
+          >
+            <ChevronLeft size={16} />
+          </button>
           <label className="flex flex-col text-[11px] font-bold text-muted">
             Dari
             <input
@@ -105,6 +131,15 @@ export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> 
               className="mt-1 rounded-lg border border-line bg-paper px-3 py-1.5 text-xs text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
             />
           </label>
+          <button
+            type="button"
+            onClick={() => stepMonth(1)}
+            title="Bulan Berikutnya"
+            className="self-end mb-1 rounded-lg border border-line bg-paper p-2 text-muted hover:bg-black/5 hover:text-ink transition-colors cursor-pointer"
+            aria-label="Bulan Berikutnya"
+          >
+            <ChevronRight size={16} />
+          </button>
         </div>
       </div>
       
@@ -156,6 +191,43 @@ export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> 
                 {currency(rule503020.wants)} · Belanja, Hiburan & Lainnya
               </small>
             </div>
+          </div>
+        </section>
+      )}
+
+      {/* Payment Method Distribution */}
+      {paymentMethods.length > 0 && stats.expense > 0 && (
+        <section className="mb-4 rounded-[18px] border border-line bg-card p-5 shadow-[0_5px_20px_rgba(30,50,73,0.025)] md:p-6">
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <p className="flex items-center gap-1.5 text-[10px] font-bold tracking-widest text-[#89938A] uppercase before:block before:h-[1px] before:w-[19px] before:bg-blue after:block after:-ml-[5px] after:h-[4px] after:w-[4px] after:rounded-full after:bg-green">
+                METODE PEMBAYARAN
+              </p>
+              <h2 className="mt-1 font-display text-xl font-bold tracking-tight text-ink">Distribusi Kanal Belanja</h2>
+            </div>
+            <span className="rounded-full border border-line bg-paper px-3 py-1 text-[10px] font-bold text-muted">
+              {paymentMethods.length} Kanal Terpakai
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+            {paymentMethods.map(pm => (
+              <div key={pm.method} className="rounded-xl border border-line/70 bg-paper/60 p-3.5">
+                <div className="flex items-center justify-between mb-1.5">
+                  <strong className="text-xs font-bold text-ink">{pm.method}</strong>
+                  <span className="text-xs font-bold text-blue">{pm.percentage}%</span>
+                </div>
+                <div className="h-2 w-full overflow-hidden rounded-full bg-line">
+                  <div
+                    className="h-full rounded-full bg-blue transition-all"
+                    style={{ width: `${Math.min(100, Math.max(4, pm.percentage))}%` }}
+                  />
+                </div>
+                <small className="mt-1.5 block text-[11px] font-mono text-muted">
+                  {currency(pm.amount)}
+                </small>
+              </div>
+            ))}
           </div>
         </section>
       )}
