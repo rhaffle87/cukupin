@@ -1,0 +1,67 @@
+'use client'
+
+import React, { useEffect, useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
+import { AppShell } from '@/components/layout/AppShell'
+import { Brand } from '@/components/ui/Brand'
+
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const router = useRouter()
+  const supabase = useMemo(() => createClient(), [])
+  const [user, setUser] = useState<{ id: string; email?: string } | null>(null)
+  const [checking, setChecking] = useState(true)
+
+  useEffect(() => {
+    if (!supabase) {
+      setChecking(false)
+      return
+    }
+    
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) {
+        setUser({ id: data.user.id, email: data.user.email })
+      } else {
+        router.push('/login')
+      }
+      setChecking(false)
+    })
+    
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setUser({ id: session.user.id, email: session.user.email })
+      } else {
+        setUser(null)
+        router.push('/login')
+      }
+    })
+    
+    return () => {
+      listener.subscription.unsubscribe()
+    }
+  }, [supabase, router])
+
+  if (checking) {
+    return (
+      <div className="loading-screen">
+        <Brand />
+        <span>Menyiapkan ruang uangmu...</span>
+      </div>
+    )
+  }
+
+  if (!user) {
+    return null // Will redirect to /login
+  }
+
+  return (
+    <AppShell
+      user={user}
+      onSignOut={async () => {
+        await supabase?.auth.signOut()
+      }}
+    >
+      {children}
+    </AppShell>
+  )
+}
