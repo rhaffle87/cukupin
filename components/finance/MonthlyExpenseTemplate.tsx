@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useRef } from 'react'
 import type { Transaction } from '@/lib/database.types'
 import { currency, shortCurrency } from '@/lib/finance'
 import { Download, FileSpreadsheet, Printer, X } from 'lucide-react'
@@ -19,6 +19,7 @@ export function MonthlyExpenseTemplate({
   defaultMonth,
   onClose,
 }: MonthlyExpenseTemplateProps) {
+  const sheetRef = useRef<HTMLDivElement>(null)
   const currentDate = new Date()
   const initialMonth = defaultMonth || `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`
   const [selectedMonth, setSelectedMonth] = useState(initialMonth)
@@ -117,103 +118,74 @@ export function MonthlyExpenseTemplate({
     toast.success('File CSV berhasil diunduh.')
   }
 
-  // Export PDF using jspdf
+  // Export PDF using high-fidelity visual rendering matching the preview
   const handleExportPdf = async () => {
+    if (!sheetRef.current) return
+    const toastId = toast.loading('Memproses ekspor PDF...')
     try {
-      const { jsPDF } = await import('jspdf')
-      const doc = new jsPDF('p', 'mm', 'a4')
-
-      // Styling parameters
-      doc.setFont('helvetica', 'normal')
-      doc.setTextColor(30, 50, 73)
-
-      // Header Sparkle title
-      doc.setFontSize(10)
-      doc.text(`MONTH OF  *  ${monthName} ${yearName}  *`, 105, 18, { align: 'center' })
-
-      doc.setFontSize(20)
-      doc.setFont('helvetica', 'bold')
-      doc.text('MONTHLY EXPENSE TRACKER', 105, 27, { align: 'center' })
-
-      // Line separator
-      doc.setDrawColor(200, 200, 200)
-      doc.line(14, 32, 196, 32)
-
-      // Meta row
-      doc.setFontSize(9)
-      doc.setFont('helvetica', 'normal')
-      doc.text(`Account: ${userEmail || 'Personal Account'}`, 14, 38)
-      doc.text(`Currency: IDR (Rp)`, 85, 38)
-      doc.text(`Generated: ${new Date().toLocaleDateString('id-ID')}`, 196, 38, { align: 'right' })
-
-      // Summary KPIs Box
-      doc.setFillColor(247, 246, 240)
-      doc.roundedRect(14, 43, 182, 16, 2, 2, 'F')
-      doc.setFontSize(8)
-      doc.text('TOTAL INCOME', 20, 48)
-      doc.text('TOTAL EXPENSE', 70, 48)
-      doc.text('NET SAVINGS', 120, 48)
-      doc.text('TRANSACTIONS', 170, 48)
-
-      doc.setFontSize(10)
-      doc.setFont('helvetica', 'bold')
-      doc.text(currency(stats.income), 20, 54)
-      doc.text(currency(stats.expense), 70, 54)
-      doc.text(currency(stats.balance), 120, 54)
-      doc.text(`${stats.count} items`, 170, 54)
-
-      // Table Header
-      let y = 68
-      doc.setFillColor(255, 255, 255)
-      doc.setDrawColor(50, 50, 50)
-      doc.setLineWidth(0.3)
-
-      doc.setFontSize(8)
-      doc.setFont('helvetica', 'bold')
-      doc.rect(14, y - 4, 182, 8)
-      doc.text('DATE', 16, y)
-      doc.text('PAYMENT METHOD', 42, y)
-      doc.text('PAID TO', 80, y)
-      doc.text('DESCRIPTION', 112, y)
-      doc.text('AMOUNT', 162, y, { align: 'right' })
-      doc.text('RUNNING TOTAL', 194, y, { align: 'right' })
-
-      y += 8
-      doc.setFont('helvetica', 'normal')
-      doc.setFontSize(8)
-
-      if (runningTransactions.length === 0) {
-        doc.text('No expense records found for this month.', 105, y + 10, { align: 'center' })
-      } else {
-        runningTransactions.slice(0, 24).forEach((t) => {
-          doc.rect(14, y - 4, 182, 7)
-          doc.text(t.transaction_date, 16, y)
-          doc.text(t.paymentMethod.slice(0, 18), 42, y)
-          doc.text(t.paidTo.slice(0, 15), 80, y)
-          doc.text(t.description.slice(0, 24), 112, y)
-          doc.text(currency(Number(t.amount)), 162, y, { align: 'right' })
-          doc.text(currency(t.runningTotal), 194, y, { align: 'right' })
-          y += 7
-        })
+      if (typeof document !== 'undefined' && document.fonts) {
+        await document.fonts.ready
       }
 
-      // Footer
-      doc.setFontSize(8)
-      doc.setTextColor(120, 120, 120)
-      doc.text('Cukupin Ledger Template - Clean, deterministic personal finance.', 105, 285, { align: 'center' })
+      const html2canvas = (await import('html2canvas')).default
+      const { jsPDF } = await import('jspdf')
 
-      doc.save(`monthly-expense-tracker-${selectedMonth}.pdf`)
-      toast.success('Laporan PDF berhasil disimpan.')
+      const element = sheetRef.current
+      const canvas = await html2canvas(element, {
+        scale: 2, // 2x high resolution
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        logging: false,
+        onclone: (clonedDoc) => {
+          const el = clonedDoc.getElementById('printable-expense-sheet')
+          if (el) {
+            el.style.maxHeight = 'none'
+            el.style.overflow = 'visible'
+          }
+        },
+      })
+
+      const imgData = canvas.toDataURL('image/png', 1.0)
+      const pdf = new jsPDF('p', 'mm', 'a4')
+      const pdfWidth = pdf.internal.pageSize.getWidth() // 210mm
+      const pdfHeight = pdf.internal.pageSize.getHeight() // 297mm
+
+      const margin = 8 // 8mm margin
+      const contentWidth = pdfWidth - margin * 2
+      const contentHeight = (canvas.height * contentWidth) / canvas.width
+
+      if (contentHeight <= pdfHeight - margin * 2) {
+        pdf.addImage(imgData, 'PNG', margin, margin, contentWidth, contentHeight, undefined, 'FAST')
+      } else {
+        let heightLeft = contentHeight
+        let position = margin
+        const pageContentHeight = pdfHeight - margin * 2
+
+        pdf.addImage(imgData, 'PNG', margin, position, contentWidth, contentHeight, undefined, 'FAST')
+        heightLeft -= pageContentHeight
+
+        while (heightLeft > 0) {
+          position -= pageContentHeight
+          pdf.addPage()
+          pdf.addImage(imgData, 'PNG', margin, position, contentWidth, contentHeight, undefined, 'FAST')
+          heightLeft -= pageContentHeight
+        }
+      }
+
+      pdf.save(`monthly-expense-tracker-${selectedMonth}.pdf`)
+      toast.dismiss(toastId)
+      toast.success('Laporan PDF visual berhasil diunduh!')
     } catch (err) {
       console.error(err)
+      toast.dismiss(toastId)
       toast.error('Gagal mengekspor PDF.')
     }
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-2 backdrop-blur-sm sm:p-4 overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-2 backdrop-blur-sm sm:p-4 overflow-y-auto print:static print:inset-auto print:bg-white print:p-0 print:overflow-visible">
       {/* Modal / Sheet Container */}
-      <div className="relative my-auto flex w-full max-w-4xl flex-col rounded-[24px] border border-line bg-card shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+      <div className="relative my-auto flex w-full max-w-4xl flex-col rounded-[24px] border border-line bg-card shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 print:max-w-none print:w-full print:rounded-none print:border-none print:shadow-none print:bg-white print:overflow-visible">
         
         {/* Top Action Toolbar (Hidden during print) */}
         <div className="print:hidden flex flex-wrap items-center justify-between gap-3 border-b border-line bg-paper px-6 py-4">
@@ -261,7 +233,11 @@ export function MonthlyExpenseTemplate({
         </div>
 
         {/* Printable Sheet Viewport - This matches Image 3 exactly */}
-        <div className="max-h-[82vh] overflow-y-auto p-6 md:p-10 bg-white text-[#111827] print:max-h-none print:overflow-visible print:p-0">
+        <div
+          ref={sheetRef}
+          id="printable-expense-sheet"
+          className="max-h-[82vh] overflow-y-auto p-6 md:p-10 bg-white text-[#111827] print:max-h-none print:overflow-visible print:p-0"
+        >
           
           {/* Header Block matching Image 3 */}
           <div className="mb-6 text-center">

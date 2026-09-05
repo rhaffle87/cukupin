@@ -60,16 +60,16 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
   return (
     <>
       <PageHeader
-        eyebrow="CATATAN UANG"
+        eyebrow="CATATAN"
         title="Transaksi"
-        subtitle="Satu catatan kecil hari ini, satu gambaran besar di akhir bulan."
+        subtitle="Catat pengeluaran dan pemasukan harianmu biar gampang dipantau."
         action={
           <div className="flex items-center gap-2">
             <button className="button secondary" onClick={() => setShowExportTemplate(true)}>
               <FileSpreadsheet size={16} /> Format Bulanan
             </button>
             <button className="button primary" onClick={() => { setEditing(undefined); setShowForm(true) }}>
-              <Plus size={16} /> Transaksi baru
+              <Plus size={16} /> Tambah catatan
             </button>
           </div>
         }
@@ -155,8 +155,8 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
           ) : (
             <EmptyState
               icon={Receipt}
-              title={data.transactions.length ? 'Tidak ada yang cocok' : 'Ledger-mu masih kosong'}
-              body={data.transactions.length ? 'Coba ubah kata kunci atau rentang tanggal.' : 'Mulai dengan satu pemasukan atau pengeluaran.'}
+              title={data.transactions.length ? 'Nggak ada yang cocok' : 'Belum ada catatan'}
+              body={data.transactions.length ? 'Coba cek lagi kata kunci atau tanggalnya.' : 'Mulai dari satu pemasukan atau pengeluaran pertamamu.'}
               action={
                 !data.transactions.length ? (
                   <button className="button secondary small" onClick={() => setShowForm(true)}>
@@ -169,8 +169,8 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
         </section>
         <aside className="panel quick-note">
           <div className="note-number">01</div>
-          <h3>Catat tanpa menghakimi.</h3>
-          <p>Tujuan Cukupin bukan membuatmu merasa bersalah. Catatan yang jujur membantu kamu mengambil keputusan yang lebih tenang.</p>
+          <h3>Catat santai aja.</h3>
+          <p>Nggak perlu pusing atau merasa bersalah. Catat apa adanya biar kamu tahu uangmu kepakai buat apa aja.</p>
         </aside>
       </div>
       

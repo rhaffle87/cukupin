@@ -66,9 +66,15 @@
 @media(max-width:680px){.skeleton-hero{height:300px;padding:27px 24px}.skeleton-box{right:18px;bottom:18px;top:auto;width:175px;height:90px}.skeleton-line.wide{width:75%}.skeleton-line.medium{width:58%}.skeleton-stats{gap:8px}.skeleton-card{padding:14px 12px;height:116px}.skeleton-line.value{height:20px;margin-top:18px}.skeleton-panels{grid-template-columns:1fr}.skeleton-card.tall{height:260px}.skeleton-panels .skeleton-card:nth-child(2){display:none}.filters-panel{padding:15px 16px 44px}.filter-controls{gap:8px}.filter-controls input,.filter-controls select{padding:10px 8px}.mobile-fab{display:flex;align-items:center;gap:7px;position:fixed;right:17px;bottom:84px;z-index:13;background:var(--green);color:white;border-radius:99px;padding:13px 17px 13px 14px;font-size:11px;font-weight:700;box-shadow:0 10px 25px rgba(62,143,104,.3);transition:transform .16s ease}.mobile-fab:active{transform:scale(.96)}}
 
 @media print {
+  @page {
+    size: A4 portrait;
+    margin: 10mm;
+  }
   body {
     background: #ffffff !important;
     color: #000000 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
   .sidebar, .mobile-header, .bottom-nav, .mobile-fab, button, .print\:hidden {
     display: none !important;

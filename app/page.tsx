@@ -28,7 +28,7 @@ export default function LandingPage() {
           <div className="absolute left-1/2 top-1/2 -z-10 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-green-soft/50 blur-[100px]" />
 
           <span className="mb-6 flex items-center gap-2 rounded-full border border-green/20 bg-green-soft px-4 py-1.5 text-[10px] font-bold tracking-widest text-green shadow-sm uppercase">
-            <Sparkles size={12} /> Personal Finance, Simplified
+            <Sparkles size={12} /> Catat santai, tahu arah uangmu
           </span>
 
           <h1 className="max-w-4xl font-display text-[2.5rem] font-bold leading-[1.05] tracking-tight text-ink md:text-[4.5rem]">
@@ -37,7 +37,7 @@ export default function LandingPage() {
           </h1>
 
           <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-muted md:text-xl">
-            Cukupin membantu kamu melihat arus uang dengan lebih jernih, satu bulan demi satu bulan, tanpa rasa bersalah.
+            Bantu kamu pantau uang masuk dan keluar tiap bulan. Simpel, santai, dan nggak bikin pusing.
           </p>
 
           <div className="mt-10 flex flex-col items-center gap-6 sm:flex-row">
@@ -45,7 +45,7 @@ export default function LandingPage() {
               href="/auth/login"
               className="group flex h-14 items-center justify-center gap-2 rounded-2xl bg-ink px-8 text-base font-bold !text-white shadow-xl shadow-ink/15 transition-all hover:-translate-y-0.5 hover:bg-ink/90 active:translate-y-0"
             >
-              Mulai ruang uangmu — Gratis
+              Coba sekarang — gratis
               <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
@@ -59,7 +59,7 @@ export default function LandingPage() {
               ))}
             </div>
             <p>
-              Bergabunglah dengan <strong className="text-ink">ratusan pengguna</strong> lainnya<br className="hidden sm:block" /> yang telah beralih ke pencatatan yang menenangkan.
+              Cocok buat kamu yang pengen <strong className="text-ink">tahu ke mana uang pergi</strong>,<br className="hidden sm:block" /> tanpa rumus atau spreadsheet yang ribet.
             </p>
           </div>
         </section>

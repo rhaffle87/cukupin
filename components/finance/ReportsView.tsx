@@ -56,9 +56,9 @@ export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> 
   return (
     <>
       <PageHeader
-        eyebrow="LIHAT LEBIH JAUH"
+        eyebrow="RINGKASAN"
         title="Laporan"
-        subtitle="Pahami pola, bukan sekadar angka."
+        subtitle="Cek ringkasan dan perbandingan pengeluaranmu."
         action={
           <div className="flex items-center gap-2">
             <button className="button secondary" onClick={() => setShowTemplate(true)}>
@@ -88,18 +88,18 @@ export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> 
       </div>
       
       <div className="report-stats">
-        <StatCard label="Pemasukan" value={currency(stats.income)} tone="green" icon={ArrowDownLeft} note="Dalam rentang" />
-        <StatCard label="Pengeluaran" value={currency(stats.expense)} tone="coral" icon={ArrowUpRight} note="Dalam rentang" />
-        <StatCard label="Saldo akhir" value={currency(stats.balance)} tone="blue" icon={Wallet} note="Pemasukan dikurangi pengeluaran" />
+        <StatCard label="Pemasukan" value={currency(stats.income)} tone="green" icon={ArrowDownLeft} note="Periode ini" />
+        <StatCard label="Pengeluaran" value={currency(stats.expense)} tone="coral" icon={ArrowUpRight} note="Periode ini" />
+        <StatCard label="Saldo akhir" value={currency(stats.balance)} tone="blue" icon={Wallet} note="Sisa uang periode ini" />
       </div>
       
       <section className="panel comparator-panel">
         <div className="panel-heading">
           <div>
-            <p className="eyebrow">KOMPARATOR PENGELUARAN</p>
+            <p className="eyebrow">PERBANDINGAN</p>
             <h2>Bulan ini vs bulan lalu</h2>
           </div>
-          <div className="formula-chip">matematika sederhana · tanpa AI</div>
+          <div className="formula-chip">hitung otomatis</div>
         </div>
         
         {comp.length ? (
@@ -123,8 +123,8 @@ export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> 
         ) : (
           <EmptyState
             icon={TrendingDown}
-            title="Belum cukup data untuk dibandingkan"
-            body="Tambahkan pengeluaran di dua bulan berbeda untuk melihat perubahannya."
+            title="Belum ada data perbandingan"
+            body="Catat pengeluaran di minimal dua bulan berbeda buat lihat perbandingannya."
           />
         )}
       </section>
@@ -133,7 +133,7 @@ export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> 
         <div className="panel-heading">
           <div>
             <p className="eyebrow">DAFTAR TRANSAKSI</p>
-            <h2>Rincian periode</h2>
+            <h2>Rincian transaksi</h2>
           </div>
         </div>
         {filtered.length ? (
@@ -143,7 +143,7 @@ export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> 
             ))}
           </div>
         ) : (
-          <EmptyState icon={FileText} title="Tidak ada transaksi" body="Coba ubah rentang tanggal laporan." />
+          <EmptyState icon={FileText} title="Nggak ada transaksi" body="Coba ganti pilihan tanggal laporanmu." />
         )}
       </section>
 

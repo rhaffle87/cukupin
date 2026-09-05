@@ -34,7 +34,7 @@ export function CookieConsent() {
         <div className="flex-1">
           <h3 className="mb-1.5 font-display text-lg font-bold text-ink">Privasi & Cookie</h3>
           <p className="text-xs leading-relaxed text-muted md:text-sm">
-            Kami menggunakan cookie untuk memastikan aplikasi berjalan dengan baik dan untuk menganalisis penggunaan secara anonim guna meningkatkan layanan Cukupin.
+            Kami pakai cookie secukupnya biar web berjalan lancar dan bantu kami ningkatin fitur Cukupin secara anonim.
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-3">

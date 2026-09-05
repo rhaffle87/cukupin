@@ -47,7 +47,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     return (
       <div className="loading-screen">
         <Brand />
-        <span>Menyiapkan ruang uangmu...</span>
+        <span>Menyiapkan catatanmu...</span>
       </div>
     )
   }

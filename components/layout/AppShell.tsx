@@ -38,7 +38,7 @@ export function AppShell({ children, user, onSignOut }: AppShellProps) {
         </div>
         
         <div className="mb-4 px-3 text-[10px] font-bold tracking-widest text-muted uppercase">
-          RUANG UANGMU
+          MENU UTAMA
         </div>
         
         <nav className="flex flex-col gap-1">

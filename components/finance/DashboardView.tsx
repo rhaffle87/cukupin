@@ -64,7 +64,7 @@ function RecentTransactions({ transactions }: { transactions: Transaction[] }) {
       <div className="mb-5 flex items-start justify-between gap-3 md:mb-6">
         <div>
           <p className="flex items-center gap-1.5 text-[10px] font-bold tracking-widest text-[#89938A] uppercase before:block before:h-[1px] before:w-[19px] before:bg-blue after:block after:-ml-[5px] after:h-[4px] after:w-[4px] after:rounded-full after:bg-green">
-            AKTIVITAS TERBARU
+            CATATAN TERBARU
           </p>
           <h2 className="mt-1.5 font-display text-xl font-bold tracking-tight">Transaksi bulan ini</h2>
         </div>
@@ -81,8 +81,8 @@ function RecentTransactions({ transactions }: { transactions: Transaction[] }) {
       ) : (
         <EmptyState
           icon={Receipt}
-          title="Belum ada transaksi"
-          body="Semua catatanmu akan muncul di sini."
+          title="Belum ada catatan"
+          body="Transaksi yang kamu input bakal muncul di sini."
           action={
             <Link href="/transactions" className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#EFF3F0] px-4 py-2.5 text-[11px] font-bold text-green transition-transform hover:scale-[0.98]">
               <Plus size={15} /> Catat transaksi
@@ -117,33 +117,32 @@ export function DashboardView({ data, user }: DashboardViewProps) {
 
   return (
     <>
-      <div className="relative mb-4 flex min-h-[270px] flex-col justify-between gap-6 overflow-hidden rounded-[24px] bg-ink p-7 text-white md:min-h-[250px] md:flex-row md:items-center md:p-11 animate-in slide-in-from-bottom-2 duration-500">
-        {/* Layered concentric rings in the background */}
-        <div className="pointer-events-none absolute -right-20 -top-24 h-[420px] w-[420px] rounded-full border border-white/10 shadow-[0_0_0_32px_rgba(255,255,255,0.022),0_0_0_72px_rgba(255,255,255,0.016)]" />
-        <div className="pointer-events-none absolute right-10 -bottom-24 h-[240px] w-[240px] rounded-full border border-white/5" />
+      <div className="relative mb-4 flex min-h-[240px] flex-col justify-between gap-6 overflow-hidden rounded-[24px] bg-ink p-7 text-white md:min-h-[230px] md:flex-row md:items-center md:px-11 md:py-8 animate-in slide-in-from-bottom-2 duration-500">
+        {/* Subtle circular arc in background matching Image 2 */}
+        <div className="pointer-events-none absolute -right-14 -top-20 h-[380px] w-[380px] rounded-full border border-white/[0.08] shadow-[0_0_0_28px_rgba(255,255,255,0.018),0_0_0_64px_rgba(255,255,255,0.012)]" />
         
         <div className="relative z-10 max-w-[500px]">
           <p className="text-[10px] font-bold tracking-widest text-[#B9C6BD] uppercase">{monthLabel().toUpperCase()}</p>
           <h1 className="mt-2.5 font-display text-[2.45rem] font-bold leading-tight tracking-tight md:text-[clamp(2.1rem,4vw,3.55rem)]">
             Halo, {firstName}.<br />
-            <em className="text-[#BEE6CF] not-italic">Yuk lihat keadaanmu.</em>
+            <em className="text-[#BEE6CF] not-italic">Cek uangmu bulan ini.</em>
           </h1>
           <p className="mt-5 max-w-[320px] text-xs leading-relaxed text-[#C0CBC4] md:max-w-[420px]">
-            Sedikit kejelasan hari ini bisa bikin keputusan besok terasa lebih ringan.
+            Pantau pengeluaran hari ini biar tetap santai sampai akhir bulan.
           </p>
         </div>
         
-        {/* Right Balance Card container matching Image 2 */}
-        <div className="relative z-10 flex min-h-[140px] w-full flex-col justify-center rounded-[22px] border border-white/10 bg-white/[0.04] p-6 shadow-[0_12px_32px_rgba(0,0,0,0.18)] backdrop-blur-md md:h-[180px] md:w-[280px]">
+        {/* Sleek compact balance card container matching Image 2 */}
+        <div className="relative z-10 flex h-[140px] w-full max-w-[260px] flex-col justify-center rounded-[20px] border border-white/10 bg-white/[0.04] p-5 shadow-[0_10px_28px_rgba(0,0,0,0.2)] backdrop-blur-md md:mr-1">
           <div className="flex flex-col items-end text-right">
             <span className="block text-[10px] font-bold tracking-widest text-[#B9C6BD] uppercase">
-              {stats.balance >= 0 ? 'RUANG MASIH ADA' : 'PERLU PERHATIAN'}
+              {stats.balance >= 0 ? 'MASIH AMAN' : 'PERLU DICEK'}
             </span>
-            <strong className="my-2 block font-display text-[32px] md:text-[38px] font-bold leading-none tracking-tight text-[#BEE6CF]">
+            <strong className="my-1.5 block font-display text-[32px] md:text-[36px] font-bold leading-none tracking-tight text-[#BEE6CF]">
               {shortCurrency(Math.abs(stats.balance))}
             </strong>
             <small className="block text-[11px] text-[#BAC9C0]">
-              {stats.balance >= 0 ? 'sisa saldo bulan ini' : 'selisih pengeluaran'}
+              {stats.balance >= 0 ? 'sisa uang bulan ini' : 'pengeluaran melebihi pemasukan'}
             </small>
           </div>
         </div>
@@ -151,13 +150,13 @@ export function DashboardView({ data, user }: DashboardViewProps) {
       
       <div className="mb-4 grid grid-cols-3 gap-2 md:gap-3">
         <div className="animate-in slide-in-from-bottom-2 duration-500 delay-50 fill-mode-both">
-          <StatCard label="Pemasukan" value={currency(stats.income)} tone="green" icon={ArrowDownLeft} note="Bulan berjalan" />
+          <StatCard label="Pemasukan" value={currency(stats.income)} tone="green" icon={ArrowDownLeft} note="Bulan ini" />
         </div>
         <div className="animate-in slide-in-from-bottom-2 duration-500 delay-75 fill-mode-both">
-          <StatCard label="Pengeluaran" value={currency(stats.expense)} tone="coral" icon={ArrowUpRight} note="Bulan berjalan" />
+          <StatCard label="Pengeluaran" value={currency(stats.expense)} tone="coral" icon={ArrowUpRight} note="Bulan ini" />
         </div>
         <div className="animate-in slide-in-from-bottom-2 duration-500 delay-100 fill-mode-both">
-          <StatCard label="Sisa saldo" value={currency(stats.balance)} tone="blue" icon={Wallet} note={stats.balance >= 0 ? 'Masih terkendali' : 'Perlu ditinjau'} />
+          <StatCard label="Sisa saldo" value={currency(stats.balance)} tone="blue" icon={Wallet} note={stats.balance >= 0 ? 'Masih aman' : 'Mulai menipis'} />
         </div>
       </div>
       
@@ -166,7 +165,7 @@ export function DashboardView({ data, user }: DashboardViewProps) {
           <div className="mb-5 flex items-start justify-between gap-3 md:mb-6">
             <div>
               <p className="flex items-center gap-1.5 text-[10px] font-bold tracking-widest text-[#89938A] uppercase before:block before:h-[1px] before:w-[19px] before:bg-blue after:block after:-ml-[5px] after:h-[4px] after:w-[4px] after:rounded-full after:bg-green">
-                ARUS HARIAN
+                GRAFIK HARIAN
               </p>
               <h2 className="mt-1.5 font-display text-xl font-bold tracking-tight">Pemasukan vs pengeluaran</h2>
             </div>
@@ -188,11 +187,11 @@ export function DashboardView({ data, user }: DashboardViewProps) {
           ) : (
             <EmptyState
               icon={BarChart3}
-              title="Belum ada aliran uang"
-              body="Tambahkan transaksi pertamamu untuk melihat pola harian."
+              title="Belum ada data grafik"
+              body="Catat pemasukan atau pengeluaranmu dulu yuk buat lihat grafiknya."
               action={
                 <Link href="/transactions" className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#EFF3F0] px-4 py-2.5 text-[11px] font-bold text-green transition-transform hover:scale-[0.98]">
-                  <Plus size={15} /> Tambah transaksi
+                  <Plus size={15} /> Tambah catatan
                 </Link>
               }
             />
@@ -203,9 +202,9 @@ export function DashboardView({ data, user }: DashboardViewProps) {
           <div className="mb-5 flex items-start justify-between gap-3 md:mb-6">
             <div>
               <p className="flex items-center gap-1.5 text-[10px] font-bold tracking-widest text-[#89938A] uppercase before:block before:h-[1px] before:w-[19px] before:bg-blue after:block after:-ml-[5px] after:h-[4px] after:w-[4px] after:rounded-full after:bg-green">
-                KE MANA PERGINYA?
+                PENGELUARAN
               </p>
-              <h2 className="mt-1.5 font-display text-xl font-bold tracking-tight">Pengeluaran per kategori</h2>
+              <h2 className="mt-1.5 font-display text-xl font-bold tracking-tight">Berdasarkan kategori</h2>
             </div>
           </div>
           {breakdown.length ? (
@@ -239,7 +238,7 @@ export function DashboardView({ data, user }: DashboardViewProps) {
               </div>
             </>
           ) : (
-            <EmptyState icon={CircleDollarSign} title="Belum ada kategori" body="Kategori akan muncul setelah ada pengeluaran." />
+            <EmptyState icon={CircleDollarSign} title="Belum ada data belanja" body="Kategori bakal muncul otomatis kalau kamu udah catat pengeluaran." />
           )}
         </section>
       </div>

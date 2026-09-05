@@ -59,20 +59,20 @@ export function AuthScreen({ supabase }: AuthScreenProps) {
 
         <div className="relative z-10 flex flex-1 flex-col justify-center max-w-lg mt-8 md:mt-0">
           <p className="mb-4 text-[10px] font-bold tracking-widest text-green-soft/80 uppercase">
-            Personal Finance, Simplified
+            Catat santai, tahu arah uangmu
           </p>
           <h1 className="mb-6 font-display text-4xl font-bold leading-tight md:text-5xl lg:text-6xl">
             Yang penting bukan banyaknya.<br />
             <em className="text-green-soft not-italic">Yang penting cukup.</em>
           </h1>
           <p className="max-w-md text-base leading-relaxed text-white/70">
-            Cukupin membantu kamu melihat uang dengan lebih jernih, satu bulan demi satu bulan.
+            Bantu kamu pantau uang masuk dan keluar tiap bulan dengan santai.
           </p>
         </div>
 
         <div className="relative z-10 hidden justify-between text-[10px] font-bold tracking-widest text-white/40 uppercase md:flex">
           <span>01</span>
-          <span>Catat · Pahami · Atur</span>
+          <span>Catat · Pantau · Santai</span>
         </div>
       </div>
       
@@ -84,13 +84,13 @@ export function AuthScreen({ supabase }: AuthScreenProps) {
           </div>
           
           <p className="mb-2 text-[10px] font-bold tracking-widest text-muted uppercase">
-            {mode === 'login' ? 'SELAMAT DATANG KEMBALI' : 'MULAI PERJALANANMU'}
+            {mode === 'login' ? 'HALO LAGI' : 'BUAT AKUN'}
           </p>
           <h2 className="mb-3 font-display text-3xl font-bold tracking-tight">
-            {mode === 'login' ? 'Masuk ke ruang uangmu.' : 'Buat ruang uangmu.'}
+            {mode === 'login' ? 'Masuk ke akunmu.' : 'Mulai catat keuanganmu.'}
           </h2>
           <p className="mb-8 text-sm leading-relaxed text-muted">
-            {mode === 'login' ? 'Lanjutkan kebiasaan baikmu mengelola uang.' : 'Gratis, sederhana, dan dibuat untuk kamu.'}
+            {mode === 'login' ? 'Yuk lanjut cek dan catat pengeluaranmu.' : 'Simpel, gratis, dan nggak ribet.'}
           </p>
           
           <form onSubmit={submit} className="flex flex-col gap-5">

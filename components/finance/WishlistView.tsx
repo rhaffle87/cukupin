@@ -57,19 +57,19 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
   return (
     <>
       <PageHeader
-        eyebrow="NANTI, KALAU SUDAH SIAP"
+        eyebrow="DAFTAR INGIN"
         title="Wishlist"
-        subtitle="Pisahkan keinginan dari kebutuhan, tanpa menghilangkannya."
+        subtitle="Tampung barang yang pengen dibeli, biar nggak impulsif."
       />
       
       <div className="wishlist-layout">
         <section className="panel wish-add">
-          <p className="eyebrow">TAMBAH KEINGINAN</p>
-          <h2>Jadikan ia rencana.</h2>
+          <p className="eyebrow">CATAT DULU</p>
+          <h2>Pengen beli apa?</h2>
           <form onSubmit={add}>
-            <input required value={name} onChange={e => setName(e.target.value)} placeholder="Nama barang atau layanan" />
+            <input required value={name} onChange={e => setName(e.target.value)} placeholder="Nama barang atau keinginan" />
             <div className="inline-form">
-              <input type="number" required min="1" value={price} onChange={e => setPrice(e.target.value)} placeholder="Harga estimasi" />
+              <input type="number" required min="1" value={price} onChange={e => setPrice(e.target.value)} placeholder="Perkiraan harga" />
               <select
                 style={{
                   width: '80px',
@@ -98,7 +98,7 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
           <div className="panel-heading">
             <div>
               <p className="eyebrow">DAFTAR KEINGINAN</p>
-              <h2>{data.wishlist.length} item</h2>
+              <h2>{data.wishlist.length} item tersimpan</h2>
             </div>
           </div>
           {data.wishlist.length ? (
@@ -121,8 +121,8 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
           ) : (
             <EmptyState
               icon={ShoppingBag}
-              title="Wishlist masih kosong"
-              body="Simpan hal yang kamu inginkan agar bisa direncanakan dengan tenang."
+              title="Belum ada wishlist"
+              body="Tulis barang impianmu di sini dulu sebelum buru-buru dibeli."
             />
           )}
         </section>

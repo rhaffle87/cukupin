@@ -68,12 +68,12 @@ export function GoalsView({ supabase, data, userId }: GoalsViewProps) {
   return (
     <>
       <PageHeader
-        eyebrow="MENUJU YANG PENTING"
+        eyebrow="TABUNGAN"
         title="Target tabungan"
-        subtitle="Beri nama pada hal yang ingin kamu wujudkan."
+        subtitle="Kumpulin uang buat hal-hal yang pengen kamu capai."
         action={
           <button className="button primary" onClick={() => setShow(true)}>
-            <Plus size={17} /> Goal baru
+            <Plus size={17} /> Target baru
           </button>
         }
       />
@@ -81,8 +81,8 @@ export function GoalsView({ supabase, data, userId }: GoalsViewProps) {
       <div className="goals-intro">
         <Target size={23} />
         <div>
-          <strong>{data.goals.length ? data.goals.length + ' hal sedang kamu tuju.' : 'Belum ada tujuan yang disimpan.'}</strong>
-          <span>Progress kecil tetap berarti.</span>
+          <strong>{data.goals.length ? data.goals.length + ' target lagi berjalan.' : 'Belum ada target tabungan.'}</strong>
+          <span>Pelan-pelan asal konsisten.</span>
         </div>
       </div>
       
@@ -102,13 +102,13 @@ export function GoalsView({ supabase, data, userId }: GoalsViewProps) {
               <h3>{goal.name}</h3>
               <div className="goal-values">
                 <strong>{currency(Number(goal.current_amount))}</strong>
-                <span>of {currency(Number(goal.target_amount))}</span>
+                <span>dari {currency(Number(goal.target_amount))}</span>
               </div>
               <div className="progress-track">
                 <span style={{ width: progress + '%' }} />
               </div>
               <div className="goal-bottom">
-                <span>{progress.toFixed(0)}% tercapai</span>
+                <span>{progress.toFixed(0)}% terkumpul</span>
                 <button className="text-link" onClick={() => setAdding(goal)}>
                   Tambah dana <Plus size={13} />
                 </button>
@@ -120,11 +120,11 @@ export function GoalsView({ supabase, data, userId }: GoalsViewProps) {
         {!data.goals.length && (
           <EmptyState
             icon={Target}
-            title="Rencanakan satu hal dulu"
-            body="Goal pertama bisa sesederhana dana darurat atau liburan kecil."
+            title="Mulai dari satu hal dulu"
+            body="Bisa buat dana darurat, beli gadget, atau jalan-jalan santai."
             action={
               <button className="button secondary small" onClick={() => setShow(true)}>
-                <Plus size={15} /> Buat goal
+                <Plus size={15} /> Buat target
               </button>
             }
           />
@@ -132,17 +132,17 @@ export function GoalsView({ supabase, data, userId }: GoalsViewProps) {
       </div>
       
       {show && (
-        <Modal title="Goal baru" onClose={() => setShow(false)}>
+        <Modal title="Target baru" onClose={() => setShow(false)}>
           <form className="transaction-form" onSubmit={createGoal}>
             <label>
-              Nama goal
+              Nama target
               <input required value={name} onChange={e => setName(e.target.value)} placeholder="Contoh: Dana darurat" />
             </label>
             <label>
-              Target nominal
+              Nominal yang ditargetkan
               <input type="number" required min="1" value={target} onChange={e => setTarget(e.target.value)} placeholder="0" />
             </label>
-            <button className="button primary wide">Simpan goal</button>
+            <button className="button primary wide">Simpan target</button>
           </form>
         </Modal>
       )}
