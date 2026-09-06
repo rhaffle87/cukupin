@@ -66,29 +66,29 @@ export function FinancialWrappedModal({
 
   // Grade Determination
   let grade = 'B'
-  let gradeColor = 'text-blue'
-  let gradeBg = 'bg-blue-soft'
+  let gradeTextColor = '#315DCB'
+  let gradeBgColor = '#EBF0FA'
   let gradeLabel = 'Cukup Sehat'
 
   if (totalScore >= 85) {
     grade = 'A+'
-    gradeColor = 'text-green'
-    gradeBg = 'bg-green-soft'
+    gradeTextColor = '#1B5E3C'
+    gradeBgColor = '#DDEEE5'
     gradeLabel = 'Sangat Sehat'
   } else if (totalScore >= 70) {
     grade = 'A'
-    gradeColor = 'text-green'
-    gradeBg = 'bg-green-soft'
+    gradeTextColor = '#1B5E3C'
+    gradeBgColor = '#DDEEE5'
     gradeLabel = 'Sehat & Terkendali'
   } else if (totalScore >= 50) {
     grade = 'B'
-    gradeColor = 'text-blue'
-    gradeBg = 'bg-blue-soft'
+    gradeTextColor = '#315DCB'
+    gradeBgColor = '#EBF0FA'
     gradeLabel = 'Cukup Terkendali'
   } else {
     grade = 'C'
-    gradeColor = 'text-coral'
-    gradeBg = 'bg-coral-soft'
+    gradeTextColor = '#BA4828'
+    gradeBgColor = '#FBECE7'
     gradeLabel = 'Perlu Evaluasi'
   }
 
@@ -113,18 +113,57 @@ export function FinancialWrappedModal({
 
   const ArchetypeIcon = archetypeIcon
 
-  // 1-Click PNG Export
+  // 1-Click PNG Export (Rock-solid offscreen cloning to prevent scroll clipping & style drift)
   const exportToImage = async () => {
     if (!cardRef.current) return
     setIsExporting(true)
     try {
-      const canvas = await html2canvas(cardRef.current, {
-        scale: 2.5,
+      const originalCard = cardRef.current
+
+      // Clone card into isolated off-screen element with fixed width and unrestrained height
+      const clone = originalCard.cloneNode(true) as HTMLElement
+      clone.style.position = 'fixed'
+      clone.style.left = '0'
+      clone.style.top = '0'
+      clone.style.width = '480px'
+      clone.style.maxWidth = '480px'
+      clone.style.height = 'auto'
+      clone.style.maxHeight = 'none'
+      clone.style.overflow = 'visible'
+      clone.style.transform = 'none'
+      clone.style.zIndex = '-9999'
+      document.body.appendChild(clone)
+
+      // Wait for fonts and paint
+      if (document.fonts) {
+        await document.fonts.ready
+      }
+      await new Promise((resolve) => setTimeout(resolve, 150))
+
+      const cardHeight = Math.ceil(clone.getBoundingClientRect().height)
+
+      const canvas = await html2canvas(clone, {
+        scale: 3, // Crisp 3x resolution
         useCORS: true,
-        backgroundColor: '#1E3249',
+        backgroundColor: '#16273A',
         logging: false,
+        width: 480,
+        height: cardHeight,
+        windowWidth: 1600,
+        windowHeight: 2400,
+        x: 0,
+        y: 0,
+        scrollX: 0,
+        scrollY: 0,
       })
+
+      // Clean up clone node from DOM
+      document.body.removeChild(clone)
+
       const image = canvas.toDataURL('image/png')
+      if (typeof window !== 'undefined') {
+        ;(window as any).__lastWrappedDataUrl = image
+      }
       const link = document.createElement('a')
       link.href = image
       link.download = `rapor-cukupin-${new Date().toISOString().slice(0, 7)}.png`
@@ -144,11 +183,16 @@ export function FinancialWrappedModal({
         {/* Shareable Card Area */}
         <div
           ref={cardRef}
-          className="relative overflow-hidden rounded-[26px] bg-gradient-to-br from-[#1E3249] via-[#16273A] to-[#0D1824] p-6 sm:p-7 text-white shadow-[0_20px_50px_rgba(0,0,0,0.35)] border border-white/20"
+          className="relative overflow-hidden rounded-[26px] p-6 pb-7 sm:p-7 sm:pb-8 text-white shadow-[0_20px_50px_rgba(0,0,0,0.35)] border border-white/20"
+          style={{
+            background: 'radial-gradient(circle at 10% 90%, rgba(62, 143, 104, 0.18) 0%, transparent 45%), radial-gradient(circle at 90% 10%, rgba(255, 255, 255, 0.06) 0%, transparent 40%), linear-gradient(145deg, #1E3249 0%, #16273A 50%, #0D1824 100%)',
+          }}
         >
-          {/* Decorative Backing Curves */}
-          <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full border border-white/10 shadow-[0_0_0_24px_rgba(255,255,255,0.02)]" />
-          <div className="pointer-events-none absolute -left-12 -bottom-12 h-44 w-44 rounded-full bg-mint/10 blur-3xl" />
+          {/* Decorative Backing Rings (Smooth SVG/CSS with zero negative scroll expansion) */}
+          <div
+            className="pointer-events-none absolute right-0 top-0 h-48 w-48 rounded-full border border-white/10"
+            style={{ transform: 'translate(25%, -25%)' }}
+          />
 
           {/* Header Row */}
           <div className="relative z-10 flex items-center justify-between border-b border-white/10 pb-4">
@@ -183,7 +227,10 @@ export function FinancialWrappedModal({
             </div>
 
             <div className="flex items-center gap-3 rounded-2xl bg-white/[0.06] p-3.5 border border-white/10 backdrop-blur-sm sm:self-center">
-              <div className={`flex h-14 w-14 items-center justify-center rounded-xl ${gradeBg} ${gradeColor} font-mono text-2xl font-black shadow-inner`}>
+              <div
+                className="flex h-14 w-14 items-center justify-center rounded-xl font-mono text-2xl font-black shrink-0 border border-white/15"
+                style={{ backgroundColor: gradeBgColor, color: gradeTextColor }}
+              >
                 {grade}
               </div>
               <div>
@@ -203,55 +250,109 @@ export function FinancialWrappedModal({
             </p>
           </div>
 
-          {/* 50/30/20 Breakdown Bars */}
-          <div className="relative z-10 mb-6 space-y-2.5">
-            <span className="text-[10px] font-bold tracking-widest text-[#B9C6BD] uppercase block">
+          {/* 50/30/20 Breakdown Bars (Explicit canvas-safe positioning & solid colors) */}
+          <div className="relative z-10 mb-6">
+            <span className="text-[10px] font-bold tracking-widest text-[#B9C6BD] uppercase block mb-3">
               ALOKASI ANGGARAN (50 / 30 / 20)
             </span>
 
             {/* Needs */}
-            <div>
-              <div className="flex justify-between text-xs mb-1">
+            <div className="mb-3.5">
+              <div className="flex justify-between items-center text-xs mb-2">
                 <span className="text-white/80">Kebutuhan (Needs · Target 50%)</span>
-                <span className="font-mono font-bold text-mint">{rule.needsPct}% ({shortCurrency(rule.needs)})</span>
+                <span className="font-mono font-bold" style={{ color: '#BEE6CF' }}>
+                  {rule.needsPct}% ({shortCurrency(rule.needs)})
+                </span>
               </div>
-              <div className="h-2 w-full rounded-full bg-white/10 overflow-hidden">
-                <div className="h-full rounded-full bg-mint transition-all duration-500" style={{ width: `${Math.min(100, rule.needsPct)}%` }} />
+              <div
+                className="relative w-full rounded-full overflow-hidden"
+                style={{ height: '8px', backgroundColor: 'rgba(255, 255, 255, 0.12)' }}
+              >
+                <div
+                  className="rounded-full"
+                  style={{
+                    width: `${Math.min(100, Math.max(0, rule.needsPct))}%`,
+                    height: '8px',
+                    backgroundColor: '#BEE6CF',
+                  }}
+                />
               </div>
             </div>
 
             {/* Wants */}
-            <div>
-              <div className="flex justify-between text-xs mb-1">
+            <div className="mb-3.5">
+              <div className="flex justify-between items-center text-xs mb-2">
                 <span className="text-white/80">Keinginan (Wants · Target 30%)</span>
-                <span className="font-mono font-bold text-coral-light">{rule.wantsPct}% ({shortCurrency(rule.wants)})</span>
+                <span className="font-mono font-bold" style={{ color: '#F2A68D' }}>
+                  {rule.wantsPct}% ({shortCurrency(rule.wants)})
+                </span>
               </div>
-              <div className="h-2 w-full rounded-full bg-white/10 overflow-hidden">
-                <div className="h-full rounded-full bg-coral transition-all duration-500" style={{ width: `${Math.min(100, rule.wantsPct)}%` }} />
+              <div
+                className="relative w-full rounded-full overflow-hidden"
+                style={{ height: '8px', backgroundColor: 'rgba(255, 255, 255, 0.12)' }}
+              >
+                <div
+                  className="rounded-full"
+                  style={{
+                    width: `${Math.min(100, Math.max(0, rule.wantsPct))}%`,
+                    height: '8px',
+                    backgroundColor: '#D98362',
+                  }}
+                />
               </div>
             </div>
 
             {/* Savings */}
             <div>
-              <div className="flex justify-between text-xs mb-1">
+              <div className="flex justify-between items-center text-xs mb-2">
                 <span className="text-white/80">Sisa / Tabungan (Savings · Target 20%)</span>
-                <span className="font-mono font-bold text-blue-soft">{Math.max(0, Math.round(savingsRate))}% ({shortCurrency(Math.max(0, balance))})</span>
+                <span className="font-mono font-bold" style={{ color: '#B0C5F8' }}>
+                  {Math.max(0, Math.round(savingsRate))}% ({shortCurrency(Math.max(0, balance))})
+                </span>
               </div>
-              <div className="h-2 w-full rounded-full bg-white/10 overflow-hidden">
-                <div className="h-full rounded-full bg-blue transition-all duration-500" style={{ width: `${Math.min(100, Math.max(0, savingsRate))}%` }} />
+              <div
+                className="relative w-full rounded-full overflow-hidden"
+                style={{ height: '8px', backgroundColor: 'rgba(255, 255, 255, 0.12)' }}
+              >
+                <div
+                  className="rounded-full"
+                  style={{
+                    width: `${Math.min(100, Math.max(0, savingsRate))}%`,
+                    height: '8px',
+                    backgroundColor: '#315DCB',
+                  }}
+                />
               </div>
             </div>
           </div>
 
           {/* Footer Metrics */}
-          <div className="relative z-10 pt-4 border-t border-white/10 flex items-center justify-between text-xs text-white/70">
+          <div className="relative z-10 pt-4 pb-2 border-t border-white/10 flex items-center justify-between text-xs text-white/70">
             <div>
-              <p className="font-mono text-[10px] tracking-wider text-white/50">DIBUAT UNTUK</p>
-              <p className="font-bold text-white uppercase text-[11px] truncate max-w-[150px]">{userName}</p>
+              <p className="font-mono text-[10px] tracking-wider text-white/50 mb-0.5">DIBUAT UNTUK</p>
+              <p
+                className="font-bold text-white uppercase text-[11px] tracking-wider"
+                style={{
+                  lineHeight: '1.6',
+                  overflow: 'visible',
+                  whiteSpace: 'normal',
+                }}
+              >
+                {userName}
+              </p>
             </div>
             <div className="text-right">
-              <p className="font-mono text-[10px] tracking-wider text-white/50">TOTAL TERCATAT</p>
-              <p className="font-mono font-bold text-mint text-xs tabular-nums">{transactions.length} Transaksi</p>
+              <p className="font-mono text-[10px] tracking-wider text-white/50 mb-0.5">TOTAL TERCATAT</p>
+              <p
+                className="font-mono font-bold text-mint text-xs tabular-nums"
+                style={{
+                  color: '#BEE6CF',
+                  lineHeight: '1.6',
+                  overflow: 'visible',
+                }}
+              >
+                {transactions.length} Transaksi
+              </p>
             </div>
           </div>
         </div>
