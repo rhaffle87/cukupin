@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { STORAGE_KEYS } from '@/lib/constants/site'
 
 export interface QueuedAction {
   queueId: string
@@ -10,7 +11,7 @@ export interface QueuedAction {
   payload: any
 }
 
-const OFFLINE_QUEUE_KEY = 'cukupin_offline_queue'
+const OFFLINE_QUEUE_KEY = STORAGE_KEYS.OFFLINE_QUEUE
 
 export function getOfflineQueue(): QueuedAction[] {
   if (typeof window === 'undefined') return []
@@ -41,13 +42,21 @@ export function enqueueOfflineAction(action: Omit<QueuedAction, 'queueId' | 'tim
 
 export function removeOfflineItem(queueId: string): void {
   if (typeof window === 'undefined') return
-  const queue = getOfflineQueue().filter(q => q.queueId !== queueId)
-  localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(queue))
+  try {
+    const queue = getOfflineQueue().filter(q => q.queueId !== queueId)
+    localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(queue))
+  } catch (e) {
+    console.error('Failed to update offline queue on removal:', e)
+  }
 }
 
 export function clearOfflineQueue(): void {
   if (typeof window === 'undefined') return
-  localStorage.removeItem(OFFLINE_QUEUE_KEY)
+  try {
+    localStorage.removeItem(OFFLINE_QUEUE_KEY)
+  } catch (e) {
+    console.error('Failed to clear offline queue:', e)
+  }
 }
 
 /**

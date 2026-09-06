@@ -124,3 +124,17 @@ export function paymentMethodBreakdown(transactions: Transaction[]) {
     }))
     .sort((a, b) => b.amount - a.amount)
 }
+
+/**
+ * OWASP CSV Injection (Formula Injection) sanitizer.
+ * If a string begins with =, +, -, @, \t, or \r, spreadsheet software (Excel, Calc)
+ * can interpret it as a formula or executable command.
+ * Prepending a single quote (') disables formula execution and treats the field as pure text.
+ */
+export function escapeCsvField(val: string | number | null | undefined): string {
+  if (val === null || val === undefined) return '""'
+  const str = String(val)
+  const dangerousChars = ['=', '+', '-', '@', '\t', '\r']
+  const sanitized = dangerousChars.includes(str.charAt(0)) ? `'${str}` : str
+  return `"${sanitized.replace(/"/g, '""')}"`
+}

@@ -7,9 +7,17 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { Eyebrow } from '@/components/ui/Eyebrow'
 import { TransactionRow } from './TransactionRow'
 import { useFinanceData } from '@/hooks/useFinanceData'
+import dynamic from 'next/dynamic'
 import { budgetRule503020, comparator, currency, isoDate, monthBounds, paymentMethodBreakdown, totals } from '@/lib/finance'
-import { MonthlyExpenseTemplate } from './MonthlyExpenseTemplate'
-import { FinancialWrappedModal } from './FinancialWrappedModal'
+
+const MonthlyExpenseTemplate = dynamic(
+  () => import('./MonthlyExpenseTemplate').then(mod => mod.MonthlyExpenseTemplate),
+  { ssr: false }
+)
+const FinancialWrappedModal = dynamic(
+  () => import('./FinancialWrappedModal').then(mod => mod.FinancialWrappedModal),
+  { ssr: false }
+)
 
 export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> }) {
   const [showTemplate, setShowTemplate] = useState(false)

@@ -1,4 +1,4 @@
-import { Analytics } from '@vercel/analytics/next'
+import { AnalyticsConsent } from '@/components/analytics/AnalyticsConsent'
 import type { Metadata, Viewport } from 'next'
 import { DM_Sans, Fraunces, DM_Mono } from 'next/font/google'
 import { Toaster } from 'sonner'
@@ -34,6 +34,31 @@ export const metadata: Metadata = {
   authors: [{ name: 'Cukupin' }],
   generator: 'Cukupin',
   metadataBase: new URL('https://cukupin.app'),
+  keywords: [
+    'aplikasi keuangan',
+    'catat pengeluaran',
+    'buku kas',
+    'budgeting',
+    'aturan 50 30 20',
+    'keuangan pribadi',
+    'quiet ledger',
+    'cukupin',
+    'pwa finance',
+  ],
+  alternates: {
+    canonical: 'https://cukupin.app',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
   openGraph: {
     title: 'Cukupin: Catat santai, tahu arah uangmu',
     description: 'Catat pengeluaran harian, pantau uang masuk-keluar, dan atur keuangan dengan santai.',
@@ -80,7 +105,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className="font-sans antialiased bg-paper text-ink">
         {children}
         <Toaster position="top-center" />
-        {process.env.NODE_ENV === 'production' && <Analytics />}
+        <AnalyticsConsent />
         <CookieConsent />
         <RegisterServiceWorker />
       </body>

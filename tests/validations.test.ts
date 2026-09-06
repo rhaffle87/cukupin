@@ -8,6 +8,7 @@ import {
   recurringBillSchema,
   categoryBudgetSchema,
 } from '@/lib/validations/finance'
+import { escapeCsvField } from '@/lib/finance'
 
 describe('Finance Validations & Input Sanitization', () => {
   describe('sanitizeNumericInput', () => {
@@ -134,4 +135,31 @@ describe('Finance Validations & Input Sanitization', () => {
       expect(categoryBudgetSchema.safeParse(invalidBudget).success).toBe(false)
     })
   })
+
+  describe('escapeCsvField (OWASP CSV Injection Defense)', () => {
+    it('handles normal strings and numbers', () => {
+      expect(escapeCsvField('Kopi Janji Jiwa')).toBe('"Kopi Janji Jiwa"')
+      expect(escapeCsvField(50000)).toBe('"50000"')
+    })
+
+    it('handles null and undefined gracefully', () => {
+      expect(escapeCsvField(null)).toBe('""')
+      expect(escapeCsvField(undefined)).toBe('""')
+      expect(escapeCsvField('')).toBe('""')
+    })
+
+    it('escapes quotes within the field value', () => {
+      expect(escapeCsvField('Catatan "spesial"')).toBe('"Catatan ""spesial"""')
+    })
+
+    it('neutralizes formula injection triggers (=, +, -, @, \\t, \\r)', () => {
+      expect(escapeCsvField('=cmd|"/c calc"!A0')).toBe('"\'=cmd|""/c calc""!A0"')
+      expect(escapeCsvField('+12345')).toBe('"\' +12345"'.replace(' ', ''))
+      expect(escapeCsvField('-1000')).toBe('"\' -1000"'.replace(' ', ''))
+      expect(escapeCsvField('@SUM(A1:B10)')).toBe('"\'@SUM(A1:B10)"')
+      expect(escapeCsvField('\tTAB_PREFIX')).toBe('"\'\tTAB_PREFIX"')
+      expect(escapeCsvField('\rCR_PREFIX')).toBe('"\'\rCR_PREFIX"')
+    })
+  })
 })
+

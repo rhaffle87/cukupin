@@ -49,4 +49,6 @@ do $$ begin
 exception when duplicate_object then null; end $$;
 
 alter table public.transactions replica identity full;
-alter publication supabase_realtime add table public.transactions;
+do $$ begin
+  alter publication supabase_realtime add table public.transactions;
+exception when others then null; end $$;

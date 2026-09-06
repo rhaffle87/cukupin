@@ -1,7 +1,9 @@
 import React, { useMemo, useState } from 'react'
+import dynamic from 'next/dynamic'
 import type { Transaction } from '@/lib/database.types'
 import { SupabaseClient } from '@supabase/supabase-js'
 import {
+  AlertTriangle,
   Archive,
   CalendarDays,
   ChevronDown,
@@ -14,6 +16,7 @@ import {
   RotateCcw,
   SlidersHorizontal,
   Sparkles,
+  Trash2,
   Upload,
   X,
 } from 'lucide-react'
@@ -23,13 +26,26 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { Modal } from '@/components/ui/Modal'
 import { TransactionRow } from './TransactionRow'
 import { TransactionForm } from './TransactionForm'
-import { MonthlyExpenseTemplate } from './MonthlyExpenseTemplate'
-import { CsvImportModal } from './CsvImportModal'
-import { RestoreJsonModal } from './RestoreJsonModal'
 import { RecurringBillsView } from './RecurringBillsView'
 import { useFinanceData } from '@/hooks/useFinanceData'
-import { currency, isoDate, monthBounds } from '@/lib/finance'
+import { currency, escapeCsvField, isoDate, monthBounds } from '@/lib/finance'
 import { enqueueOfflineAction } from '@/lib/offlineQueue'
+import { generateFullBackupPayload, downloadBackupAsJson } from '@/lib/backup'
+import { trackCustomEvent } from '@/lib/analytics'
+
+// Dynamic imports for heavy modals to reduce initial bundle size & optimize LCP/TBT
+const MonthlyExpenseTemplate = dynamic(
+  () => import('./MonthlyExpenseTemplate').then(mod => mod.MonthlyExpenseTemplate),
+  { ssr: false }
+)
+const CsvImportModal = dynamic(
+  () => import('./CsvImportModal').then(mod => mod.CsvImportModal),
+  { ssr: false }
+)
+const RestoreJsonModal = dynamic(
+  () => import('./RestoreJsonModal').then(mod => mod.RestoreJsonModal),
+  { ssr: false }
+)
 
 const categories = ['Food', 'Transport', 'Bills', 'Shopping', 'Health', 'Salary', 'Freelance', 'Other']
 
@@ -47,6 +63,9 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
   const [showCsvImport, setShowCsvImport] = useState(false)
   const [showJsonRestore, setShowJsonRestore] = useState(false)
   const [showManageMenu, setShowManageMenu] = useState(false)
+  const [showPurgeModal, setShowPurgeModal] = useState(false)
+  const [purgeConfirmation, setPurgeConfirmation] = useState('')
+  const [isPurging, setIsPurging] = useState(false)
   
   const [query, setQuery] = useState('')
   const [selectedTag, setSelectedTag] = useState('')
@@ -263,13 +282,13 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
     }
     const headers = ['Tanggal', 'Tipe', 'Kategori', 'Deskripsi', 'Jumlah', 'Metode Pembayaran', 'Catatan']
     const rows = filtered.map(t => [
-      t.transaction_date,
-      t.type === 'income' ? 'Pemasukan' : 'Pengeluaran',
-      `"${t.category.replace(/"/g, '""')}"`,
-      `"${(t.description || '').replace(/"/g, '""')}"`,
+      escapeCsvField(t.transaction_date),
+      escapeCsvField(t.type === 'income' ? 'Pemasukan' : 'Pengeluaran'),
+      escapeCsvField(t.category),
+      escapeCsvField(t.description),
       t.amount,
-      `"${(t.payment_method || '-').replace(/"/g, '""')}"`,
-      `"${(t.note || '').replace(/"/g, '""')}"`,
+      escapeCsvField(t.payment_method || '-'),
+      escapeCsvField(t.note),
     ])
     const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n')
     const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
@@ -280,28 +299,22 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
+    URL.revokeObjectURL(url)
     toast.success('File CSV berhasil diunduh.')
   }
 
   function exportJsonBackup() {
-    const backupData = {
-      app: 'cukupin',
-      version: '1.0',
-      exported_at: new Date().toISOString(),
+    const payload = generateFullBackupPayload({
       transactions: data.transactions,
       goals: data.goals,
       wishlist: data.wishlist,
       bills: data.bills,
       budgets: data.budgets,
-    }
-    const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.setAttribute('href', url)
-    link.setAttribute('download', `cukupin-backup-${new Date().toISOString().slice(0, 10)}.json`)
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+    })
+    downloadBackupAsJson(payload)
+    trackCustomEvent('backup_exported', {
+      transactions_count: payload.record_counts.transactions,
+    })
     toast.success('Backup data lengkap (JSON) berhasil diunduh.')
   }
 
@@ -406,6 +419,13 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
                       className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-blue hover:bg-paper transition-colors text-left cursor-pointer"
                     >
                       <Upload size={14} className="text-blue" /> Pulihkan (Restore) JSON
+                    </button>
+                    <div className="my-1 border-t border-line/60" />
+                    <button
+                      onClick={() => { setShowManageMenu(false); setShowPurgeModal(true) }}
+                      className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-coral hover:bg-coral-soft/50 transition-colors text-left cursor-pointer"
+                    >
+                      <Trash2 size={14} className="text-coral" /> Hapus Seluruh Data
                     </button>
                   </div>
                 </>
@@ -856,6 +876,86 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
           onClose={() => setShowJsonRestore(false)}
           onRestored={data.refresh}
         />
+      )}
+
+      {/* GDPR & UU PDP No. 27/2022 Right to Erasure (Pemusnahan Data Pribadi) Modal */}
+      {showPurgeModal && (
+        <Modal title="Hapus Seluruh Data Keuangan" onClose={() => { setShowPurgeModal(false); setPurgeConfirmation('') }}>
+          <div className="space-y-4 pt-1">
+            <div className="flex items-start gap-3 rounded-xl bg-coral/10 border border-coral/30 p-3 text-xs text-coral">
+              <AlertTriangle size={18} className="shrink-0 mt-0.5" />
+              <p className="leading-relaxed">
+                <strong>Peringatan Penting:</strong> Tindakan ini permanen sesuai hak penghapusan data (UU PDP No. 27/2022 & GDPR). Seluruh riwayat transaksi, tagihan rutin, target tabungan, wishlist, dan limit anggaran akan dimusnahkan tanpa bisa dipulihkan.
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-ink mb-1.5">
+                Ketik <span className="font-mono text-coral font-bold select-all">HAPUS</span> untuk mengonfirmasi:
+              </label>
+              <input
+                type="text"
+                value={purgeConfirmation}
+                onChange={(e) => setPurgeConfirmation(e.target.value)}
+                placeholder="Ketik HAPUS"
+                className="w-full rounded-xl border border-line bg-paper px-3.5 py-2.5 text-sm font-mono text-ink outline-none focus:border-coral focus:ring-1 focus:ring-coral"
+              />
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-line/50">
+              <button
+                type="button"
+                onClick={() => { setShowPurgeModal(false); setPurgeConfirmation('') }}
+                className="rounded-xl px-4 py-2 text-xs font-semibold text-muted hover:bg-black/5 transition-colors cursor-pointer"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                disabled={purgeConfirmation.trim().toUpperCase() !== 'HAPUS' || isPurging}
+                onClick={async () => {
+                  if (purgeConfirmation.trim().toUpperCase() !== 'HAPUS') return
+                  setIsPurging(true)
+                  const toastId = toast.loading('Menghapus seluruh data keuangan...')
+                  try {
+                    if (supabase && userId && userId !== 'local-dev-user') {
+                      await Promise.all([
+                        supabase.from('transactions').delete().eq('user_id', userId),
+                        supabase.from('saving_goals').delete().eq('user_id', userId),
+                        supabase.from('wishlist').delete().eq('user_id', userId),
+                        supabase.from('recurring_bills').delete().eq('user_id', userId),
+                        supabase.from('category_budgets').delete().eq('user_id', userId),
+                      ])
+                    }
+                    if (typeof window !== 'undefined') {
+                      localStorage.removeItem('cukupin_local_transactions')
+                      localStorage.removeItem('cukupin_local_goals')
+                      localStorage.removeItem('cukupin_local_wishlist')
+                      localStorage.removeItem('cukupin_local_bills')
+                      localStorage.removeItem('cukupin_local_budgets')
+                      localStorage.removeItem('cukupin_offline_queue')
+                    }
+                    await data.refresh()
+                    toast.success('Seluruh data berhasil dihapus permanen.', { id: toastId })
+                    setShowPurgeModal(false)
+                    setPurgeConfirmation('')
+                  } catch (err: any) {
+                    toast.error('Gagal menghapus data: ' + (err.message || 'Terjadi kesalahan'), { id: toastId })
+                  } finally {
+                    setIsPurging(false)
+                  }
+                }}
+                className={`rounded-xl px-4 py-2 text-xs font-bold transition-all cursor-pointer ${
+                  purgeConfirmation.trim().toUpperCase() === 'HAPUS' && !isPurging
+                    ? 'bg-coral text-white shadow-xs hover:bg-coral/90 active:scale-95'
+                    : 'bg-muted/20 text-muted cursor-not-allowed'
+                }`}
+              >
+                {isPurging ? 'Memproses...' : 'Musnahkan Seluruh Data'}
+              </button>
+            </div>
+          </div>
+        </Modal>
       )}
     </>
   )

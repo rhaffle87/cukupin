@@ -2,13 +2,14 @@
 
 import React, { useEffect, useState } from 'react'
 import { X } from 'lucide-react'
+import { STORAGE_KEYS } from '@/lib/constants/site'
 
 export function CookieConsent() {
   const [show, setShow] = useState(false)
 
   useEffect(() => {
     // Check if user has already consented
-    const consent = localStorage.getItem('cukupin-cookie-consent')
+    const consent = localStorage.getItem(STORAGE_KEYS.COOKIE_CONSENT)
     if (!consent) {
       // Delay showing the banner slightly for better UX
       const timer = setTimeout(() => setShow(true), 1500)
@@ -17,12 +18,12 @@ export function CookieConsent() {
   }, [])
 
   const accept = () => {
-    localStorage.setItem('cukupin-cookie-consent', 'accepted')
+    localStorage.setItem(STORAGE_KEYS.COOKIE_CONSENT, 'accepted')
     setShow(false)
   }
 
   const decline = () => {
-    localStorage.setItem('cukupin-cookie-consent', 'declined')
+    localStorage.setItem(STORAGE_KEYS.COOKIE_CONSENT, 'declined')
     setShow(false)
   }
 

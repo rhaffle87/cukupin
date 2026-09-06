@@ -9,8 +9,13 @@ import { TransactionRow } from './TransactionRow'
 import { categoryBreakdown, currency, dailySeries, monthBounds, monthLabel, shortCurrency, totals, calculateDailySafeSpend } from '@/lib/finance'
 import { useFinanceData } from '@/hooks/useFinanceData'
 import { CategoryBudgetWidget } from './CategoryBudgetWidget'
-import { FinancialWrappedModal } from './FinancialWrappedModal'
 import { SupabaseClient } from '@supabase/supabase-js'
+import dynamic from 'next/dynamic'
+
+const FinancialWrappedModal = dynamic(
+  () => import('./FinancialWrappedModal').then(mod => mod.FinancialWrappedModal),
+  { ssr: false }
+)
 
 import {
   ResponsiveContainer,

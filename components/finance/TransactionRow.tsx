@@ -9,7 +9,7 @@ interface TransactionRowProps {
   onEdit?: () => void
 }
 
-export function TransactionRow({ transaction: t, onDelete, onEdit }: TransactionRowProps) {
+export const TransactionRow = React.memo(function TransactionRow({ transaction: t, onDelete, onEdit }: TransactionRowProps) {
   return (
     <div className="transaction-row">
       <div className={`transaction-icon ${t.type}`}>
@@ -49,4 +49,4 @@ export function TransactionRow({ transaction: t, onDelete, onEdit }: Transaction
       )}
     </div>
   )
-}
+})

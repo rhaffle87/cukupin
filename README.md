@@ -15,18 +15,22 @@
 - **Target Tabungan & Wishlist**: Rencanakan tabungan masa depan dan kontrol belanja impulsif dengan daftar impian.
 - **PWA & Offline-First Resilience**: Tetap bisa mencatat saat tanpa internet; transaksi dan aksi otomatis disinkronkan kembali saat online.
 - **Penyimpanan Lokal & Cloud**: Mendukung mode pengembang/tamu berbasis penyimpanan lokal serta integrasi Supabase PostgreSQL dengan Row-Level Security (RLS).
-- **Impor & Ekspor Lengkap**: Impor data via CSV dan cadangkan/pulihkan seluruh data (5 entitas) via JSON.
+- **Sistem Cadangan & Pemulihan (Disaster Recovery)**: Impor data via CSV (dengan mitigasi injeksi formula OWASP) dan cadangkan/pulihkan seluruh data via JSON tervalidasi skema Zod.
+- **Halaman Galat & 404 Kustom**: Antarmuka 404 dan *error boundary* yang ramah, informatif, dan terintegrasi dengan palet desain Cukupin.
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠️ Tech Stack & Infrastruktur
 
 - **Framework**: [Next.js 16](https://nextjs.org/) (App Router, Turbopack)
 - **Styling**: Vanilla CSS & Tailwind CSS v4 (*Quiet Ledger theme palette*)
 - **Typography**: [DM Sans](https://fonts.google.com/specimen/DM+Sans), [Fraunces](https://fonts.google.com/specimen/Fraunces), dan [DM Mono](https://fonts.google.com/specimen/DM+Mono) via `next/font/google`
 - **Database & Auth**: [Supabase](https://supabase.com/) (PostgreSQL dengan RLS)
+- **Analytics & Observability**: [Vercel Analytics](https://vercel.com/analytics) & [Vercel Speed Insights](https://vercel.com/docs/speed-insights) (*privacy consent-gated*)
 - **Charts & Visuals**: Recharts, Lucide Icons, html2canvas
-- **Testing**: Vitest + jsdom
+- **Testing**: Vitest + jsdom (38+ unit tests)
+
+> 📘 Untuk detail arsitektur lengkap, diagram alir sistem, dan model mitigasi keamanan, silakan baca dokumentasi arsitektur di [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ---
 
@@ -92,7 +96,11 @@ Berkas migrasi skema tersimpan di direktori `supabase/migrations/`.
 
 ---
 
-## 📄 Lisensi & Privasi
+## 🔒 Privasi, Keamanan & Regulasi
 
-Aplikasi ini mematuhi prinsip perlindungan privasi data pribadi sesuai regulasi UU PDP No. 27/2022. Informasi hukum dan ketentuan layanan dapat diakses di `/legal/privacy` dan `/legal/terms`.
+Aplikasi ini dibangun dengan kepatuhan penuh terhadap standar perlindungan privasi data pribadi **UU PDP No. 27/2022** dan prinsip **GDPR**:
+- **Hak Penghapusan Data (Pasal 39)**: Pengguna memiliki akses mandiri untuk menghapus seluruh catatan keuangan (*hard-delete*) secara permanen.
+- **Persetujuan Pelacakan**: Telemetri Vercel Analytics dan Speed Insights hanya diaktifkan jika pengguna memberikan persetujuan melalui banner cookie.
+- **Keamanan HTTP**: Dilengkapi HSTS (`max-age=63072000`), CSP, dan proteksi anti-Clickjacking.
 
+Informasi hukum dan ketentuan layanan dapat diakses di `/legal/privacy` dan `/legal/terms`.

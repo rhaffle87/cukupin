@@ -99,7 +99,12 @@ export function TransactionForm({ supabase, userId, initial, onDone }: Transacti
     e.preventDefault()
     setFormError(null)
 
-    if (!supabase || !userId) {
+    if (!userId) {
+      toast.error('Silakan masuk untuk menyimpan transaksi.')
+      return
+    }
+
+    if (!supabase && userId !== 'local-dev-user') {
       toast.error('Hubungkan Supabase dan masuk untuk menyimpan.')
       return
     }

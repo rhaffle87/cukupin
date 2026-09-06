@@ -7,23 +7,14 @@ import { Archive, CheckCircle2, FileUp, AlertTriangle, RefreshCw } from 'lucide-
 import { toast } from 'sonner'
 import confetti from 'canvas-confetti'
 import type { Transaction, SavingGoal, WishlistItem, RecurringBill, CategoryBudget } from '@/lib/database.types'
+import { validateBackupFile, type BackupPayload } from '@/lib/backup'
+import { trackCustomEvent } from '@/lib/analytics'
 
 interface RestoreJsonModalProps {
   supabase: SupabaseClient | null
   userId?: string
   onClose: () => void
   onRestored: () => void
-}
-
-interface BackupPayload {
-  app?: string
-  version?: string
-  exported_at?: string
-  transactions?: Transaction[]
-  goals?: SavingGoal[]
-  wishlist?: WishlistItem[]
-  bills?: RecurringBill[]
-  budgets?: CategoryBudget[]
 }
 
 export function RestoreJsonModal({
@@ -48,30 +39,14 @@ export function RestoreJsonModal({
 
     const reader = new FileReader()
     reader.onload = (event) => {
-      try {
-        const text = event.target?.result as string
-        const json = JSON.parse(text)
-
-        if (!json.transactions && !json.goals && !json.wishlist && !json.bills && !json.budgets) {
-          setErrorMsg('File JSON tidak valid. Pastikan ini adalah file cadangan resmi dari Cukupin.')
-          setParsedData(null)
-          return
-        }
-
-        setParsedData({
-          app: json.app || 'cukupin',
-          version: json.version || '1.0',
-          exported_at: json.exported_at,
-          transactions: Array.isArray(json.transactions) ? json.transactions : [],
-          goals: Array.isArray(json.goals) ? json.goals : [],
-          wishlist: Array.isArray(json.wishlist) ? json.wishlist : [],
-          bills: Array.isArray(json.bills) ? json.bills : [],
-          budgets: Array.isArray(json.budgets) ? json.budgets : [],
-        })
-      } catch (err) {
-        setErrorMsg('Gagal membaca file JSON. Format file rusak atau tidak didukung.')
+      const text = event.target?.result as string
+      const validation = validateBackupFile(text)
+      if (!validation.success || !validation.data) {
+        setErrorMsg(validation.error || 'Format berkas cadangan JSON tidak valid.')
         setParsedData(null)
+        return
       }
+      setParsedData(validation.data)
     }
     reader.readAsText(file)
   }
@@ -184,6 +159,11 @@ export function RestoreJsonModal({
       } catch {
         // ignore in non-browser env
       }
+
+      trackCustomEvent('backup_restored', {
+        mode: restoreMode,
+        transactions_count: txs.length,
+      })
 
       toast.success('Data Cukupin berhasil dipulihkan!')
       onRestored()

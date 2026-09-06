@@ -14,11 +14,25 @@ export function AuthScreen({ supabase }: AuthScreenProps) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [busy, setBusy] = useState(false)
+  const [isLocalhost, setIsLocalhost] = useState(false)
   const router = useRouter()
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setIsLocalhost(
+        window.location.hostname === 'localhost' ||
+        window.location.hostname === '127.0.0.1' ||
+        window.location.hostname.endsWith('.local')
+      )
+    }
+  }, [])
 
   async function submit(e: React.FormEvent) {
     e.preventDefault()
-    if (!supabase) return
+    if (!supabase) {
+      toast.error('Koneksi Supabase belum dikonfigurasi. Gunakan Mode Developer di bawah.')
+      return
+    }
     setBusy(true)
 
     const result = mode === 'login'
@@ -30,8 +44,12 @@ export function AuthScreen({ supabase }: AuthScreenProps) {
     if (result.error) {
       toast.error(result.error.message)
     } else {
-      toast.success(mode === 'login' ? 'Selamat datang kembali.' : 'Akun berhasil dibuat.')
-      router.push('/dashboard')
+      if (mode === 'register' && !result.data?.session) {
+        toast.info('Pendaftaran berhasil! Silakan periksa email kamu untuk tautan konfirmasi akun.')
+      } else {
+        toast.success(mode === 'login' ? 'Selamat datang kembali.' : 'Akun berhasil dibuat.')
+        router.push('/dashboard')
+      }
     }
   }
 
@@ -147,10 +165,7 @@ export function AuthScreen({ supabase }: AuthScreenProps) {
             {mode === 'login' ? 'Belum punya akun? Daftar' : 'Sudah punya akun? Masuk'}
           </button>
 
-          {typeof window !== 'undefined' &&
-            (window.location.hostname === 'localhost' ||
-              window.location.hostname === '127.0.0.1' ||
-              window.location.hostname.endsWith('.local')) && (
+          {isLocalhost && (
               <div className="mt-8 rounded-2xl border border-dashed border-green/40 bg-green-soft/20 p-4 text-center">
                 <p className="text-[11px] font-bold text-green uppercase tracking-wider">Mode Developer (Localhost)</p>
                 <p className="mt-1 text-xs text-muted">Akses instan ke dashboard tanpa perlu konfigurasi auth Supabase.</p>

@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState, useRef } from 'react'
 import type { Transaction } from '@/lib/database.types'
-import { currency, shortCurrency } from '@/lib/finance'
+import { currency, escapeCsvField, shortCurrency } from '@/lib/finance'
 import { Download, FileSpreadsheet, X } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -97,7 +97,7 @@ export function MonthlyExpenseTemplate({
     }
   }, [transactions, selectedMonth])
 
-  // Export CSV
+  // Export CSV (Sanitized against formula injection with UTF-8 BOM)
   const handleExportCsv = () => {
     if (!runningTransactions.length) {
       toast.error('Tidak ada transaksi di bulan ini untuk di-export.')
@@ -106,23 +106,25 @@ export function MonthlyExpenseTemplate({
 
     const headers = ['Date', 'Payment Method', 'Paid To / Category', 'Description', 'Type', 'Amount (IDR)', 'Running Expense Total (IDR)']
     const rows = runningTransactions.map(t => [
-      t.transaction_date,
-      `"${t.paymentMethod}"`,
-      `"${t.paidTo}"`,
-      `"${t.description.replace(/"/g, '""')}"`,
-      t.type,
+      escapeCsvField(t.transaction_date),
+      escapeCsvField(t.paymentMethod),
+      escapeCsvField(t.paidTo),
+      escapeCsvField(t.description),
+      escapeCsvField(t.type),
       t.amount,
       t.runningTotal,
     ])
 
-    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n')
-    const encodedUri = encodeURI(csvContent)
+    const csvContent = [headers.join(','), ...rows.map(e => e.join(','))].join('\n')
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
-    link.setAttribute('href', encodedUri)
+    link.setAttribute('href', url)
     link.setAttribute('download', `monthly-expense-tracker-${selectedMonth}.csv`)
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
+    URL.revokeObjectURL(url)
     toast.success('File CSV berhasil diunduh.')
   }
 
