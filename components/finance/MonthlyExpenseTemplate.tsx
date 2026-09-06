@@ -194,7 +194,7 @@ export function MonthlyExpenseTemplate({
       <div className="relative my-auto flex w-full max-w-4xl flex-col rounded-[24px] border border-line bg-card shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 print:max-w-none print:w-full print:rounded-none print:border-none print:shadow-none print:bg-white print:overflow-visible">
         
         {/* Top Action Toolbar (Hidden during print) */}
-        <div className="print:hidden flex flex-wrap items-center justify-between gap-3 border-b border-line bg-paper px-6 py-4">
+        <div className="print:hidden flex flex-wrap items-center justify-between gap-2.5 border-b border-line bg-paper px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center gap-3">
             <span className="font-display text-lg font-bold text-ink">Template Export</span>
             <div className="flex items-center gap-2">
@@ -236,7 +236,7 @@ export function MonthlyExpenseTemplate({
         <div
           ref={sheetRef}
           id="printable-expense-sheet"
-          className="max-h-[82vh] overflow-y-auto p-6 md:p-10 bg-white text-[#111827] print:max-h-none print:overflow-visible print:p-0"
+          className="max-h-[82vh] overflow-y-auto p-4 sm:p-6 md:p-10 bg-white text-[#111827] print:max-h-none print:overflow-visible print:p-0"
         >
           
           {/* Header Block matching Image 3 */}
@@ -272,9 +272,14 @@ export function MonthlyExpenseTemplate({
             </div>
           </div>
 
+          {/* Mobile Scroll Hint */}
+          <p className="md:hidden text-[10px] text-[#6B7280] text-center mb-2 italic">
+            ← Geser tabel ke kanan untuk melihat kolom lengkap →
+          </p>
+
           {/* The Ledger Table matching Image 3 structure */}
           <div className="overflow-x-auto border border-[#111827]">
-            <table className="w-full border-collapse text-left text-xs" aria-label="Tabel rincian transaksi bulanan">
+            <table className="w-full min-w-[640px] border-collapse text-left text-xs" aria-label="Tabel rincian transaksi bulanan">
               <thead>
                 <tr className="border-b border-[#111827] bg-[#F3F4F6] text-[10px] font-bold uppercase tracking-wider text-[#111827]">
                   <th scope="col" className="border-r border-[#111827] px-3 py-2.5 w-[110px]">DATE OF PAYMENT</th>

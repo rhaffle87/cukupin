@@ -35,10 +35,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       return
     }
 
-    supabase.auth
-      .getUser()
+    // Add a 1200ms timeout race to prevent hanging indefinitely on slow or paused Supabase instances
+    const timeoutPromise = new Promise<{ data: { user: null } }>((resolve) =>
+      setTimeout(() => resolve({ data: { user: null } }), 1200)
+    )
+
+    Promise.race([supabase.auth.getUser(), timeoutPromise])
       .then(({ data }) => {
-        if (data.user) {
+        if (data?.user) {
           setUser({ id: data.user.id, email: data.user.email })
         } else if (isLocalhost && !isExplicitlyLoggedOut) {
           // Allow seamless localhost development without blocking on Supabase auth
@@ -75,9 +79,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (checking) {
     return (
-      <div className="loading-screen">
+      <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-paper p-6 text-center text-muted">
         <Brand />
-        <span>Menyiapkan catatanmu...</span>
+        <div className="mt-2 flex items-center gap-2 text-xs font-semibold text-muted">
+          <span className="h-2 w-2 animate-ping rounded-full bg-green" />
+          <span>Menyiapkan catatanmu...</span>
+        </div>
       </div>
     )
   }

@@ -51,7 +51,7 @@ export default function LandingPage() {
     },
     {
       q: 'Bisakah saya mengekspor data pengeluaran?',
-      a: 'Bisa. Kamu bisa mengunduh riwayat transaksi dan format buku kas bulanan ke dalam format PDF siap cetak atau file CSV untuk dibuka di spreadsheet kapan saja.',
+      a: 'Bisa. Kamu bisa mengunduh riwayat transaksi dan format buku kas bulanan ke dalam format PDF rapi atau file CSV untuk dibuka di spreadsheet kapan saja.',
     },
   ]
 
@@ -96,43 +96,43 @@ export default function LandingPage() {
             <em className="text-green not-italic">Yang penting cukup.</em>
           </h1>
 
-          {/* AEO Extraction Sentence (Strictly 25-40 words for AI citations & SERP snippets) */}
-          <blockquote className="my-6 max-w-2xl rounded-2xl border border-green/25 bg-green-soft/40 px-5 py-4 text-left text-xs sm:text-sm leading-relaxed text-ink shadow-xs">
-            <strong className="block text-[11px] uppercase tracking-wider text-green font-bold mb-1">
-              Tentang Cukupin
-            </strong>
-            Cukupin adalah aplikasi pencatat keuangan harian gratis yang dirancang santai dan sederhana untuk memantau uang masuk, pengeluaran harian, dan budget aman tanpa rumus rumit atau integrasi bank yang membingungkan.
-          </blockquote>
-
-          <div className="flex flex-col sm:flex-row items-center gap-3.5 mt-2">
+          <div className="flex flex-col sm:flex-row items-center gap-3.5 mt-6 mb-6 w-full sm:w-auto">
             <Link
               href="/auth/login"
-              className="group flex h-12 items-center justify-center gap-2.5 rounded-2xl bg-ink px-7 text-sm font-bold !text-white shadow-xl shadow-ink/15 transition-all hover:-translate-y-0.5 hover:bg-ink/90 active:translate-y-0 focus-visible:ring-2 focus-visible:ring-green"
+              className="group flex h-12 w-full sm:w-auto items-center justify-center gap-2.5 rounded-2xl bg-ink px-7 text-sm font-bold !text-white shadow-xl shadow-ink/15 transition-all hover:-translate-y-0.5 hover:bg-ink/90 active:translate-y-0 focus-visible:ring-2 focus-visible:ring-green"
             >
               Coba Sekarang, Gratis
               <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-1" />
             </Link>
             <a
               href="#cara-kerja"
-              className="group flex h-12 items-center justify-center gap-2 rounded-2xl border border-line bg-card px-6 text-sm font-bold text-ink transition-all hover:bg-paper active:scale-98 focus-visible:ring-2 focus-visible:ring-green"
+              className="group flex h-12 w-full sm:w-auto items-center justify-center gap-2 rounded-2xl border border-line bg-card px-6 text-sm font-bold text-ink transition-all hover:bg-paper active:scale-98 focus-visible:ring-2 focus-visible:ring-green"
             >
               Lihat Cara Kerja
               <ArrowDown size={14} className="text-muted transition-transform duration-200 group-hover:translate-y-0.5" />
             </a>
           </div>
 
+          {/* AEO Extraction Sentence (Strictly 25-40 words for AI citations & SERP snippets) */}
+          <blockquote className="my-2 max-w-2xl rounded-2xl border border-green/25 bg-green-soft/40 px-5 py-4 text-left text-xs sm:text-sm leading-relaxed text-ink shadow-xs">
+            <strong className="block text-[11px] uppercase tracking-wider text-green font-bold mb-1">
+              Tentang Cukupin
+            </strong>
+            Cukupin adalah aplikasi pencatat keuangan harian gratis yang dirancang santai dan sederhana untuk memantau uang masuk, pengeluaran harian, dan budget aman tanpa rumus rumit atau integrasi bank yang membingungkan.
+          </blockquote>
+
           {/* Micro Social Proof & Security Badges */}
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-4 text-xs text-muted">
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-2 sm:gap-4 text-xs text-muted">
             <span className="inline-flex items-center gap-1.5 font-medium">
-              <ShieldCheck size={16} className="text-green" /> 100% Gratis & Tanpa Iklan
+              <ShieldCheck size={16} className="text-green shrink-0" /> 100% Gratis & Tanpa Iklan
             </span>
-            <span className="text-line">•</span>
+            <span className="hidden sm:inline text-line">•</span>
             <span className="inline-flex items-center gap-1.5 font-medium">
-              <Lock size={15} className="text-blue" /> Tanpa Akses Rekening Bank
+              <Lock size={15} className="text-blue shrink-0" /> Tanpa Akses Rekening Bank
             </span>
-            <span className="text-line">•</span>
+            <span className="hidden sm:inline text-line">•</span>
             <span className="inline-flex items-center gap-1.5 font-medium">
-              <Smartphone size={15} className="text-coral" /> Bisa di HP & Laptop (PWA)
+              <Smartphone size={15} className="text-coral shrink-0" /> Bisa di HP & Laptop (PWA)
             </span>
           </div>
         </div>
@@ -277,7 +277,7 @@ export default function LandingPage() {
                   <FileSpreadsheet size={20} />
                 </div>
                 <h3 className="font-display text-lg sm:text-xl font-bold text-ink">
-                  Format Laporan Bulanan Siap Cetak & PDF
+                  Format Rekapitulasi & Laporan PDF Bulanan
                 </h3>
                 <p className="mt-2 text-xs leading-relaxed text-muted">
                   Butuh rekapitulasi rapi untuk arsip pribadi atau evaluasi keuangan bersama pasangan? Ekspor laporan bulanan lengkap dengan running total ke PDF bersih atau file CSV kapan saja.
@@ -351,8 +351,13 @@ export default function LandingPage() {
             </p>
           </div>
 
+          {/* Mobile Table Scroll Indicator */}
+          <p className="md:hidden text-center text-[10px] text-muted mb-2.5 italic">
+            ← Geser tabel ke kanan untuk melihat perbandingan lengkap →
+          </p>
+
           <div className="overflow-x-auto rounded-[20px] border border-line bg-card shadow-xs">
-            <table className="w-full text-left text-xs border-collapse">
+            <table className="w-full min-w-[560px] text-left text-xs border-collapse">
               <thead>
                 <tr className="border-b border-line bg-paper/80">
                   <th scope="col" className="p-4 font-bold text-ink">Kriteria</th>

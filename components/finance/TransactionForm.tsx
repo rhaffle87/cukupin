@@ -243,7 +243,7 @@ export function TransactionForm({ supabase, userId, initial, onDone }: Transacti
         ))}
       </div>
 
-      <div className="grid grid-cols-2 gap-3 items-start">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-start">
         <label className="flex flex-col gap-1.5">
           <span className="text-xs font-bold text-ink">Kategori</span>
           <select value={category} onChange={e => setCategory(e.target.value)}>
@@ -280,7 +280,7 @@ export function TransactionForm({ supabase, userId, initial, onDone }: Transacti
         </label>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 items-start">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-start">
         <label className="flex flex-col gap-1.5">
           <div className="flex items-center gap-1.5 text-xs font-bold text-ink">
             <span>Metode Bayar</span>

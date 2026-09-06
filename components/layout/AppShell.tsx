@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Brand } from '@/components/ui/Brand'
 import { Bell, FileText, Home as HomeIcon, LogOut, Menu, Plus, Receipt, ShoppingBag, Sparkles, Target, X } from 'lucide-react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { DailyReminderModal } from '@/components/finance/DailyReminderModal'
 
 interface AppShellProps {
@@ -23,6 +23,15 @@ export function AppShell({ children, user, onSignOut }: AppShellProps) {
   const [open, setOpen] = useState(false)
   const [showReminderModal, setShowReminderModal] = useState(false)
   const pathname = usePathname()
+  const router = useRouter()
+
+  const handleOpenNewTx = () => {
+    if (pathname === '/transactions') {
+      window.dispatchEvent(new CustomEvent('cukupin:open-new-tx'))
+    } else {
+      router.push('/transactions?new=1')
+    }
+  }
 
   React.useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -130,17 +139,19 @@ export function AppShell({ children, user, onSignOut }: AppShellProps) {
           </button>
           <Brand compact />
           <button 
-            className="flex h-10 w-10 items-center justify-center rounded-xl bg-ink !text-white shadow-xs transition-transform active:scale-95" 
-            onClick={() => window.dispatchEvent(new CustomEvent('cukupin:open-new-tx'))}
+            className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl bg-ink !text-white shadow-xs transition-transform active:scale-95 cursor-pointer" 
+            onClick={handleOpenNewTx}
             aria-label="Tambah catatan baru"
             title="Tambah catatan baru"
           >
-            <Plus size={18} />
+            <Plus size={20} />
           </button>
         </header>
         
-        <main className="flex-1 overflow-y-auto p-4 pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] md:p-8 lg:p-10">
-          {children}
+        <main className="flex-1 overflow-y-auto p-4 md:p-8 lg:p-10">
+          <div className="pb-28 md:pb-0">
+            {children}
+          </div>
         </main>
         
         {/* Mobile Bottom Nav */}

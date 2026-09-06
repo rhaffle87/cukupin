@@ -66,12 +66,12 @@ export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> 
           </p>
           <strong className="mt-1 block font-display text-lg font-bold text-ink">Pilih periode laporan</strong>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           <button
             type="button"
             onClick={() => stepMonth(-1)}
             title="Bulan Sebelumnya"
-            className="self-end mb-1 rounded-lg border border-line bg-paper p-2 text-muted hover:bg-black/5 hover:text-ink transition-colors cursor-pointer"
+            className="self-end mb-1 rounded-lg border border-line bg-paper p-1.5 sm:p-2 text-muted hover:bg-black/5 hover:text-ink transition-colors cursor-pointer"
             aria-label="Bulan Sebelumnya"
           >
             <ChevronLeft size={16} />
@@ -82,7 +82,7 @@ export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> 
               type="date"
               value={from}
               onChange={e => setFrom(e.target.value)}
-              className="mt-1 rounded-lg border border-line bg-paper px-3 py-1.5 text-xs text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
+              className="mt-1 w-[115px] sm:w-[130px] rounded-lg border border-line bg-paper px-2 py-1.5 text-xs text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
             />
           </label>
           <span className="self-end pb-2 text-xs font-medium text-muted">s/d</span>
@@ -92,14 +92,14 @@ export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> 
               type="date"
               value={to}
               onChange={e => setTo(e.target.value)}
-              className="mt-1 rounded-lg border border-line bg-paper px-3 py-1.5 text-xs text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
+              className="mt-1 w-[115px] sm:w-[130px] rounded-lg border border-line bg-paper px-2 py-1.5 text-xs text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
             />
           </label>
           <button
             type="button"
             onClick={() => stepMonth(1)}
             title="Bulan Berikutnya"
-            className="self-end mb-1 rounded-lg border border-line bg-paper p-2 text-muted hover:bg-black/5 hover:text-ink transition-colors cursor-pointer"
+            className="self-end mb-1 rounded-lg border border-line bg-paper p-1.5 sm:p-2 text-muted hover:bg-black/5 hover:text-ink transition-colors cursor-pointer"
             aria-label="Bulan Berikutnya"
           >
             <ChevronRight size={16} />
@@ -117,14 +117,14 @@ export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> 
       {/* 50/30/20 Budget Rule Breakdown */}
       {rule503020.totalExpense > 0 && (
         <section className="mb-4 rounded-[18px] border border-line bg-card p-5 shadow-[0_5px_20px_rgba(30,50,73,0.025)] md:p-6">
-          <div className="mb-4 flex items-center justify-between">
+          <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
               <p className="flex items-center gap-1.5 text-[10px] font-bold tracking-widest text-[#89938A] uppercase before:block before:h-[1px] before:w-[19px] before:bg-blue after:block after:-ml-[5px] after:h-[4px] after:w-[4px] after:rounded-full after:bg-green">
                 POLA PENGELUARAN (50/30/20)
               </p>
-              <h2 className="mt-1 font-display text-xl font-bold tracking-tight text-ink">Kebutuhan vs Keinginan</h2>
+              <h2 className="mt-1 font-display text-lg sm:text-xl font-bold tracking-tight text-ink">Kebutuhan vs Keinginan</h2>
             </div>
-            <span className="rounded-full border border-line bg-paper px-3 py-1 text-[10px] font-bold text-muted">
+            <span className="self-start sm:self-auto rounded-full border border-line bg-paper px-3 py-1 text-[10px] font-bold text-muted">
               Total {currency(rule503020.totalExpense)}
             </span>
           </div>
@@ -162,14 +162,14 @@ export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> 
       {/* Payment Method Distribution */}
       {paymentMethods.length > 0 && stats.expense > 0 && (
         <section className="mb-4 rounded-[18px] border border-line bg-card p-5 shadow-[0_5px_20px_rgba(30,50,73,0.025)] md:p-6">
-          <div className="mb-4 flex items-center justify-between">
+          <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
               <p className="flex items-center gap-1.5 text-[10px] font-bold tracking-widest text-[#89938A] uppercase before:block before:h-[1px] before:w-[19px] before:bg-blue after:block after:-ml-[5px] after:h-[4px] after:w-[4px] after:rounded-full after:bg-green">
                 METODE PEMBAYARAN
               </p>
-              <h2 className="mt-1 font-display text-xl font-bold tracking-tight text-ink">Distribusi Kanal Belanja</h2>
+              <h2 className="mt-1 font-display text-lg sm:text-xl font-bold tracking-tight text-ink">Distribusi Kanal Belanja</h2>
             </div>
-            <span className="rounded-full border border-line bg-paper px-3 py-1 text-[10px] font-bold text-muted">
+            <span className="self-start sm:self-auto rounded-full border border-line bg-paper px-3 py-1 text-[10px] font-bold text-muted">
               {paymentMethods.length} Kanal Terpakai
             </span>
           </div>

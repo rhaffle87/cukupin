@@ -327,7 +327,7 @@ export function GoalsView({ supabase, data, userId }: GoalsViewProps) {
 
       {/* Goals Grid */}
       {filteredGoals.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-8 md:pb-0">
           {filteredGoals.map(goal => {
             const current = Number(goal.current_amount)
             const targetAmt = Number(goal.target_amount)

@@ -283,49 +283,49 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
       />
 
       {/* Top Structured KPI Summary Cards */}
-      <div className="mb-5 grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div className="rounded-[18px] border border-line bg-card p-4 shadow-2xs">
+      <div className="mb-4 grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
+        <div className="rounded-[18px] border border-line bg-card p-3 sm:p-4 shadow-2xs">
           <div className="flex items-center justify-between text-muted text-xs">
-            <span className="font-bold text-[10px] uppercase tracking-wider">Total Nilai Wishlist</span>
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-soft text-blue">
-              <ShoppingBag size={15} />
+            <span className="font-bold text-[10px] uppercase tracking-wider">Total Nilai</span>
+            <div className="flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-lg bg-blue-soft text-blue">
+              <ShoppingBag size={14} />
             </div>
           </div>
-          <strong className="mt-2 block font-display text-xl md:text-2xl font-bold text-ink">
+          <strong className="mt-1.5 block font-display text-base sm:text-xl md:text-2xl font-bold text-ink truncate" title={currency(totalWishlistValue)}>
             {currency(totalWishlistValue)}
           </strong>
-          <small className="mt-0.5 block text-[11px] text-muted">
+          <small className="mt-0.5 block text-[10px] sm:text-[11px] text-muted">
             {data.wishlist.length} barang tersimpan
           </small>
         </div>
 
-        <div className="rounded-[18px] border border-line bg-card p-4 shadow-2xs">
+        <div className="rounded-[18px] border border-line bg-card p-3 sm:p-4 shadow-2xs">
           <div className="flex items-center justify-between text-muted text-xs">
             <span className="font-bold text-[10px] uppercase tracking-wider">Siap Dibeli</span>
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-green-soft text-green">
-              <Sparkles size={15} />
+            <div className="flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-lg bg-green-soft text-green">
+              <Sparkles size={14} />
             </div>
           </div>
-          <strong className="mt-2 block font-display text-xl md:text-2xl font-bold text-green">
+          <strong className="mt-1.5 block font-display text-base sm:text-xl md:text-2xl font-bold text-green">
             {affordableCount} Barang
           </strong>
-          <small className="mt-0.5 block text-[11px] text-muted">
-            Saldo cukup dengan saldo saat ini ({currency(currentBalance)})
+          <small className="mt-0.5 block text-[10px] sm:text-[11px] text-muted truncate">
+            Saldo cukup ({currency(currentBalance)})
           </small>
         </div>
 
-        <div className="rounded-[18px] border border-line bg-card p-4 shadow-2xs">
+        <div className="col-span-2 sm:col-span-1 rounded-[18px] border border-line bg-card p-3 sm:p-4 shadow-2xs">
           <div className="flex items-center justify-between text-muted text-xs">
             <span className="font-bold text-[10px] uppercase tracking-wider">Saldo Kas Tersedia</span>
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-paper text-ink">
-              <Wallet size={15} />
+            <div className="flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-lg bg-paper text-ink">
+              <Wallet size={14} />
             </div>
           </div>
-          <strong className={`mt-2 block font-display text-xl md:text-2xl font-bold ${currentBalance >= 0 ? 'text-ink' : 'text-coral'}`}>
+          <strong className={`mt-1.5 block font-display text-base sm:text-xl md:text-2xl font-bold truncate ${currentBalance >= 0 ? 'text-ink' : 'text-coral'}`} title={currency(currentBalance)}>
             {currency(currentBalance)}
           </strong>
-          <small className="mt-0.5 block text-[11px] text-muted">
-            {currentBalance >= 0 ? 'Kondisi kas aman untuk belanja' : 'Arus kas minus, tunda dulu belanja'}
+          <small className="mt-0.5 block text-[10px] sm:text-[11px] text-muted">
+            {currentBalance >= 0 ? 'Kondisi kas aman untuk belanja' : 'Arus kas minus, tunda dulu'}
           </small>
         </div>
       </div>
@@ -383,7 +383,7 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
 
       {/* Structured Wishlist Cards Grid */}
       {filteredWishlist.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-8 md:pb-0">
           {filteredWishlist.map(item => {
             const itemPrice = Number(item.price || 0)
             const isAffordable = currentBalance >= itemPrice && currentBalance > 0

@@ -59,13 +59,23 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
   // Dynamic companion card tip index
   const [tipIndex, setTipIndex] = useState(0)
 
-  // Listen for global shortcut 'N'
+  // Listen for global shortcut 'N' and searchParam ?new=1
   React.useEffect(() => {
     function handleOpenNew() {
       setEditing(undefined)
       setShowForm(true)
     }
     window.addEventListener('cukupin:open-new-tx', handleOpenNew)
+
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search)
+      if (params.get('new') === '1') {
+        handleOpenNew()
+        const newUrl = window.location.pathname
+        window.history.replaceState({}, '', newUrl)
+      }
+    }
+
     return () => window.removeEventListener('cukupin:open-new-tx', handleOpenNew)
   }, [])
 
@@ -462,7 +472,7 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
                 type="button"
                 onClick={() => stepMonth(-1)}
                 title="Bulan Sebelumnya"
-                className="rounded-lg border border-line bg-paper p-1.5 text-muted hover:bg-black/5 hover:text-ink transition-colors"
+                className="rounded-lg border border-line bg-paper p-1.5 text-muted hover:bg-black/5 hover:text-ink transition-colors cursor-pointer"
                 aria-label="Bulan Sebelumnya"
               >
                 <ChevronLeft size={15} />
@@ -471,20 +481,20 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
                 type="date"
                 value={from}
                 onChange={e => { setFrom(e.target.value); setVisibleCount(10) }}
-                className="rounded-lg border border-line bg-paper px-2.5 py-1.5 text-xs text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
+                className="w-[125px] sm:w-auto rounded-lg border border-line bg-paper px-2 py-1.5 text-xs text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
               />
               <span className="text-xs text-muted">s/d</span>
               <input
                 type="date"
                 value={to}
                 onChange={e => { setTo(e.target.value); setVisibleCount(10) }}
-                className="rounded-lg border border-line bg-paper px-2.5 py-1.5 text-xs text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
+                className="w-[125px] sm:w-auto rounded-lg border border-line bg-paper px-2 py-1.5 text-xs text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
               />
               <button
                 type="button"
                 onClick={() => stepMonth(1)}
                 title="Bulan Berikutnya"
-                className="rounded-lg border border-line bg-paper p-1.5 text-muted hover:bg-black/5 hover:text-ink transition-colors"
+                className="rounded-lg border border-line bg-paper p-1.5 text-muted hover:bg-black/5 hover:text-ink transition-colors cursor-pointer"
                 aria-label="Bulan Berikutnya"
               >
                 <ChevronRight size={15} />
@@ -718,12 +728,7 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
           </div>
         </aside>
       </div>
-      
-      <button className="mobile-fab" onClick={() => { setEditing(undefined); setShowForm(true) }} aria-label="Tambah transaksi">
-        <Plus size={22} />
-        <span>Tambah</span>
-      </button>
-      
+
       {showForm && (
         <Modal title={editing ? 'Edit transaksi' : 'Transaksi baru'} onClose={() => setShowForm(false)}>
           <TransactionForm

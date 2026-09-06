@@ -38,8 +38,8 @@ export function AuthScreen({ supabase }: AuthScreenProps) {
   return (
     <div className="flex min-h-screen flex-col md:flex-row bg-paper text-ink selection:bg-green-soft selection:text-green">
       
-      {/* Left Art Panel */}
-      <div className="relative flex min-h-[340px] w-full flex-col overflow-hidden bg-ink p-8 text-white md:min-h-screen md:w-[55%] md:p-14 lg:w-[60%]">
+      {/* Left Art Panel (Hidden on mobile for direct form ergonomics) */}
+      <div className="relative hidden md:flex min-h-screen w-full flex-col overflow-hidden bg-ink p-8 text-white md:w-[55%] md:p-14 lg:w-[60%]">
         {/* Decorative Circles */}
         <div className="absolute -bottom-[150px] -right-[150px] h-[500px] w-[500px] rounded-full border border-white/10 shadow-[0_0_0_40px_rgba(255,255,255,0.02),0_0_0_80px_rgba(255,255,255,0.01)]" />
         <div className="absolute -left-[100px] top-[10%] h-[300px] w-[300px] rounded-full bg-green-soft/20 blur-[100px]" />
@@ -52,7 +52,7 @@ export function AuthScreen({ supabase }: AuthScreenProps) {
               <span className="h-1 w-4 -rotate-45 translate-y-[3px] -translate-x-[1px] rounded bg-green" />
             </div>
             <div className="flex flex-col">
-              <strong className="font-display text-[20px] leading-none tracking-tight">cukupin</strong>
+              <strong className="font-display text-[20px] leading-none tracking-tight">Cukupin</strong>
             </div>
           </div>
         </div>
@@ -77,9 +77,9 @@ export function AuthScreen({ supabase }: AuthScreenProps) {
       </div>
       
       {/* Right Auth Panel */}
-      <div className="flex w-full flex-1 flex-col items-center justify-center p-8 md:p-12">
+      <div className="flex w-full flex-1 flex-col items-center justify-center p-6 sm:p-8 md:p-12">
         <div className="w-full max-w-sm">
-          <div className="mb-10 md:hidden">
+          <div className="mb-6 md:hidden">
             <Brand />
           </div>
           
