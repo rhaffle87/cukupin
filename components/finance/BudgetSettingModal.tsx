@@ -125,14 +125,14 @@ export function BudgetSettingModal({
               </div>
 
               <div className="relative w-44 shrink-0">
-                <span className="absolute left-2.5 top-2 text-xs font-mono text-muted">Rp</span>
+                <span className="pointer-events-none absolute inset-y-0 left-2.5 flex items-center text-xs font-mono text-muted select-none">Rp</span>
                 <input
                   type="text"
                   inputMode="numeric"
                   placeholder="0 (Tanpa batas)"
                   value={limits[cat] || ''}
                   onChange={(e) => handleInputChange(cat, e.target.value)}
-                  className="w-full rounded-lg border border-line bg-card pl-8 pr-2.5 py-1.5 text-xs font-mono text-ink outline-none focus:border-ink focus:ring-1 focus:ring-ink"
+                  className="w-full rounded-lg border border-line bg-card !pl-8 pr-2.5 py-1.5 text-xs font-mono text-ink outline-none focus:border-ink focus:ring-1 focus:ring-ink"
                 />
               </div>
             </div>

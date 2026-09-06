@@ -389,14 +389,14 @@ export function RecurringBillsView({
                   Jumlah (Rp)
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3 top-2.5 text-xs font-mono text-muted">Rp</span>
+                  <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-xs font-mono text-muted select-none">Rp</span>
                   <input
                     type="text"
                     inputMode="numeric"
                     placeholder="0"
                     value={amountStr}
                     onChange={(e) => setAmountStr(formatRupiahInput(e.target.value))}
-                    className="w-full rounded-xl border border-line bg-paper pl-9 pr-3.5 py-2.5 text-sm font-mono text-ink outline-none focus:border-ink focus:ring-1 focus:ring-ink"
+                    className="w-full rounded-xl border border-line bg-paper !pl-9 pr-3.5 py-2.5 text-sm font-mono text-ink outline-none focus:border-ink focus:ring-1 focus:ring-ink"
                     required
                   />
                 </div>
