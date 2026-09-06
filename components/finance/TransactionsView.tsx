@@ -484,7 +484,7 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
               value={query}
               onChange={e => { setQuery(e.target.value); setVisibleCount(10) }}
               placeholder="Cari kategori atau catatan..."
-              className="w-full rounded-xl border border-line bg-paper pl-10 pr-9 py-2.5 text-xs text-ink placeholder:text-muted/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green transition-all"
+              className="w-full rounded-xl border border-line bg-paper !pl-11 pr-9 py-2.5 text-xs text-ink placeholder:text-muted/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green transition-all"
             />
             {query && (
               <button
@@ -695,15 +695,15 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
             <div className="mb-4 grid grid-cols-3 gap-2 rounded-xl bg-paper/80 p-3 border border-line/60 text-xs shadow-2xs">
               <div>
                 <span className="block text-[10px] font-bold text-muted uppercase">Pemasukan</span>
-                <strong className="text-green font-display text-sm">{currency(filteredStats.income)}</strong>
+                <strong className="text-green !font-mono tabular-nums font-bold text-sm">{currency(filteredStats.income)}</strong>
               </div>
               <div>
                 <span className="block text-[10px] font-bold text-muted uppercase">Pengeluaran</span>
-                <strong className="text-coral font-display text-sm">{currency(filteredStats.expense)}</strong>
+                <strong className="text-coral !font-mono tabular-nums font-bold text-sm">{currency(filteredStats.expense)}</strong>
               </div>
               <div>
                 <span className="block text-[10px] font-bold text-muted uppercase">Net Sisa</span>
-                <strong className={`font-display text-sm ${filteredStats.balance >= 0 ? 'text-blue' : 'text-coral'}`}>
+                <strong className={`!font-mono tabular-nums font-bold text-sm ${filteredStats.balance >= 0 ? 'text-blue' : 'text-coral'}`}>
                   {currency(filteredStats.balance)}
                 </strong>
               </div>

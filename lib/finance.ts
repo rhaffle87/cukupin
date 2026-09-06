@@ -56,8 +56,8 @@ export function comparator(current: Transaction[], previous: Transaction[]) {
 /**
  * Calculates remaining days in the current month and daily safe spend allowance.
  */
-export function calculateDailySafeSpend(balance: number) {
-  const now = new Date()
+export function calculateDailySafeSpend(balance: number, referenceDate: Date = new Date()) {
+  const now = referenceDate
   const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
   const currentDay = now.getDate()
   const remainingDays = Math.max(1, lastDay - currentDay + 1)

@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import { ArrowDownLeft, ArrowUpRight, ChevronLeft, ChevronRight, FileSpreadsheet, FileText, PieChart, TrendingDown, TrendingUp, Wallet } from 'lucide-react'
+import { ArrowDownLeft, ArrowUpRight, ChevronLeft, ChevronRight, FileSpreadsheet, FileText, PieChart, Sparkles, TrendingDown, TrendingUp, Wallet } from 'lucide-react'
 import { toast } from 'sonner'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { StatCard } from '@/components/ui/StatCard'
@@ -9,9 +9,11 @@ import { TransactionRow } from './TransactionRow'
 import { useFinanceData } from '@/hooks/useFinanceData'
 import { budgetRule503020, comparator, currency, isoDate, monthBounds, paymentMethodBreakdown, totals } from '@/lib/finance'
 import { MonthlyExpenseTemplate } from './MonthlyExpenseTemplate'
+import { FinancialWrappedModal } from './FinancialWrappedModal'
 
 export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> }) {
   const [showTemplate, setShowTemplate] = useState(false)
+  const [showWrapped, setShowWrapped] = useState(false)
   const [from, setFrom] = useState(monthBounds().start)
   const [to, setTo] = useState(monthBounds().end)
 
@@ -50,12 +52,20 @@ export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> 
         title="Laporan"
         subtitle="Cek ringkasan dan perbandingan pengeluaranmu."
         action={
-          <button
-            onClick={() => setShowTemplate(true)}
-            className="inline-flex items-center gap-2 rounded-xl bg-ink px-4 py-2 text-xs font-bold !text-white shadow-sm transition-all hover:bg-ink/90 active:scale-95 cursor-pointer"
-          >
-            <FileSpreadsheet size={15} className="text-green" /> Lihat & Unduh Laporan
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => setShowWrapped(true)}
+              className="inline-flex items-center gap-2 rounded-xl border border-line bg-card px-3.5 py-2 text-xs font-bold text-ink shadow-2xs transition-all hover:bg-black/5 active:scale-95 cursor-pointer"
+            >
+              <Sparkles size={15} className="text-green" /> Rapor Cukupin
+            </button>
+            <button
+              onClick={() => setShowTemplate(true)}
+              className="inline-flex items-center gap-2 rounded-xl bg-ink px-4 py-2 text-xs font-bold !text-white shadow-sm transition-all hover:bg-ink/90 active:scale-95 cursor-pointer"
+            >
+              <FileSpreadsheet size={15} className="text-mint" /> Format Bulanan (PDF/Cetak)
+            </button>
+          </div>
         }
       />
       
@@ -255,6 +265,14 @@ export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> 
           transactions={data.transactions}
           defaultMonth={from.slice(0, 7)}
           onClose={() => setShowTemplate(false)}
+        />
+      )}
+
+      {showWrapped && (
+        <FinancialWrappedModal
+          isOpen={showWrapped}
+          onClose={() => setShowWrapped(false)}
+          transactions={filtered}
         />
       )}
     </>

@@ -159,15 +159,6 @@ export function AppShell({ children, user, onSignOut }: AppShellProps) {
           >
             <LogOut size={16} /> Keluar
           </button>
-
-          {/* Desktop Keyboard Shortcut Badge */}
-          <div className="mt-3 hidden md:flex items-center justify-between rounded-xl bg-black/[0.03] px-3 py-2 text-[10px] text-muted">
-            <span>Pintasan</span>
-            <div className="flex items-center gap-1.5 font-medium">
-              <kbd className="rounded border border-line bg-card px-1.5 py-0.5 font-mono font-bold text-ink shadow-2xs">N</kbd>
-              <span>Catat baru</span>
-            </div>
-          </div>
         </div>
       </aside>
       

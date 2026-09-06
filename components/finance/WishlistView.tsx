@@ -342,7 +342,7 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
               <ShoppingBag size={14} />
             </div>
           </div>
-          <strong className="mt-1.5 block font-display text-base sm:text-xl md:text-2xl font-bold text-ink truncate" title={currency(totalWishlistValue)}>
+          <strong className="mt-1.5 block !font-mono tabular-nums text-base sm:text-xl md:text-2xl font-bold text-ink truncate" title={currency(totalWishlistValue)}>
             {currency(totalWishlistValue)}
           </strong>
           <small className="mt-0.5 block text-[10px] sm:text-[11px] text-muted">
@@ -357,7 +357,7 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
               <Sparkles size={14} />
             </div>
           </div>
-          <strong className="mt-1.5 block font-display text-base sm:text-xl md:text-2xl font-bold text-green">
+          <strong className="mt-1.5 block !font-mono tabular-nums text-base sm:text-xl md:text-2xl font-bold text-green">
             {affordableCount} Barang
           </strong>
           <small className="mt-0.5 block text-[10px] sm:text-[11px] text-muted truncate">
@@ -372,7 +372,7 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
               <Wallet size={14} />
             </div>
           </div>
-          <strong className={`mt-1.5 block font-display text-base sm:text-xl md:text-2xl font-bold truncate ${currentBalance >= 0 ? 'text-ink' : 'text-coral'}`} title={currency(currentBalance)}>
+          <strong className={`mt-1.5 block !font-mono tabular-nums text-base sm:text-xl md:text-2xl font-bold truncate ${currentBalance >= 0 ? 'text-ink' : 'text-coral'}`} title={currency(currentBalance)}>
             {currency(currentBalance)}
           </strong>
           <small className="mt-0.5 block text-[10px] sm:text-[11px] text-muted">
@@ -474,7 +474,7 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
                   </h3>
 
                   {/* Price */}
-                  <strong className="mt-2 block font-display text-xl font-bold text-ink">
+                  <strong className="mt-2 block !font-mono tabular-nums text-xl font-bold text-ink">
                     {currency(itemPrice)}
                   </strong>
 

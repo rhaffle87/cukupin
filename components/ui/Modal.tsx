@@ -5,13 +5,14 @@ interface ModalProps {
   title: string
   onClose: () => void
   children: React.ReactNode
+  className?: string
 }
 
-export function Modal({ title, onClose, children }: ModalProps) {
+export function Modal({ title, onClose, children, className }: ModalProps) {
   return (
     <div className="modal-backdrop" onMouseDown={onClose}>
       <div
-        className="modal max-h-[90vh] flex flex-col overflow-hidden shadow-2xl"
+        className={`modal max-h-[90vh] flex flex-col overflow-hidden shadow-2xl ${className || ''}`}
         onMouseDown={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"

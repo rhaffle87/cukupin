@@ -17,7 +17,7 @@ export function StatCard({ label, value, tone, icon: Icon, note }: StatCardProps
           <Icon size={14} className="sm:w-4 sm:h-4" />
         </div>
       </div>
-      <strong className="my-1 sm:my-2 block truncate font-display text-sm sm:text-lg md:text-2xl font-bold tracking-tight text-ink" title={value}>
+      <strong className="my-1 sm:my-2 block truncate !font-mono font-bold tabular-nums text-sm sm:text-lg md:text-2xl tracking-tight text-ink" title={value}>
         {value}
       </strong>
       <small className="block truncate text-[9px] sm:text-[11px] text-muted" title={note}>

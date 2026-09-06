@@ -1,33 +1,98 @@
-# cukupin
+# Cukupin
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [v0](https://v0.app).
+> **Catat santai, tahu arah uangmu.**  
+> Aplikasi pencatatan keuangan pribadi dengan pendekatan *Quiet Ledger* — tenang, berfokus pada kebiasaan sehat, ramah privasi, dan mendukung penggunaan offline (PWA).
 
-## Built with v0
+---
 
-This repository is linked to a [v0](https://v0.app) project. You can continue developing by visiting the link below -- start new chats to make changes, and v0 will push commits directly to this repo. Every merge to `main` will automatically deploy.
+## ✨ Fitur Utama
 
-[Continue working on v0 →](https://v0.app/chat/projects/prj_M8b2fQ8hPUw3kuH7KF5x3piLeHIs)
+- **Hero ATM / Debit Card**: Visualisasi saldo kas realtime dengan sentuhan kartu ATM elegan (chip emas EMV, indikator NFC, status aman/menipis).
+- **Rapor Keuangan Cukupin (Wrapped & Scorecard)**: Penilaian kesehatan finansial 100 poin (Tingkat Tabungan, Kepatuhan Anggaran, Disiplin Catat, Rasio 50/30/20) dan kartu rapor yang dapat diunduh (PNG) untuk dibagikan.
+- **Pola Pengeluaran 50/30/20**: Distribusi otomatis pengeluaran ke kategori Kebutuhan (*Needs*), Keinginan (*Wants*), dan Tabungan (*Savings*).
+- **Tagihan Rutin & Pengingat**: Kelola pengeluaran berulang bulanan/tahunan dengan peringatan tagihan tertunda langsung di Dashboard.
+- **Limit Anggaran Kategori**: Tetapkan batas belanja per kategori dengan indikator visual sisa/defisit anggaran.
+- **Target Tabungan & Wishlist**: Rencanakan tabungan masa depan dan kontrol belanja impulsif dengan daftar impian.
+- **PWA & Offline-First Resilience**: Tetap bisa mencatat saat tanpa internet; transaksi dan aksi otomatis disinkronkan kembali saat online.
+- **Penyimpanan Lokal & Cloud**: Mendukung mode pengembang/tamu berbasis penyimpanan lokal serta integrasi Supabase PostgreSQL dengan Row-Level Security (RLS).
+- **Impor & Ekspor Lengkap**: Impor data via CSV dan cadangkan/pulihkan seluruh data (5 entitas) via JSON.
 
-## Getting Started
+---
 
-First, run the development server:
+## 🛠️ Tech Stack
 
+- **Framework**: [Next.js 16](https://nextjs.org/) (App Router, Turbopack)
+- **Styling**: Vanilla CSS & Tailwind CSS v4 (*Quiet Ledger theme palette*)
+- **Typography**: [DM Sans](https://fonts.google.com/specimen/DM+Sans), [Fraunces](https://fonts.google.com/specimen/Fraunces), dan [DM Mono](https://fonts.google.com/specimen/DM+Mono) via `next/font/google`
+- **Database & Auth**: [Supabase](https://supabase.com/) (PostgreSQL dengan RLS)
+- **Charts & Visuals**: Recharts, Lucide Icons, html2canvas
+- **Testing**: Vitest + jsdom
+
+---
+
+## 🚀 Memulai (Getting Started)
+
+### 1. Prasyarat
+- Node.js 18.17+ atau 20+
+- npm / pnpm / yarn
+
+### 2. Instalasi Dependensi
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 3. Konfigurasi Lingkungan (.env)
+Salin berkas template dan sesuaikan variabel Supabase:
+```bash
+cp .env.example .env.local
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Isi variabel:
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+```
+*(Catatan: Tanpa variabel ini, aplikasi tetap dapat dijalankan dalam mode lokal/offline).*
 
-## Learn More
+### 4. Menjalankan Server Pengembangan
+```bash
+npm run dev
+```
+Buka [http://localhost:3000](http://localhost:3000) di peramban Anda.
 
-To learn more, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-- [v0 Documentation](https://v0.app/docs) - learn about v0 and how to use it.
+## 🧪 Pengujian (Testing)
+
+Jalankan rangkaian unit test suite:
+```bash
+# Sekali jalan (CI mode)
+npm run test
+
+# Mode interaktif / watch
+npm run test:watch
+```
+
+---
+
+## 🗄️ Database & Supabase CLI
+
+```bash
+# Push migrasi ke database
+npm run db:push
+
+# Cek perbedaan skema lokal vs remote
+npm run db:diff
+
+# Lint skema SQL
+npm run db:lint
+```
+
+Berkas migrasi skema tersimpan di direktori `supabase/migrations/`.
+
+---
+
+## 📄 Lisensi & Privasi
+
+Aplikasi ini mematuhi prinsip perlindungan privasi data pribadi sesuai regulasi UU PDP No. 27/2022. Informasi hukum dan ketentuan layanan dapat diakses di `/legal/privacy` dan `/legal/terms`.
+

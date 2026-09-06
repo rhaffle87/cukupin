@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import type { Transaction } from '@/lib/database.types'
 import { ArrowDownLeft, ArrowUpRight, BarChart3, ChevronRight, CircleDollarSign, Plus, Wallet, Receipt, Sparkles } from 'lucide-react'
 import Link from 'next/link'
@@ -9,6 +9,7 @@ import { TransactionRow } from './TransactionRow'
 import { categoryBreakdown, currency, dailySeries, monthBounds, monthLabel, shortCurrency, totals, calculateDailySafeSpend } from '@/lib/finance'
 import { useFinanceData } from '@/hooks/useFinanceData'
 import { CategoryBudgetWidget } from './CategoryBudgetWidget'
+import { FinancialWrappedModal } from './FinancialWrappedModal'
 import { SupabaseClient } from '@supabase/supabase-js'
 
 import {
@@ -101,6 +102,8 @@ interface DashboardViewProps {
 }
 
 export function DashboardView({ data, user, supabase }: DashboardViewProps) {
+  const [showWrapped, setShowWrapped] = useState(false)
+
   const { monthTx, stats, series, breakdown, insight, safeSpend } = useMemo(() => {
     const current = monthBounds()
     const tx = data.transactions.filter(t => t.transaction_date >= current.start && t.transaction_date <= current.end)
@@ -152,21 +155,78 @@ export function DashboardView({ data, user, supabase }: DashboardViewProps) {
           </p>
         </div>
 
-        <div className="relative z-10 flex h-[200px] w-full max-w-[260px] flex-col justify-center rounded-[20px] border border-white/10 bg-white/[0.04] p-5 shadow-[0_10px_28px_rgba(0,0,0,0.2)] backdrop-blur-md md:mr-1">
-          <div className="flex flex-col items-end text-right">
-            <span className="block text-[10px] font-bold tracking-widest text-[#B9C6BD] uppercase">
-              {stats.balance >= 0 ? 'MASIH AMAN' : 'PERLU DICEK'}
-            </span>
-            <strong className="my-1.5 block font-display text-[32px] md:text-[36px] font-bold leading-none tracking-tight text-mint">
-              {shortCurrency(Math.abs(stats.balance))}
-            </strong>
-            <small className="block text-[11px] text-[#BAC9C0]">
-              {stats.balance >= 0 ? 'sisa uang bulan ini' : 'pengeluaran melebihi pemasukan'}
-            </small>
-            {stats.balance > 0 && (
-              <span className="mt-1.5 inline-flex items-center rounded-full bg-white/[0.08] px-2 py-0.5 text-[9px] font-semibold text-mint">
-                Aman: {shortCurrency(safeSpend.dailyAllowance)}/hr
+        {/* Authentic Ultra-Premium ATM / Debit Card (Solves Image 4) */}
+        <div className="relative z-10 w-full max-w-[320px] sm:max-w-[340px] aspect-[1.586/1] rounded-[22px] border border-white/20 bg-gradient-to-br from-[#1E2E40] via-[#142230] to-[#0A131C] p-4 sm:p-5 shadow-[0_16px_38px_rgba(0,0,0,0.4),inset_0_1px_1px_rgba(255,255,255,0.25)] flex flex-col justify-between overflow-hidden group select-none transition-all duration-300 hover:border-mint/35 md:mr-1">
+          {/* Subtle Ambient Glows */}
+          <div className="pointer-events-none absolute -right-10 -bottom-10 h-32 w-32 rounded-full bg-mint/[0.08] blur-2xl" />
+          <div className="pointer-events-none absolute -left-8 -top-8 h-24 w-24 rounded-full bg-blue-500/[0.06] blur-xl" />
+
+          {/* Top Bar: EMV Chip + NFC Wave + Brand & Status */}
+          <div className="relative z-10 flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              {/* EMV Gold Micro-Chip with Circuit Traces */}
+              <div className="relative h-6 w-8 sm:h-7 sm:w-9 rounded-md bg-gradient-to-br from-[#F5D77F] via-[#D4AF37] to-[#996515] p-0.5 shadow-inner border border-[#E6C760]/70 flex flex-col justify-between overflow-hidden">
+                <div className="h-[1px] w-full bg-black/30 mt-1" />
+                <div className="flex justify-between h-full py-0.5">
+                  <div className="w-[1px] h-full bg-black/30 ml-2" />
+                  <div className="w-[1px] h-full bg-black/30 mr-2" />
+                </div>
+                <div className="h-[1px] w-full bg-black/30 mb-1" />
+              </div>
+              {/* Contactless NFC Wave */}
+              <svg className="w-4 h-4 text-white/45 rotate-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+                <path d="M5 12.55a11 11 0 0 1 14.08 0" />
+                <path d="M8.5 15.5a6 6 0 0 1 7 0" />
+                <path d="M12 18.5a1 1 0 0 1 0 0" />
+              </svg>
+            </div>
+
+            {/* Brand Pill */}
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] font-extrabold tracking-widest text-white/90 uppercase font-sans">
+                CUKUPIN <span className="text-mint font-bold text-[8px] px-1 py-0.5 rounded bg-white/10 ml-0.5">DEBIT</span>
               </span>
+            </div>
+          </div>
+
+          {/* Middle Section: Balance & Live Status */}
+          <div className="relative z-10 my-auto py-1">
+            <div className="flex items-center justify-between">
+              <span className="text-[9px] font-bold tracking-widest text-white/60 uppercase">
+                Sisa Saldo
+              </span>
+              <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-bold tracking-wide uppercase ${
+                stats.balance >= 0 
+                  ? 'bg-green/20 text-mint border border-mint/20' 
+                  : 'bg-coral/20 text-coral-light border border-coral/30'
+              }`}>
+                <span className={`h-1.5 w-1.5 rounded-full ${stats.balance >= 0 ? 'bg-mint animate-pulse' : 'bg-coral'}`} />
+                {stats.balance >= 0 ? 'MASIH AMAN' : 'PERLU DICEK'}
+              </span>
+            </div>
+            <div className="mt-1 flex items-baseline">
+              <strong className="font-mono text-2xl sm:text-[27px] font-extrabold leading-none tracking-tight text-mint tabular-nums">
+                {currency(stats.balance)}
+              </strong>
+            </div>
+          </div>
+
+          {/* Bottom Bar: Masked Card Number, Name, & Safe Daily Spend */}
+          <div className="relative z-10 pt-2 border-t border-white/10 flex items-end justify-between text-white/70">
+            <div>
+              <p className="font-mono text-[10px] sm:text-[11px] tracking-[0.2em] text-white/60">
+                •••• •••• •••• 2026
+              </p>
+              <p className="mt-0.5 text-[9px] sm:text-[10px] font-bold tracking-wider uppercase text-white/80 font-sans truncate max-w-[130px]">
+                {firstName.toUpperCase()}
+              </p>
+            </div>
+            {stats.balance > 0 && (
+              <div className="text-right">
+                <span className="inline-flex items-center gap-1 rounded-lg bg-white/10 px-2 py-1 text-[10px] font-semibold text-mint border border-white/10 font-mono tabular-nums">
+                  Aman: {shortCurrency(safeSpend.dailyAllowance)}/hr
+                </span>
+              </div>
             )}
           </div>
         </div>
@@ -185,14 +245,24 @@ export function DashboardView({ data, user, supabase }: DashboardViewProps) {
       </div>
 
       {/* Smart Contextual Spending Insight Banner */}
-      <div className="mb-4 flex items-center gap-3 rounded-[18px] border border-line bg-card p-4 shadow-[0_2px_12px_rgba(30,50,73,0.02)] animate-in slide-in-from-bottom-2 duration-500 delay-100">
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-green-soft text-green">
-          <Sparkles size={16} />
+      <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-[18px] border border-line bg-card p-4 shadow-[0_2px_12px_rgba(30,50,73,0.02)] animate-in slide-in-from-bottom-2 duration-500 delay-100">
+        <div className="flex items-center gap-3">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-green-soft text-green">
+            <Sparkles size={16} />
+          </div>
+          <p className="text-xs leading-relaxed text-muted">
+            <strong className="text-ink font-bold">Catatan Cukupin: </strong>
+            {insight}
+          </p>
         </div>
-        <p className="text-xs leading-relaxed text-muted">
-          <strong className="text-ink font-bold">Catatan Cukupin: </strong>
-          {insight}
-        </p>
+        <button
+          type="button"
+          onClick={() => setShowWrapped(true)}
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-green hover:underline cursor-pointer shrink-0 self-start sm:self-auto"
+        >
+          <span>Lihat Rapor Keuangan</span>
+          <ChevronRight size={13} />
+        </button>
       </div>
 
       {/* Pending Recurring Bills Alert */}
@@ -318,6 +388,15 @@ export function DashboardView({ data, user, supabase }: DashboardViewProps) {
       />
 
       <RecentTransactions transactions={monthTx.slice(0, 5)} />
+
+      {showWrapped && (
+        <FinancialWrappedModal
+          isOpen={showWrapped}
+          onClose={() => setShowWrapped(false)}
+          transactions={data.transactions}
+          userName={firstName}
+        />
+      )}
     </>
   )
 }
