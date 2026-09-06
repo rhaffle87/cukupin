@@ -50,6 +50,39 @@ export const wishlistSchema = z.object({
 
 export type WishlistInput = z.infer<typeof wishlistSchema>
 
+export const recurringBillSchema = z.object({
+  name: z
+    .string()
+    .min(1, 'Nama tagihan wajib diisi')
+    .max(120, 'Maksimal 120 karakter')
+    .trim(),
+  amount: z
+    .number({ message: 'Nominal tagihan harus berupa angka' })
+    .positive('Nominal harus lebih dari 0')
+    .max(10_000_000_000, 'Nominal terlalu besar'),
+  category: z.string().min(1, 'Pilih kategori tagihan'),
+  due_day: z
+    .number({ message: 'Tanggal jatuh tempo harus berupa angka' })
+    .int('Tanggal harus bilangan bulat')
+    .min(1, 'Minimal tanggal 1')
+    .max(31, 'Maksimal tanggal 31'),
+  frequency: z.enum(['monthly', 'yearly']).default('monthly'),
+  payment_method: z.string().max(50, 'Metode pembayaran maksimal 50 karakter').optional().nullable(),
+  is_active: z.boolean().default(true),
+})
+
+export type RecurringBillInput = z.infer<typeof recurringBillSchema>
+
+export const categoryBudgetSchema = z.object({
+  category: z.string().min(1, 'Pilih kategori pengeluaran'),
+  monthly_limit: z
+    .number({ message: 'Limit anggaran harus berupa angka' })
+    .positive('Limit anggaran harus lebih dari 0')
+    .max(100_000_000_000, 'Limit anggaran terlalu besar'),
+})
+
+export type CategoryBudgetInput = z.infer<typeof categoryBudgetSchema>
+
 /**
  * Sanitizes numeric strings by removing currency prefixes, commas, and dots.
  */

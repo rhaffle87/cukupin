@@ -6,7 +6,7 @@ import { Modal } from '@/components/ui/Modal'
 import { Archive, CheckCircle2, FileUp, AlertTriangle, RefreshCw } from 'lucide-react'
 import { toast } from 'sonner'
 import confetti from 'canvas-confetti'
-import type { Transaction, SavingGoal, WishlistItem } from '@/lib/database.types'
+import type { Transaction, SavingGoal, WishlistItem, RecurringBill, CategoryBudget } from '@/lib/database.types'
 
 interface RestoreJsonModalProps {
   supabase: SupabaseClient | null
@@ -22,6 +22,8 @@ interface BackupPayload {
   transactions?: Transaction[]
   goals?: SavingGoal[]
   wishlist?: WishlistItem[]
+  bills?: RecurringBill[]
+  budgets?: CategoryBudget[]
 }
 
 export function RestoreJsonModal({
@@ -50,7 +52,7 @@ export function RestoreJsonModal({
         const text = event.target?.result as string
         const json = JSON.parse(text)
 
-        if (!json.transactions && !json.goals && !json.wishlist) {
+        if (!json.transactions && !json.goals && !json.wishlist && !json.bills && !json.budgets) {
           setErrorMsg('File JSON tidak valid. Pastikan ini adalah file cadangan resmi dari Cukupin.')
           setParsedData(null)
           return
@@ -63,6 +65,8 @@ export function RestoreJsonModal({
           transactions: Array.isArray(json.transactions) ? json.transactions : [],
           goals: Array.isArray(json.goals) ? json.goals : [],
           wishlist: Array.isArray(json.wishlist) ? json.wishlist : [],
+          bills: Array.isArray(json.bills) ? json.bills : [],
+          budgets: Array.isArray(json.budgets) ? json.budgets : [],
         })
       } catch (err) {
         setErrorMsg('Gagal membaca file JSON. Format file rusak atau tidak didukung.')
@@ -80,6 +84,8 @@ export function RestoreJsonModal({
       const txs = parsedData.transactions || []
       const goals = parsedData.goals || []
       const wish = parsedData.wishlist || []
+      const bills = parsedData.bills || []
+      const budgets = parsedData.budgets || []
 
       if (userId === 'local-dev-user' || !supabase) {
         // Local mode handling
@@ -87,23 +93,33 @@ export function RestoreJsonModal({
           localStorage.setItem('cukupin_local_transactions', JSON.stringify(txs))
           localStorage.setItem('cukupin_local_goals', JSON.stringify(goals))
           localStorage.setItem('cukupin_local_wishlist', JSON.stringify(wish))
+          localStorage.setItem('cukupin_local_bills', JSON.stringify(bills))
+          localStorage.setItem('cukupin_local_budgets', JSON.stringify(budgets))
         } else {
           // Merge mode
           const curTx: Transaction[] = JSON.parse(localStorage.getItem('cukupin_local_transactions') || '[]')
           const curGoals: SavingGoal[] = JSON.parse(localStorage.getItem('cukupin_local_goals') || '[]')
           const curWish: WishlistItem[] = JSON.parse(localStorage.getItem('cukupin_local_wishlist') || '[]')
+          const curBills: RecurringBill[] = JSON.parse(localStorage.getItem('cukupin_local_bills') || '[]')
+          const curBudgets: CategoryBudget[] = JSON.parse(localStorage.getItem('cukupin_local_budgets') || '[]')
 
           const existingTxIds = new Set(curTx.map(t => t.id))
           const existingGoalIds = new Set(curGoals.map(g => g.id))
           const existingWishIds = new Set(curWish.map(w => w.id))
+          const existingBillIds = new Set(curBills.map(b => b.id))
+          const existingBudgetCats = new Set(curBudgets.map(b => b.category))
 
           const mergedTx = [...curTx, ...txs.filter(t => !existingTxIds.has(t.id))]
           const mergedGoals = [...curGoals, ...goals.filter(g => !existingGoalIds.has(g.id))]
           const mergedWish = [...curWish, ...wish.filter(w => !existingWishIds.has(w.id))]
+          const mergedBills = [...curBills, ...bills.filter(b => !existingBillIds.has(b.id))]
+          const mergedBudgets = [...curBudgets, ...budgets.filter(b => !existingBudgetCats.has(b.category))]
 
           localStorage.setItem('cukupin_local_transactions', JSON.stringify(mergedTx))
           localStorage.setItem('cukupin_local_goals', JSON.stringify(mergedGoals))
           localStorage.setItem('cukupin_local_wishlist', JSON.stringify(mergedWish))
+          localStorage.setItem('cukupin_local_bills', JSON.stringify(mergedBills))
+          localStorage.setItem('cukupin_local_budgets', JSON.stringify(mergedBudgets))
         }
       } else if (userId && supabase) {
         // Supabase cloud restore
@@ -111,6 +127,8 @@ export function RestoreJsonModal({
           await supabase.from('transactions').delete().eq('user_id', userId)
           await supabase.from('saving_goals').delete().eq('user_id', userId)
           await supabase.from('wishlist').delete().eq('user_id', userId)
+          await supabase.from('recurring_bills').delete().eq('user_id', userId)
+          await supabase.from('category_budgets').delete().eq('user_id', userId)
         }
 
         // Insert new records mapped with current user_id
@@ -137,6 +155,22 @@ export function RestoreJsonModal({
             id: undefined,
           }))
           await supabase.from('wishlist').insert(mappedWish)
+        }
+        if (bills.length > 0) {
+          const mappedBills = bills.map(b => ({
+            ...b,
+            user_id: userId,
+            id: undefined,
+          }))
+          await supabase.from('recurring_bills').insert(mappedBills)
+        }
+        if (budgets.length > 0) {
+          const mappedBudgets = budgets.map(b => ({
+            ...b,
+            user_id: userId,
+            id: undefined,
+          }))
+          await supabase.from('category_budgets').insert(mappedBudgets)
         }
       }
 
@@ -212,7 +246,7 @@ export function RestoreJsonModal({
               )}
             </div>
 
-            <div className="grid grid-cols-3 gap-2 text-center">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-center">
               <div className="rounded-xl bg-paper p-2.5">
                 <strong className="block text-base font-display font-bold text-ink">
                   {parsedData.transactions?.length || 0}
@@ -230,6 +264,18 @@ export function RestoreJsonModal({
                   {parsedData.wishlist?.length || 0}
                 </strong>
                 <span className="text-[10px] text-muted font-medium">Wishlist</span>
+              </div>
+              <div className="rounded-xl bg-paper p-2.5">
+                <strong className="block text-base font-display font-bold text-amber-700">
+                  {parsedData.bills?.length || 0}
+                </strong>
+                <span className="text-[10px] text-muted font-medium">Tagihan Rutin</span>
+              </div>
+              <div className="rounded-xl bg-paper p-2.5 col-span-2 sm:col-span-1">
+                <strong className="block text-base font-display font-bold text-ink">
+                  {parsedData.budgets?.length || 0}
+                </strong>
+                <span className="text-[10px] text-muted font-medium">Limit Anggaran</span>
               </div>
             </div>
 

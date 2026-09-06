@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: 'Catat pengeluaran harian, pantau uang masuk-keluar, dan atur keuangan dengan santai.',
     start_url: '/',
     display: 'standalone',
-    background_color: '#f5f7f4',
-    theme_color: '#f5f7f4',
+    background_color: '#F7F6F0',
+    theme_color: '#F7F6F0',
     orientation: 'portrait-primary',
     icons: [
       {

@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   description: 'Catat pengeluaran harian, pantau uang masuk-keluar, dan atur keuangan dengan santai.',
   applicationName: 'Cukupin',
   authors: [{ name: 'Cukupin' }],
-  generator: 'v0.app',
+  generator: 'Cukupin',
   metadataBase: new URL('https://cukupin.app'),
   openGraph: {
     title: 'Cukupin: Catat santai, tahu arah uangmu',

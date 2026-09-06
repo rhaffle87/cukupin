@@ -9,6 +9,8 @@ import { currency, isoDate } from '@/lib/finance'
 import { sanitizeNumericInput } from '@/lib/validations/finance'
 import type { Transaction } from '@/lib/database.types'
 
+import { enqueueOfflineAction } from '@/lib/offlineQueue'
+
 interface CsvImportModalProps {
   supabase: SupabaseClient | null
   userId?: string
@@ -118,17 +120,48 @@ export function CsvImportModal({ supabase, userId, onClose, onSuccess }: CsvImpo
   }
 
   async function handleImport() {
-    if (!supabase || !userId) {
-      toast.error('Sesi tidak aktif')
-      return
-    }
-
     if (!rows.length) {
       toast.error('Pilih file CSV terlebih dahulu')
       return
     }
 
     setLoading(true)
+
+    // Local development mode / unauthenticated fallback
+    if (userId === 'local-dev-user' || !supabase) {
+      try {
+        const stored = localStorage.getItem('cukupin_local_transactions')
+        const current: Transaction[] = stored ? JSON.parse(stored) : []
+        const newLocalTx: Transaction[] = rows.map((r, idx) => ({
+          id: `tx-import-${Date.now()}-${idx}`,
+          user_id: userId || 'local-dev-user',
+          type: r.type,
+          category: r.category,
+          description: r.description,
+          amount: r.amount,
+          transaction_date: r.transaction_date,
+          note: r.note || null,
+          payment_method: r.payment_method || 'Other',
+          created_at: new Date().toISOString(),
+        }))
+        const updated = [...newLocalTx, ...current]
+        localStorage.setItem('cukupin_local_transactions', JSON.stringify(updated))
+        toast.success(`${rows.length} transaksi berhasil diimpor ke penyimpanan lokal!`)
+        onSuccess()
+        onClose()
+      } catch (err) {
+        toast.error('Gagal menyimpan ke penyimpanan lokal.')
+      }
+      setLoading(false)
+      return
+    }
+
+    if (!userId) {
+      toast.error('Sesi tidak aktif')
+      setLoading(false)
+      return
+    }
+
     const payloads = rows.map(r => ({
       user_id: userId,
       type: r.type,
@@ -139,6 +172,21 @@ export function CsvImportModal({ supabase, userId, onClose, onSuccess }: CsvImpo
       note: r.note || null,
       payment_method: r.payment_method || null,
     }))
+
+    // Offline queue fallback for authenticated cloud user
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      enqueueOfflineAction({
+        userId,
+        action: 'insert',
+        table: 'transactions',
+        payload: payloads,
+      })
+      setLoading(false)
+      toast.info(`${rows.length} transaksi disimpan dalam antrean offline. Akan disinkronkan saat online.`)
+      onSuccess()
+      onClose()
+      return
+    }
 
     let { error } = await supabase.from('transactions').insert(payloads)
 

@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react'
 import type { Transaction } from '@/lib/database.types'
 import { ArrowDownLeft, ArrowUpRight, BarChart3, ChevronRight, CircleDollarSign, Plus, Wallet, Receipt, Sparkles } from 'lucide-react'
-import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { StatCard } from '@/components/ui/StatCard'
 import { EmptyState } from '@/components/ui/EmptyState'
@@ -9,6 +8,8 @@ import { Eyebrow } from '@/components/ui/Eyebrow'
 import { TransactionRow } from './TransactionRow'
 import { categoryBreakdown, currency, dailySeries, monthBounds, monthLabel, shortCurrency, totals, calculateDailySafeSpend } from '@/lib/finance'
 import { useFinanceData } from '@/hooks/useFinanceData'
+import { CategoryBudgetWidget } from './CategoryBudgetWidget'
+import { SupabaseClient } from '@supabase/supabase-js'
 
 import {
   ResponsiveContainer,
@@ -95,10 +96,11 @@ function RecentTransactions({ transactions }: { transactions: Transaction[] }) {
 
 interface DashboardViewProps {
   data: ReturnType<typeof useFinanceData>
-  user: { email?: string } | null
+  user: { id?: string; email?: string } | null
+  supabase?: SupabaseClient | null
 }
 
-export function DashboardView({ data, user }: DashboardViewProps) {
+export function DashboardView({ data, user, supabase }: DashboardViewProps) {
   const { monthTx, stats, series, breakdown, insight, safeSpend } = useMemo(() => {
     const current = monthBounds()
     const tx = data.transactions.filter(t => t.transaction_date >= current.start && t.transaction_date <= current.end)
@@ -193,6 +195,41 @@ export function DashboardView({ data, user }: DashboardViewProps) {
         </p>
       </div>
 
+      {/* Pending Recurring Bills Alert */}
+      {(() => {
+        const currentMonthStr = new Date().toISOString().slice(0, 7)
+        const pendingBills = (data.bills || []).filter(
+          (b) => b.is_active && b.last_logged_month !== currentMonthStr
+        )
+        if (pendingBills.length === 0) return null
+        const totalPending = pendingBills.reduce((s, b) => s + b.amount, 0)
+        return (
+          <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-[18px] border border-amber-500/20 bg-amber-500/5 p-4 shadow-2xs animate-in slide-in-from-bottom-2 duration-500 delay-120">
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-amber-500/15 text-amber-800">
+                <Receipt size={16} />
+              </div>
+              <div>
+                <p className="text-xs text-ink font-semibold">
+                  Ada {pendingBills.length} tagihan rutin belum dicatat bulan ini ({currency(totalPending)})
+                </p>
+                <p className="text-[11px] text-muted">
+                  {pendingBills.slice(0, 3).map((b) => b.name).join(', ')}
+                  {pendingBills.length > 3 ? '...' : ''}
+                </p>
+              </div>
+            </div>
+            <Link
+              href="/transactions?tab=bills"
+              className="shrink-0 inline-flex items-center justify-center gap-1 rounded-xl bg-card border border-line px-3 py-1.5 text-xs font-bold text-ink hover:bg-black/5 active:scale-95 transition-all"
+            >
+              <span>Catat Sekarang</span>
+              <ChevronRight size={13} />
+            </Link>
+          </div>
+        )
+      })()}
+
       <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-[minmax(0,1.55fr)_minmax(270px,0.85fr)]">
         <section className="min-h-[320px] rounded-[18px] border border-line bg-card p-5 shadow-[0_5px_20px_rgba(30,50,73,0.025)] md:min-h-[347px] md:p-6 animate-in slide-in-from-bottom-2 duration-500 delay-100 fill-mode-both">
           <div className="mb-5 flex items-start justify-between gap-3 md:mb-6">
@@ -271,6 +308,15 @@ export function DashboardView({ data, user }: DashboardViewProps) {
           )}
         </section>
       </div>
+
+      <CategoryBudgetWidget
+        budgets={data.budgets || []}
+        setBudgets={data.setBudgets}
+        transactions={monthTx}
+        supabase={supabase || null}
+        userId={user?.id}
+      />
+
       <RecentTransactions transactions={monthTx.slice(0, 5)} />
     </>
   )

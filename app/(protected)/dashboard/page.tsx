@@ -6,5 +6,5 @@ import { DashboardView } from '@/components/finance/DashboardView'
 
 export default function DashboardPage() {
   const finance = useFinance()
-  return <DashboardView data={finance} user={finance.user} />
+  return <DashboardView data={finance} user={finance.user} supabase={finance.supabase} />
 }

@@ -22,6 +22,7 @@ import { useFinanceData } from '@/hooks/useFinanceData'
 import { currency, isoDate, totals } from '@/lib/finance'
 import { formatRupiahInput, sanitizeNumericInput, wishlistSchema } from '@/lib/validations/finance'
 import confetti from 'canvas-confetti'
+import { enqueueOfflineAction } from '@/lib/offlineQueue'
 
 interface WishlistViewProps {
   supabase: SupabaseClient | null
@@ -150,6 +151,44 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
       return
     }
 
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      enqueueOfflineAction({
+        userId: userId || 'user',
+        action: 'insert',
+        table: 'transactions',
+        payload: {
+          user_id: userId,
+          type: 'expense',
+          description: item.name,
+          amount: Number(item.price),
+          category: 'Shopping',
+          transaction_date: isoDate(new Date()),
+          note: 'Dibeli dari Wishlist',
+          payment_method: 'Transfer Bank',
+        },
+      })
+      enqueueOfflineAction({
+        userId: userId || 'user',
+        action: 'delete',
+        table: 'wishlist',
+        targetId: item.id,
+        payload: { id: item.id },
+      })
+      data.setTransactions(prev => [txPayload, ...prev])
+
+      try {
+        confetti({
+          particleCount: 75,
+          spread: 65,
+          origin: { y: 0.65 },
+          colors: ['#3E8F68', '#BEE6CF', '#315DCB', '#D98362'],
+        })
+      } catch { }
+
+      toast.info(`Tersimpan offline. "${item.name}" berhasil dibeli dan akan disinkronkan saat online.`)
+      return
+    }
+
     let txRes = await supabase.from('transactions').insert({
       user_id: userId,
       type: 'expense',
@@ -207,6 +246,18 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
       const localWish: WishlistItem[] = stored ? JSON.parse(stored) : []
       localStorage.setItem('cukupin_local_wishlist', JSON.stringify(localWish.filter(w => w.id !== item.id)))
       toast.success('Item dihapus dari wishlist.')
+      return
+    }
+
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      enqueueOfflineAction({
+        userId: userId || 'user',
+        action: 'delete',
+        table: 'wishlist',
+        targetId: item.id,
+        payload: { id: item.id },
+      })
+      toast.info('Penghapusan disimpan dalam antrean offline.')
       return
     }
 

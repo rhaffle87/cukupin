@@ -5,6 +5,7 @@ import { ArrowDownLeft, ArrowUpRight } from 'lucide-react'
 import { isoDate } from '@/lib/finance'
 import { toast } from 'sonner'
 import { formatRupiahInput, sanitizeNumericInput, transactionSchema } from '@/lib/validations/finance'
+import { enqueueOfflineAction } from '@/lib/offlineQueue'
 
 interface TransactionFormProps {
   supabase: SupabaseClient | null
@@ -149,6 +150,28 @@ export function TransactionForm({ supabase, userId, initial, onDone }: Transacti
       return
     }
 
+    // Offline queue check for authenticated Supabase users
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      const offlineTx: Transaction = {
+        id: initial?.id || 'offline-' + Date.now(),
+        created_at: initial?.created_at || new Date().toISOString(),
+        user_id: userId || 'user',
+        ...parsed.data,
+      } as Transaction
+
+      enqueueOfflineAction({
+        userId: userId || 'user',
+        action: initial ? 'update' : 'insert',
+        targetId: initial?.id,
+        payload: initial ? parsed.data : payload,
+      })
+
+      setBusy(false)
+      toast.success(initial ? 'Pembaruan disimpan dalam antrean offline.' : 'Tersimpan dalam antrean offline!')
+      onDone(offlineTx)
+      return
+    }
+
     let result = initial
       ? await supabase.from('transactions').update(payload).eq('id', initial.id).select().single()
       : await supabase.from('transactions').insert(payload).select().single()
@@ -173,7 +196,26 @@ export function TransactionForm({ supabase, userId, initial, onDone }: Transacti
     setBusy(false)
 
     if (result.error) {
-      toast.error(result.error.message)
+      if (typeof navigator !== 'undefined' && (!navigator.onLine || result.error.message?.includes('fetch'))) {
+        const offlineTx: Transaction = {
+          id: initial?.id || 'offline-' + Date.now(),
+          created_at: initial?.created_at || new Date().toISOString(),
+          user_id: userId || 'user',
+          ...parsed.data,
+        } as Transaction
+
+        enqueueOfflineAction({
+          userId: userId || 'user',
+          action: initial ? 'update' : 'insert',
+          targetId: initial?.id,
+          payload: initial ? parsed.data : payload,
+        })
+
+        toast.warning('Koneksi terputus. Transaksi disimpan dalam antrean offline.')
+        onDone(offlineTx)
+      } else {
+        toast.error(result.error.message)
+      }
     } else {
       toast.success(initial ? 'Transaksi diperbarui.' : 'Transaksi dicatat.')
       onDone(result.data as Transaction)

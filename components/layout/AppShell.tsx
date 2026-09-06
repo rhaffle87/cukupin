@@ -1,13 +1,17 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Brand } from '@/components/ui/Brand'
-import { Bell, FileText, Home as HomeIcon, LogOut, Menu, Plus, Receipt, ShoppingBag, Sparkles, Target, X } from 'lucide-react'
+import { Bell, FileText, Home as HomeIcon, LogOut, Menu, Plus, Receipt, ShoppingBag, Sparkles, Target, WifiOff, X } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { DailyReminderModal } from '@/components/finance/DailyReminderModal'
+import { InstallPrompt } from '@/components/pwa/InstallPrompt'
+import { syncOfflineQueue } from '@/lib/offlineQueue'
+import { useFinance } from '@/context/FinanceContext'
+import { toast } from 'sonner'
 
 interface AppShellProps {
   children: React.ReactNode
-  user: { email?: string } | null
+  user: { id?: string; email?: string } | null
   onSignOut: () => void
 }
 
@@ -22,8 +26,10 @@ const navItems = [
 export function AppShell({ children, user, onSignOut }: AppShellProps) {
   const [open, setOpen] = useState(false)
   const [showReminderModal, setShowReminderModal] = useState(false)
+  const [isOffline, setIsOffline] = useState(false)
   const pathname = usePathname()
   const router = useRouter()
+  const { supabase, refresh } = useFinance()
 
   const handleOpenNewTx = () => {
     if (pathname === '/transactions') {
@@ -32,6 +38,39 @@ export function AppShell({ children, user, onSignOut }: AppShellProps) {
       router.push('/transactions?new=1')
     }
   }
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    setIsOffline(!navigator.onLine)
+
+    const handleOnline = async () => {
+      setIsOffline(false)
+      if (supabase && user?.id && user.id !== 'local-dev-user') {
+        const { syncedCount } = await syncOfflineQueue(supabase, user.id)
+        if (syncedCount > 0) {
+          toast.success(`Koneksi kembali! ${syncedCount} transaksi offline berhasil disinkronkan.`)
+          refresh()
+        } else {
+          toast.success('Koneksi internet kembali normal.')
+        }
+      } else {
+        toast.success('Koneksi internet kembali normal.')
+      }
+    }
+
+    const handleOffline = () => {
+      setIsOffline(true)
+      toast.warning('Mode Offline aktif. Transaksi baru tetap tersimpan di perangkat.')
+    }
+
+    window.addEventListener('online', handleOnline)
+    window.addEventListener('offline', handleOffline)
+    return () => {
+      window.removeEventListener('online', handleOnline)
+      window.removeEventListener('offline', handleOffline)
+    }
+  }, [supabase, user?.id, refresh])
 
   React.useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -63,6 +102,13 @@ export function AppShell({ children, user, onSignOut }: AppShellProps) {
             <X size={20} />
           </button>
         </div>
+
+        {isOffline && (
+          <div className="mb-4 flex items-center gap-2 rounded-xl bg-amber-500/10 px-3 py-2 text-xs font-medium text-amber-800 border border-amber-500/20">
+            <WifiOff size={14} className="shrink-0 text-amber-700" />
+            <span>Mode Offline aktif</span>
+          </div>
+        )}
         
         <div className="mb-4 px-3 text-[10px] font-bold tracking-widest text-muted uppercase">
           MENU UTAMA
@@ -130,14 +176,21 @@ export function AppShell({ children, user, onSignOut }: AppShellProps) {
         
         {/* Mobile Header */}
         <header className="flex items-center justify-between border-b border-line bg-card p-4 md:hidden">
-          <button 
-            className="flex h-11 w-11 items-center justify-center rounded-full text-ink transition-colors hover:bg-black/5" 
-            onClick={() => setOpen(true)} 
-            aria-label="Buka menu"
-          >
-            <Menu size={20} />
-          </button>
-          <Brand compact />
+          <div className="flex items-center gap-2">
+            <button 
+              className="flex h-11 w-11 items-center justify-center rounded-full text-ink transition-colors hover:bg-black/5" 
+              onClick={() => setOpen(true)} 
+              aria-label="Buka menu"
+            >
+              <Menu size={20} />
+            </button>
+            <Brand compact />
+            {isOffline && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-mono font-medium text-amber-800 border border-amber-500/20">
+                <WifiOff size={10} /> Offline
+              </span>
+            )}
+          </div>
           <button 
             className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl bg-ink !text-white shadow-xs transition-transform active:scale-95 cursor-pointer" 
             onClick={handleOpenNewTx}
@@ -188,6 +241,8 @@ export function AppShell({ children, user, onSignOut }: AppShellProps) {
       {showReminderModal && (
         <DailyReminderModal onClose={() => setShowReminderModal(false)} />
       )}
+
+      <InstallPrompt />
     </div>
   )
 }

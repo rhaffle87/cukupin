@@ -26,8 +26,10 @@ import { TransactionForm } from './TransactionForm'
 import { MonthlyExpenseTemplate } from './MonthlyExpenseTemplate'
 import { CsvImportModal } from './CsvImportModal'
 import { RestoreJsonModal } from './RestoreJsonModal'
+import { RecurringBillsView } from './RecurringBillsView'
 import { useFinanceData } from '@/hooks/useFinanceData'
 import { currency, isoDate, monthBounds } from '@/lib/finance'
+import { enqueueOfflineAction } from '@/lib/offlineQueue'
 
 const categories = ['Food', 'Transport', 'Bills', 'Shopping', 'Health', 'Salary', 'Freelance', 'Other']
 
@@ -38,6 +40,7 @@ interface TransactionsViewProps {
 }
 
 export function TransactionsView({ supabase, data, userId }: TransactionsViewProps) {
+  const [activeTab, setActiveTab] = useState<'transactions' | 'bills'>('transactions')
   const [editing, setEditing] = useState<Transaction | undefined>()
   const [showForm, setShowForm] = useState(false)
   const [showExportTemplate, setShowExportTemplate] = useState(false)
@@ -73,6 +76,9 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
         handleOpenNew()
         const newUrl = window.location.pathname
         window.history.replaceState({}, '', newUrl)
+      }
+      if (params.get('tab') === 'bills') {
+        setActiveTab('bills')
       }
     }
 
@@ -285,6 +291,8 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
       transactions: data.transactions,
       goals: data.goals,
       wishlist: data.wishlist,
+      bills: data.bills,
+      budgets: data.budgets,
     }
     const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
@@ -309,6 +317,18 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
       const updated = localTxs.filter(item => item.id !== t.id)
       localStorage.setItem('cukupin_local_transactions', JSON.stringify(updated))
       toast.success('Transaksi dihapus.')
+      return
+    }
+
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      enqueueOfflineAction({
+        userId: userId || 'user',
+        action: 'delete',
+        table: 'transactions',
+        targetId: t.id,
+        payload: { id: t.id },
+      })
+      toast.info('Penghapusan disimpan dalam antrean offline.')
       return
     }
 
@@ -395,8 +415,65 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
         }
       />
       
-      {/* Polished & Structured Filter Panel (Solves Image 1 cluttering) */}
-      <section className="mb-4 rounded-[20px] border border-line bg-card p-5 shadow-[0_4px_20px_rgba(30,50,73,0.03)]">
+      {/* View Switcher: Catatan Transaksi vs Tagihan Rutin */}
+      <div className="flex items-center gap-1.5 rounded-2xl bg-black/[0.03] p-1 border border-line w-fit mb-5">
+        <button
+          type="button"
+          onClick={() => setActiveTab('transactions')}
+          className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold transition-all cursor-pointer ${
+            activeTab === 'transactions'
+              ? 'bg-card text-ink shadow-2xs font-bold'
+              : 'text-muted hover:text-ink'
+          }`}
+        >
+          <Receipt size={14} className={activeTab === 'transactions' ? 'text-green' : 'text-muted'} />
+          <span>Daftar Transaksi</span>
+          <span className="rounded-full bg-black/5 px-1.5 py-0.5 font-mono text-[10px] text-muted">
+            {data.transactions.length}
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('bills')}
+          className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold transition-all cursor-pointer ${
+            activeTab === 'bills'
+              ? 'bg-card text-ink shadow-2xs font-bold'
+              : 'text-muted hover:text-ink'
+          }`}
+        >
+          <CalendarDays size={14} className={activeTab === 'bills' ? 'text-green' : 'text-muted'} />
+          <span>Tagihan Rutin</span>
+          {(() => {
+            const currentMonthStr = new Date().toISOString().slice(0, 7)
+            const pendingCount = (data.bills || []).filter(
+              (b) => b.is_active && b.last_logged_month !== currentMonthStr
+            ).length
+            return pendingCount > 0 ? (
+              <span className="rounded-full bg-coral/15 px-1.5 py-0.5 font-mono text-[10px] font-bold text-coral-dark">
+                {pendingCount} belum dicatat
+              </span>
+            ) : (
+              <span className="rounded-full bg-green/10 px-1.5 py-0.5 font-mono text-[10px] font-medium text-green">
+                Lunas
+              </span>
+            )
+          })()}
+        </button>
+      </div>
+
+      {activeTab === 'bills' ? (
+        <RecurringBillsView
+          supabase={supabase}
+          userId={userId}
+          bills={data.bills || []}
+          setBills={data.setBills}
+          logRecurringBillAsTransaction={data.logRecurringBillAsTransaction}
+        />
+      ) : (
+        <>
+          {/* Polished & Structured Filter Panel (Solves Image 1 cluttering) */}
+          <section className="mb-4 rounded-[20px] border border-line bg-card p-5 shadow-[0_4px_20px_rgba(30,50,73,0.03)]">
         {/* Row 1: Search + Jenis + Kategori + Urutkan */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[minmax(220px,1.6fr)_minmax(130px,1fr)_minmax(140px,1fr)_minmax(140px,1fr)] gap-3">
           {/* Search Input */}
@@ -728,6 +805,8 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
           </div>
         </aside>
       </div>
+      </>
+      )}
 
       {showForm && (
         <Modal title={editing ? 'Edit transaksi' : 'Transaksi baru'} onClose={() => setShowForm(false)}>

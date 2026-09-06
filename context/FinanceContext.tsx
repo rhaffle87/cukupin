@@ -3,7 +3,7 @@
 import React, { createContext, useContext } from 'react'
 import { SupabaseClient } from '@supabase/supabase-js'
 import { useFinanceData } from '@/hooks/useFinanceData'
-import type { Transaction, SavingGoal, WishlistItem } from '@/lib/database.types'
+import type { Transaction, SavingGoal, WishlistItem, RecurringBill, CategoryBudget } from '@/lib/database.types'
 
 interface FinanceContextType {
   supabase: SupabaseClient | null
@@ -11,11 +11,16 @@ interface FinanceContextType {
   transactions: Transaction[]
   goals: SavingGoal[]
   wishlist: WishlistItem[]
+  bills: RecurringBill[]
+  budgets: CategoryBudget[]
   loading: boolean
   refresh: () => Promise<void>
   setTransactions: React.Dispatch<React.SetStateAction<Transaction[]>>
   setGoals: React.Dispatch<React.SetStateAction<SavingGoal[]>>
   setWishlist: React.Dispatch<React.SetStateAction<WishlistItem[]>>
+  setBills: React.Dispatch<React.SetStateAction<RecurringBill[]>>
+  setBudgets: React.Dispatch<React.SetStateAction<CategoryBudget[]>>
+  logRecurringBillAsTransaction: (bill: RecurringBill) => Promise<boolean>
 }
 
 const FinanceContext = createContext<FinanceContextType | undefined>(undefined)
