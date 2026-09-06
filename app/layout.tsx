@@ -1,4 +1,5 @@
 import { Analytics } from '@vercel/analytics/next'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import type { Metadata, Viewport } from 'next'
 import { DM_Sans, Fraunces, DM_Mono } from 'next/font/google'
 import { Toaster } from 'sonner'
@@ -81,6 +82,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         {children}
         <Toaster position="top-center" />
         {process.env.NODE_ENV === 'production' && <Analytics />}
+        {process.env.NODE_ENV === 'production' && <SpeedInsights />}
         <CookieConsent />
         <RegisterServiceWorker />
       </body>
