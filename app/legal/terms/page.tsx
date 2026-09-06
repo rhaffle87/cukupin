@@ -131,7 +131,7 @@ export default function TermsOfServicePage() {
           {/* Sticky Table of Contents (Desktop Sidebar) */}
           <aside className="lg:col-span-4 lg:sticky lg:top-24 rounded-2xl border border-line bg-card p-6 shadow-2xs space-y-4">
             <div>
-              <p className="text-[10px] font-bold tracking-widest text-[#89938A] uppercase">DAFTAR PASAL</p>
+              <p className="text-[10px] font-bold tracking-widest text-slate uppercase">DAFTAR PASAL</p>
               <h2 className="font-display text-base font-bold text-ink mt-1">Navigasi Dokumen</h2>
             </div>
             <nav className="space-y-1.5 text-xs">

@@ -460,7 +460,7 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
                       onClick={() => checkout(item)}
                       className="inline-flex items-center gap-1.5 rounded-xl bg-ink px-3.5 py-2 text-xs font-bold !text-white shadow-2xs hover:bg-ink/90 active:scale-95 transition-all cursor-pointer"
                     >
-                      <Check size={14} className="text-[#BEE6CF]" /> Terbeli
+                      <Check size={14} className="text-mint" /> Terbeli
                     </button>
                   </div>
                 </div>

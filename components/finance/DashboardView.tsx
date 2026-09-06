@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { StatCard } from '@/components/ui/StatCard'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { Eyebrow } from '@/components/ui/Eyebrow'
 import { TransactionRow } from './TransactionRow'
 import { categoryBreakdown, currency, dailySeries, monthBounds, monthLabel, shortCurrency, totals, calculateDailySafeSpend } from '@/lib/finance'
 import { useFinanceData } from '@/hooks/useFinanceData'
@@ -63,9 +64,7 @@ function RecentTransactions({ transactions }: { transactions: Transaction[] }) {
     <section className="mt-4 rounded-[18px] border border-line bg-card p-5 shadow-[0_5px_20px_rgba(30,50,73,0.025)] md:p-6 animate-in slide-in-from-bottom-2 duration-500 delay-150 fill-mode-both">
       <div className="mb-5 flex items-start justify-between gap-3 md:mb-6">
         <div>
-          <p className="flex items-center gap-1.5 text-[10px] font-bold tracking-widest text-[#89938A] uppercase before:block before:h-[1px] before:w-[19px] before:bg-blue after:block after:-ml-[5px] after:h-[4px] after:w-[4px] after:rounded-full after:bg-green">
-            CATATAN TERBARU
-          </p>
+          <Eyebrow>CATATAN TERBARU</Eyebrow>
           <h2 className="mt-1.5 font-display text-xl font-bold tracking-tight">Transaksi bulan ini</h2>
         </div>
         <Link href="/transactions" className="flex items-center gap-1 bg-transparent text-[11px] font-bold text-blue">
@@ -144,7 +143,7 @@ export function DashboardView({ data, user }: DashboardViewProps) {
           <p className="text-[10px] font-bold tracking-widest text-[#B9C6BD] uppercase">{monthLabel().toUpperCase()}</p>
           <h1 className="mt-2.5 font-display text-[2.45rem] font-bold leading-tight tracking-tight">
             Halo, {firstName}.<br />
-            <em className="text-[#BEE6CF] not-italic">Cek uangmu bulan ini.</em>
+            <em className="text-mint not-italic">Cek uangmu bulan ini.</em>
           </h1>
           <p className="mt-5 max-w-[320px] text-xs leading-relaxed text-[#C0CBC4] md:max-w-[420px]">
             Pantau pengeluaran hari ini biar tetap santai sampai akhir bulan.
@@ -156,14 +155,14 @@ export function DashboardView({ data, user }: DashboardViewProps) {
             <span className="block text-[10px] font-bold tracking-widest text-[#B9C6BD] uppercase">
               {stats.balance >= 0 ? 'MASIH AMAN' : 'PERLU DICEK'}
             </span>
-            <strong className="my-1.5 block font-display text-[32px] md:text-[36px] font-bold leading-none tracking-tight text-[#BEE6CF]">
+            <strong className="my-1.5 block font-display text-[32px] md:text-[36px] font-bold leading-none tracking-tight text-mint">
               {shortCurrency(Math.abs(stats.balance))}
             </strong>
             <small className="block text-[11px] text-[#BAC9C0]">
               {stats.balance >= 0 ? 'sisa uang bulan ini' : 'pengeluaran melebihi pemasukan'}
             </small>
             {stats.balance > 0 && (
-              <span className="mt-1.5 inline-flex items-center rounded-full bg-white/[0.08] px-2 py-0.5 text-[9px] font-semibold text-[#BEE6CF]">
+              <span className="mt-1.5 inline-flex items-center rounded-full bg-white/[0.08] px-2 py-0.5 text-[9px] font-semibold text-mint">
                 Aman: {shortCurrency(safeSpend.dailyAllowance)}/hr
               </span>
             )}
@@ -198,9 +197,7 @@ export function DashboardView({ data, user }: DashboardViewProps) {
         <section className="min-h-[320px] rounded-[18px] border border-line bg-card p-5 shadow-[0_5px_20px_rgba(30,50,73,0.025)] md:min-h-[347px] md:p-6 animate-in slide-in-from-bottom-2 duration-500 delay-100 fill-mode-both">
           <div className="mb-5 flex items-start justify-between gap-3 md:mb-6">
             <div>
-              <p className="flex items-center gap-1.5 text-[10px] font-bold tracking-widest text-[#89938A] uppercase before:block before:h-[1px] before:w-[19px] before:bg-blue after:block after:-ml-[5px] after:h-[4px] after:w-[4px] after:rounded-full after:bg-green">
-                GRAFIK HARIAN
-              </p>
+              <Eyebrow>GRAFIK HARIAN</Eyebrow>
               <h2 className="mt-1.5 font-display text-xl font-bold tracking-tight">Pemasukan vs pengeluaran</h2>
             </div>
             <span className="flex items-center gap-1.5 whitespace-nowrap rounded-full border border-line px-2.5 py-1.5 text-[9px] text-muted md:text-[10px]">
@@ -235,9 +232,7 @@ export function DashboardView({ data, user }: DashboardViewProps) {
         <section className="min-h-[320px] rounded-[18px] border border-line bg-card p-5 shadow-[0_5px_20px_rgba(30,50,73,0.025)] md:min-h-[347px] md:p-6 animate-in slide-in-from-bottom-2 duration-500 delay-100 fill-mode-both">
           <div className="mb-5 flex items-start justify-between gap-3 md:mb-6">
             <div>
-              <p className="flex items-center gap-1.5 text-[10px] font-bold tracking-widest text-[#89938A] uppercase before:block before:h-[1px] before:w-[19px] before:bg-blue after:block after:-ml-[5px] after:h-[4px] after:w-[4px] after:rounded-full after:bg-green">
-                PENGELUARAN
-              </p>
+              <Eyebrow>PENGELUARAN</Eyebrow>
               <h2 className="mt-1.5 font-display text-xl font-bold tracking-tight">Berdasarkan kategori</h2>
             </div>
           </div>

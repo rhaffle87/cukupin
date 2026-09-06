@@ -719,7 +719,7 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
               <button
                 type="button"
                 onClick={() => setTipIndex(prev => prev + 1)}
-                className="inline-flex items-center gap-1.5 rounded-xl bg-white/10 px-3 py-1.5 text-xs font-bold text-[#BEE6CF] hover:bg-white/20 active:scale-95 transition-all cursor-pointer"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-white/10 px-3 py-1.5 text-xs font-bold text-mint hover:bg-white/20 active:scale-95 transition-all cursor-pointer"
               >
                 <span>Tips Berikutnya</span>
                 <ChevronRight size={13} />

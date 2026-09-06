@@ -1,9 +1,31 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
+import { DM_Sans, Fraunces, DM_Mono } from 'next/font/google'
 import { Toaster } from 'sonner'
 import { CookieConsent } from '@/components/ui/CookieConsent'
 import { RegisterServiceWorker } from '@/components/pwa/RegisterServiceWorker'
 import './globals.css'
+
+const dmSans = DM_Sans({
+  subsets: ['latin'],
+  variable: '--font-sans',
+  display: 'swap',
+  weight: ['400', '500', '600', '700'],
+})
+
+const fraunces = Fraunces({
+  subsets: ['latin'],
+  variable: '--font-display',
+  display: 'swap',
+  weight: ['500', '600', '700'],
+})
+
+const dmMono = DM_Mono({
+  subsets: ['latin'],
+  variable: '--font-mono',
+  display: 'swap',
+  weight: ['400', '500'],
+})
 
 export const metadata: Metadata = {
   title: 'Cukupin: Catat santai, tahu arah uangmu',
@@ -46,7 +68,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   colorScheme: 'light',
-  themeColor: '#f5f7f4',
+  themeColor: '#F7F6F0',
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
@@ -54,8 +76,8 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="id" className="bg-background">
-      <body className="antialiased">
+    <html lang="id" className={`${dmSans.variable} ${fraunces.variable} ${dmMono.variable} bg-paper text-ink font-sans`}>
+      <body className="font-sans antialiased bg-paper text-ink">
         {children}
         <Toaster position="top-center" />
         {process.env.NODE_ENV === 'production' && <Analytics />}

@@ -291,7 +291,7 @@ export function RestoreJsonModal({
               </>
             ) : (
               <>
-                <CheckCircle2 size={14} className="text-[#BEE6CF]" /> Pulihkan Data
+                <CheckCircle2 size={14} className="text-mint" /> Pulihkan Data
               </>
             )}
           </button>

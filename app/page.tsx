@@ -142,7 +142,7 @@ export default function LandingPage() {
       <section id="masalah" className="border-t border-line/60 bg-paper px-6 py-16 md:py-24">
         <div className="mx-auto max-w-4xl">
           <div className="text-center max-w-2xl mx-auto mb-12">
-            <p className="text-[10px] font-bold tracking-widest text-[#89938A] uppercase">MASALAH UMUM</p>
+            <p className="text-[10px] font-bold tracking-widest text-slate uppercase">MASALAH UMUM</p>
             <h2 className="mt-2 font-display text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-ink">
               Kenapa atur uang sering bikin malas dan pusing?
             </h2>
@@ -194,7 +194,7 @@ export default function LandingPage() {
               <p className="text-[10px] font-bold tracking-widest text-[#B9C6BD] uppercase">SOLUSI CUKUPIN</p>
               <h2 className="mt-2 font-display text-3xl sm:text-4xl font-bold tracking-tight text-white leading-tight">
                 Cukup catat sebentar.<br />
-                <em className="text-[#BEE6CF] not-italic">Tahu batas amanmu tiap hari.</em>
+                <em className="text-mint not-italic">Tahu batas amanmu tiap hari.</em>
               </h2>
               <p className="mt-4 text-xs sm:text-sm leading-relaxed text-[#C0CBC4]">
                 Cukupin membuang semua kerumitan finansial yang berlebihan. Kamu hanya perlu mencatat apa yang keluar dan masuk, lalu sistem otomatis memberi tahu berapa budget aman yang boleh kamu belanjakan hari ini.
@@ -216,7 +216,7 @@ export default function LandingPage() {
       <section id="fitur" className="border-t border-line/60 bg-paper px-6 py-16 md:py-24">
         <div className="mx-auto max-w-4xl">
           <div className="text-center max-w-2xl mx-auto mb-12">
-            <p className="text-[10px] font-bold tracking-widest text-[#89938A] uppercase">FITUR UTAMA</p>
+            <p className="text-[10px] font-bold tracking-widest text-slate uppercase">FITUR UTAMA</p>
             <h2 className="mt-2 font-display text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-ink">
               Dibuat praktis untuk rutinitas harianmu
             </h2>
@@ -298,7 +298,7 @@ export default function LandingPage() {
       <section id="cara-kerja" className="border-t border-line/60 bg-white/[0.5] px-6 py-16 md:py-24">
         <div className="mx-auto max-w-4xl">
           <div className="text-center max-w-2xl mx-auto mb-12">
-            <p className="text-[10px] font-bold tracking-widest text-[#89938A] uppercase">CARA KERJA</p>
+            <p className="text-[10px] font-bold tracking-widest text-slate uppercase">CARA KERJA</p>
             <h2 className="mt-2 font-display text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-ink">
               Tiga langkah santai menuju keuangan yang tenang
             </h2>
@@ -342,7 +342,7 @@ export default function LandingPage() {
       <section id="perbandingan" className="border-t border-line/60 bg-paper px-6 py-16 md:py-24">
         <div className="mx-auto max-w-4xl">
           <div className="text-center max-w-2xl mx-auto mb-12">
-            <p className="text-[10px] font-bold tracking-widest text-[#89938A] uppercase">PERBANDINGAN JUJUR</p>
+            <p className="text-[10px] font-bold tracking-widest text-slate uppercase">PERBANDINGAN JUJUR</p>
             <h2 className="mt-2 font-display text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-ink">
               Bagaimana Cukupin dibanding alternatif lain?
             </h2>
@@ -409,7 +409,7 @@ export default function LandingPage() {
       <section className="border-t border-line/60 bg-white/[0.4] px-6 py-16 md:py-24">
         <div className="mx-auto max-w-4xl">
           <div className="text-center max-w-2xl mx-auto mb-12">
-            <p className="text-[10px] font-bold tracking-widest text-[#89938A] uppercase">TESTIMONI PENGGUNA</p>
+            <p className="text-[10px] font-bold tracking-widest text-slate uppercase">TESTIMONI PENGGUNA</p>
             <h2 className="mt-2 font-display text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-ink">
               Cerita santai dari mereka yang sudah mencoba
             </h2>
@@ -453,7 +453,7 @@ export default function LandingPage() {
       <section id="faq" className="border-t border-line/60 bg-paper px-6 py-16 md:py-24">
         <div className="mx-auto max-w-3xl">
           <div className="text-center mb-12">
-            <p className="text-[10px] font-bold tracking-widest text-[#89938A] uppercase">PERTANYAAN UMUM</p>
+            <p className="text-[10px] font-bold tracking-widest text-slate uppercase">PERTANYAAN UMUM</p>
             <h2 className="mt-2 font-display text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-ink">
               Ada yang ingin kamu tanyakan?
             </h2>
@@ -501,7 +501,7 @@ export default function LandingPage() {
             <div className="pointer-events-none absolute left-1/2 top-1/2 -z-0 h-[450px] w-[450px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/10 shadow-[0_0_0_40px_rgba(255,255,255,0.02)]" />
 
             <div className="relative z-10 max-w-xl mx-auto flex flex-col items-center">
-              <span className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-[10px] font-bold tracking-widest text-[#BEE6CF] uppercase">
+              <span className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-[10px] font-bold tracking-widest text-mint uppercase">
                 MULAI HARI INI
               </span>
               <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-tight">
@@ -609,7 +609,7 @@ export default function LandingPage() {
                   <span className="text-muted">Template Laporan Bulanan</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#89938A]" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-slate" />
                   <span className="text-muted">Cadangan Data JSON Lokal</span>
                 </li>
               </ul>

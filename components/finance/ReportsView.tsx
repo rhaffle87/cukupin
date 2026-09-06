@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { StatCard } from '@/components/ui/StatCard'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { Eyebrow } from '@/components/ui/Eyebrow'
 import { TransactionRow } from './TransactionRow'
 import { useFinanceData } from '@/hooks/useFinanceData'
 import { budgetRule503020, comparator, currency, isoDate, monthBounds, paymentMethodBreakdown, totals } from '@/lib/finance'
@@ -61,9 +62,7 @@ export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> 
       {/* Date Filter Bar */}
       <div className="mb-4 flex flex-col sm:flex-row sm:items-end justify-between gap-4 rounded-[18px] border border-line bg-card p-5 shadow-[0_4px_16px_rgba(30,50,73,0.02)]">
         <div>
-          <p className="flex items-center gap-1.5 text-[10px] font-bold tracking-widest text-[#89938A] uppercase before:block before:h-[1px] before:w-[19px] before:bg-blue after:block after:-ml-[5px] after:h-[4px] after:w-[4px] after:rounded-full after:bg-green">
-            RENTANG TANGGAL
-          </p>
+          <Eyebrow>RENTANG TANGGAL</Eyebrow>
           <strong className="mt-1 block font-display text-lg font-bold text-ink">Pilih periode laporan</strong>
         </div>
         <div className="flex items-center gap-1.5 sm:gap-2">
@@ -119,9 +118,7 @@ export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> 
         <section className="mb-4 rounded-[18px] border border-line bg-card p-5 shadow-[0_5px_20px_rgba(30,50,73,0.025)] md:p-6">
           <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
-              <p className="flex items-center gap-1.5 text-[10px] font-bold tracking-widest text-[#89938A] uppercase before:block before:h-[1px] before:w-[19px] before:bg-blue after:block after:-ml-[5px] after:h-[4px] after:w-[4px] after:rounded-full after:bg-green">
-                POLA PENGELUARAN (50/30/20)
-              </p>
+              <Eyebrow>POLA PENGELUARAN (50/30/20)</Eyebrow>
               <h2 className="mt-1 font-display text-lg sm:text-xl font-bold tracking-tight text-ink">Kebutuhan vs Keinginan</h2>
             </div>
             <span className="self-start sm:self-auto rounded-full border border-line bg-paper px-3 py-1 text-[10px] font-bold text-muted">
@@ -164,9 +161,7 @@ export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> 
         <section className="mb-4 rounded-[18px] border border-line bg-card p-5 shadow-[0_5px_20px_rgba(30,50,73,0.025)] md:p-6">
           <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
-              <p className="flex items-center gap-1.5 text-[10px] font-bold tracking-widest text-[#89938A] uppercase before:block before:h-[1px] before:w-[19px] before:bg-blue after:block after:-ml-[5px] after:h-[4px] after:w-[4px] after:rounded-full after:bg-green">
-                METODE PEMBAYARAN
-              </p>
+              <Eyebrow>METODE PEMBAYARAN</Eyebrow>
               <h2 className="mt-1 font-display text-lg sm:text-xl font-bold tracking-tight text-ink">Distribusi Kanal Belanja</h2>
             </div>
             <span className="self-start sm:self-auto rounded-full border border-line bg-paper px-3 py-1 text-[10px] font-bold text-muted">
@@ -200,9 +195,7 @@ export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> 
       <section className="mb-4 rounded-[18px] border border-line bg-card p-5 shadow-[0_5px_20px_rgba(30,50,73,0.025)] md:p-6">
         <div className="mb-5 flex items-start justify-between gap-3">
           <div>
-            <p className="flex items-center gap-1.5 text-[10px] font-bold tracking-widest text-[#89938A] uppercase before:block before:h-[1px] before:w-[19px] before:bg-blue after:block after:-ml-[5px] after:h-[4px] after:w-[4px] after:rounded-full after:bg-green">
-              PERBANDINGAN
-            </p>
+            <Eyebrow>PERBANDINGAN</Eyebrow>
             <h2 className="mt-1.5 font-display text-xl font-bold tracking-tight text-ink">Bulan ini vs bulan lalu</h2>
           </div>
           <span className="rounded-full border border-line px-2.5 py-1 text-[10px] font-semibold text-muted">
@@ -243,9 +236,7 @@ export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> 
       {/* Filtered Transactions Table */}
       <section className="rounded-[18px] border border-line bg-card p-5 shadow-[0_5px_20px_rgba(30,50,73,0.025)] md:p-6">
         <div className="mb-4">
-          <p className="flex items-center gap-1.5 text-[10px] font-bold tracking-widest text-[#89938A] uppercase before:block before:h-[1px] before:w-[19px] before:bg-blue after:block after:-ml-[5px] after:h-[4px] after:w-[4px] after:rounded-full after:bg-green">
-            DAFTAR TRANSAKSI
-          </p>
+          <Eyebrow>DAFTAR TRANSAKSI</Eyebrow>
           <h2 className="mt-1.5 font-display text-xl font-bold tracking-tight text-ink">Rincian transaksi</h2>
         </div>
         {filtered.length ? (
