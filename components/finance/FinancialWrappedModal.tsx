@@ -3,7 +3,6 @@ import { Modal } from '@/components/ui/Modal'
 import type { Transaction } from '@/lib/database.types'
 import { currency, shortCurrency, budgetRule503020, totals, monthLabel } from '@/lib/finance'
 import { Download, Sparkles, Award, ShieldCheck, TrendingUp, CheckCircle2, Share2, HeartHandshake, Loader2 } from 'lucide-react'
-import html2canvas from 'html2canvas'
 import { toast } from 'sonner'
 
 interface FinancialWrappedModalProps {
@@ -113,7 +112,10 @@ export function FinancialWrappedModal({
 
   const ArchetypeIcon = archetypeIcon
 
-  // 1-Click PNG Export (Rock-solid offscreen cloning to prevent scroll clipping & style drift)
+  // 1-Click PNG Export using html-to-image (SVG foreignObject).
+  // html2canvas re-implements CSS in JS — causing text sag, missing backdrop-blur,
+  // and gradient/border-radius artifacts. html-to-image delegates rendering to the
+  // browser's own CSS engine for pixel-perfect output.
   const exportToImage = async () => {
     if (!cardRef.current) return
     setIsExporting(true)
@@ -138,34 +140,25 @@ export function FinancialWrappedModal({
       if (document.fonts) {
         await document.fonts.ready
       }
-      await new Promise((resolve) => setTimeout(resolve, 150))
+      await new Promise((resolve) => setTimeout(resolve, 200))
 
-      const cardHeight = Math.ceil(clone.getBoundingClientRect().height)
+      const { toPng } = await import('html-to-image')
 
-      const canvas = await html2canvas(clone, {
-        scale: 3, // Crisp 3x resolution
-        useCORS: true,
+      const dataUrl = await toPng(clone, {
+        pixelRatio: 3,
+        cacheBust: true,
+        skipAutoScale: true,
         backgroundColor: '#16273A',
-        logging: false,
-        width: 480,
-        height: cardHeight,
-        windowWidth: 1600,
-        windowHeight: 2400,
-        x: 0,
-        y: 0,
-        scrollX: 0,
-        scrollY: 0,
       })
 
       // Clean up clone node from DOM
       document.body.removeChild(clone)
 
-      const image = canvas.toDataURL('image/png')
       if (typeof window !== 'undefined') {
-        ;(window as any).__lastWrappedDataUrl = image
+        ;(window as any).__lastWrappedDataUrl = dataUrl
       }
       const link = document.createElement('a')
-      link.href = image
+      link.href = dataUrl
       link.download = `rapor-cukupin-${new Date().toISOString().slice(0, 7)}.png`
       link.click()
       toast.success('Rapor Cukupin berhasil diunduh sebagai gambar PNG!')
