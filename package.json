@@ -10,7 +10,8 @@
     "test:watch": "vitest",
     "db:push": "supabase db push",
     "db:diff": "supabase db diff",
-    "db:lint": "supabase db lint"
+    "db:lint": "supabase db lint",
+    "test:e2e": "python tests/e2e/test_user_flows.py"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",
@@ -47,6 +48,8 @@
     "zod": "^4.5.4"
   },
   "devDependencies": {
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/react": "^16.3.3",
     "@types/canvas-confetti": "^1.9.0",
     "@types/node": "^24",
     "@types/react": "^19",
