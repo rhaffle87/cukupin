@@ -1,11 +1,11 @@
 # Cukupin
 
 > **Catat santai, tahu arah uangmu.**  
-> Aplikasi pencatatan keuangan pribadi dengan pendekatan *Quiet Ledger* — tenang, berfokus pada kebiasaan sehat, ramah privasi, dan mendukung penggunaan offline (PWA).
+> Aplikasi pencatatan keuangan pribadi dengan pendekatan *Quiet Ledger* � tenang, berfokus pada kebiasaan sehat, ramah privasi, dan mendukung penggunaan offline (PWA).
 
 ---
 
-## ✨ Fitur Utama
+## ? Fitur Utama
 
 - **Hero ATM / Debit Card**: Visualisasi saldo kas realtime dengan sentuhan kartu ATM elegan (chip emas EMV, indikator NFC, status aman/menipis).
 - **Rapor Keuangan Cukupin (Wrapped & Scorecard)**: Penilaian kesehatan finansial 100 poin (Tingkat Tabungan, Kepatuhan Anggaran, Disiplin Catat, Rasio 50/30/20) dan kartu rapor yang dapat diunduh (PNG) untuk dibagikan.
@@ -20,7 +20,19 @@
 
 ---
 
-## 🛠️ Tech Stack & Infrastruktur
+## ?? Pusat Dokumentasi Teknis (Engineering Docs)
+
+Dokumentasi arsitektur dan operasional lengkap tersedia di direktori [`docs/`](./docs):
+
+- ??? [**Arsitektur Sistem (ARCHITECTURE.md)**](./docs/ARCHITECTURE.md) � Desain sistem high-level, edge proxy, state management, & observabilitas.
+- ??? [**Skema Basis Data (DATABASE_SCHEMA.md)**](./docs/DATABASE_SCHEMA.md) � Diagram ERD, spesifikasi tabel, RLS, indeks performa, & publikasi realtime.
+- ??? [**Audit Keamanan (SECURITY_AUDIT.md)**](./docs/SECURITY_AUDIT.md) � Pemodelan ancaman (STRIDE), mitigasi OWASP Top 10, CSP, & kepatuhan UU PDP.
+- ?? [**Alur Data & API (API_AND_DATA_FLOW.md)**](./docs/API_AND_DATA_FLOW.md) � Arsitektur alur data, antrean offline-first, backup payload v2.0, & pipeline CSV.
+- ??? [**Panduan Developer (DEVELOPER_GUIDE.md)**](./docs/DEVELOPER_GUIDE.md) � Panduan onboarding developer, setup lokal tanpa Supabase, TDD Vitest, & konvensi kode.
+
+---
+
+## ??? Tech Stack & Infrastruktur
 
 - **Framework**: [Next.js 16](https://nextjs.org/) (App Router, Turbopack)
 - **Styling**: Vanilla CSS & Tailwind CSS v4 (*Quiet Ledger theme palette*)
@@ -28,16 +40,14 @@
 - **Database & Auth**: [Supabase](https://supabase.com/) (PostgreSQL dengan RLS)
 - **Analytics & Observability**: [Vercel Analytics](https://vercel.com/analytics) & [Vercel Speed Insights](https://vercel.com/docs/speed-insights) (*privacy consent-gated*)
 - **Charts & Visuals**: Recharts, Lucide Icons, html2canvas
-- **Testing**: Vitest + jsdom (38+ unit tests)
-
-> 📘 Untuk detail arsitektur lengkap, diagram alir sistem, dan model mitigasi keamanan, silakan baca dokumentasi arsitektur di [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+- **Testing**: Vitest + jsdom (44 unit tests, 100% passing)
 
 ---
 
-## 🚀 Memulai (Getting Started)
+## ?? Memulai (Getting Started)
 
 ### 1. Prasyarat
-- Node.js 18.17+ atau 20+
+- Node.js 18.18+ atau 20+
 - npm / pnpm / yarn
 
 ### 2. Instalasi Dependensi
@@ -66,7 +76,7 @@ Buka [http://localhost:3000](http://localhost:3000) di peramban Anda.
 
 ---
 
-## 🧪 Pengujian (Testing)
+## ?? Pengujian (Testing)
 
 Jalankan rangkaian unit test suite:
 ```bash
@@ -79,7 +89,7 @@ npm run test:watch
 
 ---
 
-## 🗄️ Database & Supabase CLI
+## ??? Database & Supabase CLI
 
 ```bash
 # Push migrasi ke database
@@ -96,7 +106,7 @@ Berkas migrasi skema tersimpan di direktori `supabase/migrations/`.
 
 ---
 
-## 🔒 Privasi, Keamanan & Regulasi
+## ?? Privasi, Keamanan & Regulasi
 
 Aplikasi ini dibangun dengan kepatuhan penuh terhadap standar perlindungan privasi data pribadi **UU PDP No. 27/2022** dan prinsip **GDPR**:
 - **Hak Penghapusan Data (Pasal 39)**: Pengguna memiliki akses mandiri untuk menghapus seluruh catatan keuangan (*hard-delete*) secara permanen.

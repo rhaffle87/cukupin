@@ -2,12 +2,17 @@ import { describe, it, expect } from 'vitest'
 import {
   currency,
   shortCurrency,
+  monthLabel,
   isoDate,
   monthBounds,
   totals,
+  dailySeries,
   categoryBreakdown,
+  comparator,
   calculateDailySafeSpend,
   budgetRule503020,
+  paymentMethodBreakdown,
+  escapeCsvField,
 } from '@/lib/finance'
 import type { Transaction } from '@/lib/database.types'
 
@@ -46,6 +51,21 @@ describe('Finance Library Utility Functions', () => {
       const result = shortCurrency(500)
       expect(result).toContain('500')
       expect(result).toContain('Rp')
+    })
+  })
+
+  describe('monthLabel', () => {
+    it('formats Date into localized Indonesian month name and year', () => {
+      const d = new Date(2026, 8, 1) // Sep 2026
+      const label = monthLabel(d)
+      expect(label.toLowerCase()).toContain('september')
+      expect(label).toContain('2026')
+    })
+
+    it('defaults to current date when called with no arguments', () => {
+      const label = monthLabel()
+      expect(typeof label).toBe('string')
+      expect(label.length).toBeGreaterThan(0)
     })
   })
 
@@ -116,6 +136,21 @@ describe('Finance Library Utility Functions', () => {
     })
   })
 
+  describe('dailySeries', () => {
+    it('aggregates income and expenses per day across given number of days', () => {
+      const today = isoDate(new Date())
+      const txs: Transaction[] = [
+        { id: '1', user_id: 'u1', type: 'income', category: 'Gaji', amount: 1000000, transaction_date: today, description: 'Gaji', note: null, created_at: '' },
+        { id: '2', user_id: 'u1', type: 'expense', category: 'Makan', amount: 50000, transaction_date: today, description: 'Makan', note: null, created_at: '' },
+      ]
+      const series = dailySeries(txs, 7)
+      expect(series).toHaveLength(7)
+      const lastDay = series[series.length - 1]
+      expect(lastDay.income).toBe(1000000)
+      expect(lastDay.expense).toBe(50000)
+    })
+  })
+
   describe('categoryBreakdown', () => {
     const mockExpenses: Transaction[] = [
       {
@@ -172,6 +207,33 @@ describe('Finance Library Utility Functions', () => {
     })
   })
 
+  describe('comparator', () => {
+    const currentTxs: Transaction[] = [
+      { id: '1', user_id: 'u1', type: 'expense', category: 'Food', amount: 600000, transaction_date: '2026-09-01', description: 'Makan', note: null, created_at: '' },
+      { id: '2', user_id: 'u1', type: 'expense', category: 'Transport', amount: 200000, transaction_date: '2026-09-01', description: 'Bensin', note: null, created_at: '' },
+    ]
+    const previousTxs: Transaction[] = [
+      { id: '3', user_id: 'u1', type: 'expense', category: 'Food', amount: 400000, transaction_date: '2026-08-01', description: 'Makan', note: null, created_at: '' },
+      { id: '4', user_id: 'u1', type: 'expense', category: 'Utilities', amount: 300000, transaction_date: '2026-08-01', description: 'Listrik', note: null, created_at: '' },
+    ]
+
+    it('computes category comparison and percentage delta between two periods', () => {
+      const comparison = comparator(currentTxs, previousTxs)
+      expect(comparison).toHaveLength(3) // Food, Utilities, Transport
+
+      const food = comparison.find(c => c.category === 'Food')
+      expect(food).toBeDefined()
+      expect(food?.current).toBe(600000)
+      expect(food?.previous).toBe(400000)
+      expect(food?.change).toBe(50) // +50%
+
+      const transport = comparison.find(c => c.category === 'Transport')
+      expect(transport?.current).toBe(200000)
+      expect(transport?.previous).toBe(0)
+      expect(transport?.change).toBe(100) // from 0 to positive -> 100%
+    })
+  })
+
   describe('calculateDailySafeSpend', () => {
     it('calculates daily allowance based on remaining days in the month', () => {
       const fakeDate = new Date(2026, 8, 20) // Sep 20, Sep has 30 days -> 11 remaining days
@@ -195,11 +257,60 @@ describe('Finance Library Utility Functions', () => {
         { id: '2', user_id: 'u1', type: 'expense', category: 'Shopping', amount: 1000000, transaction_date: '2026-09-02', description: 'Baju', note: null, created_at: '' },
       ]
       const result = budgetRule503020(expenses)
-      expect(result.needs).toBe(2000000) // Food is categorized as needs
-      expect(result.wants).toBe(1000000) // Shopping is categorized as wants
+      expect(result.needs).toBe(2000000)
+      expect(result.wants).toBe(1000000)
       expect(result.totalExpense).toBe(3000000)
       expect(result.needsPct).toBe(67)
       expect(result.wantsPct).toBe(33)
+    })
+  })
+
+  describe('paymentMethodBreakdown', () => {
+    it('aggregates expenses by payment method and calculates percentages', () => {
+      const txs: Transaction[] = [
+        { id: '1', user_id: 'u1', type: 'expense', category: 'Food', amount: 50000, payment_method: 'qris', transaction_date: '2026-09-01', description: 'Bakso', note: null, created_at: '' },
+        { id: '2', user_id: 'u1', type: 'expense', category: 'Food', amount: 150000, payment_method: 'qris', transaction_date: '2026-09-02', description: 'Resto', note: null, created_at: '' },
+        { id: '3', user_id: 'u1', type: 'expense', category: 'Shopping', amount: 300000, payment_method: 'debit', transaction_date: '2026-09-03', description: 'Baju', note: null, created_at: '' },
+        { id: '4', user_id: 'u1', type: 'income', category: 'Gaji', amount: 5000000, payment_method: 'transfer', transaction_date: '2026-09-01', description: 'Gaji', note: null, created_at: '' },
+      ]
+      const breakdown = paymentMethodBreakdown(txs)
+      expect(breakdown).toHaveLength(2)
+      expect(breakdown[0]).toEqual({ method: 'debit', amount: 300000, percentage: 60 })
+      expect(breakdown[1]).toEqual({ method: 'qris', amount: 200000, percentage: 40 })
+    })
+
+    it('defaults unspecified payment method to "Lainnya / Tidak Ditentukan"', () => {
+      const txs: Transaction[] = [
+        { id: '1', user_id: 'u1', type: 'expense', category: 'Food', amount: 20000, transaction_date: '2026-09-01', description: 'Kopi', note: null, created_at: '' },
+      ]
+      const breakdown = paymentMethodBreakdown(txs)
+      expect(breakdown[0].method).toBe('Lainnya / Tidak Ditentukan')
+      expect(breakdown[0].amount).toBe(20000)
+      expect(breakdown[0].percentage).toBe(100)
+    })
+  })
+
+  describe('escapeCsvField (OWASP Anti-Formula Injection)', () => {
+    it('neutralizes spreadsheet formula prefixes with a leading single quote', () => {
+      expect(escapeCsvField('=SUM(A1:A10)')).toBe('"\'=SUM(A1:A10)\"')
+      expect(escapeCsvField('+12345')).toBe('"\'+12345\"')
+      expect(escapeCsvField('-danger')).toBe('"\'-danger\"')
+      expect(escapeCsvField('@HYPERLINK(\"http://evil.com\")')).toBe('"\'@HYPERLINK(\"\"http://evil.com\"\")\"')
+      expect(escapeCsvField('\tcmd.exe')).toBe('"\'\tcmd.exe\"')
+    })
+
+    it('escapes internal quotes by doubling them per RFC 4180', () => {
+      expect(escapeCsvField('Belanja "Bulanan" Pasar')).toBe('"Belanja ""Bulanan"" Pasar"')
+    })
+
+    it('wraps ordinary strings and numbers in safe quotes', () => {
+      expect(escapeCsvField('Gaji Bulanan')).toBe('"Gaji Bulanan"')
+      expect(escapeCsvField(5000000)).toBe('"5000000"')
+    })
+
+    it('handles null and undefined safely', () => {
+      expect(escapeCsvField(null)).toBe('""')
+      expect(escapeCsvField(undefined)).toBe('""')
     })
   })
 })
