@@ -31,6 +31,11 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const { request } = event;
 
+  // Only handle http/https requests (ignore chrome-extension://, moz-extension://, etc.)
+  if (!request.url.startsWith('http://') && !request.url.startsWith('https://')) {
+    return;
+  }
+
   // Never cache Supabase API calls or non-GET requests
   if (
     request.method !== 'GET' ||

@@ -256,7 +256,7 @@ export function TransactionForm({ supabase, userId, initial, onDone }: Transacti
           value={desc}
           onChange={e => handleDescChange(e.target.value)}
           placeholder="Contoh: Makan siang atau Beli kopi"
-          className="focus-visible:ring-2 focus-visible:ring-green focus-visible:outline-none"
+          className="w-full h-11 px-3.5 py-2.5 rounded-xl border border-line bg-[#fcfcf8] text-sm text-ink focus-visible:ring-2 focus-visible:ring-green focus-visible:outline-none transition-all placeholder:text-muted/60"
         />
       </label>
 
@@ -272,7 +272,7 @@ export function TransactionForm({ supabase, userId, initial, onDone }: Transacti
             setFormError(null)
           }}
           placeholder="0"
-          className="focus-visible:ring-2 focus-visible:ring-green focus-visible:outline-none font-semibold font-mono"
+          className="w-full h-11 px-3.5 py-2.5 rounded-xl border border-line bg-[#fcfcf8] text-base text-ink focus-visible:ring-2 focus-visible:ring-green focus-visible:outline-none font-semibold font-mono transition-all placeholder:text-muted/60"
         />
       </label>
 
@@ -293,7 +293,7 @@ export function TransactionForm({ supabase, userId, initial, onDone }: Transacti
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-start">
         <label className="flex flex-col gap-1.5">
           <span className="text-xs font-bold text-ink">Kategori</span>
-          <select value={category} onChange={e => setCategory(e.target.value)}>
+          <select value={category} onChange={e => setCategory(e.target.value)} className="w-full h-11 px-3.5 py-2.5 rounded-xl border border-line bg-[#fcfcf8] text-sm text-ink focus-visible:ring-2 focus-visible:ring-green focus-visible:outline-none transition-all cursor-pointer">
             {categories.map(c => (
               <option key={c}>{c}</option>
             ))}
@@ -323,7 +323,7 @@ export function TransactionForm({ supabase, userId, initial, onDone }: Transacti
               </button>
             </div>
           </div>
-          <input type="date" required value={date} onChange={e => setDate(e.target.value)} />
+          <input type="date" required value={date} onChange={e => setDate(e.target.value)} className="w-full h-11 px-3.5 py-2.5 rounded-xl border border-line bg-[#fcfcf8] text-sm text-ink focus-visible:ring-2 focus-visible:ring-green focus-visible:outline-none transition-all" />
         </label>
       </div>
 
@@ -333,7 +333,7 @@ export function TransactionForm({ supabase, userId, initial, onDone }: Transacti
             <span>Metode Bayar</span>
             <span className="text-[11px] font-normal text-muted">(opsional)</span>
           </div>
-          <select value={paymentMethod} onChange={e => setPaymentMethod(e.target.value)}>
+          <select value={paymentMethod} onChange={e => setPaymentMethod(e.target.value)} className="w-full h-11 px-3.5 py-2.5 rounded-xl border border-line bg-[#fcfcf8] text-sm text-ink focus-visible:ring-2 focus-visible:ring-green focus-visible:outline-none transition-all cursor-pointer">
             {paymentMethods.map(p => (
               <option key={p.value} value={p.value}>{p.label}</option>
             ))}
@@ -344,7 +344,7 @@ export function TransactionForm({ supabase, userId, initial, onDone }: Transacti
             <span>Catatan</span>
             <span className="text-[11px] font-normal text-muted">(opsional)</span>
           </div>
-          <input value={note} onChange={e => setNote(e.target.value)} placeholder="Misal: Sarapan bareng tim" />
+          <input value={note} onChange={e => setNote(e.target.value)} placeholder="Misal: Sarapan bareng tim" className="w-full h-11 px-3.5 py-2.5 rounded-xl border border-line bg-[#fcfcf8] text-sm text-ink focus-visible:ring-2 focus-visible:ring-green focus-visible:outline-none transition-all placeholder:text-muted/60" />
         </label>
       </div>
 

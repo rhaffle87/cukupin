@@ -69,32 +69,30 @@
   .page-subtitle {
     color: var(--color-muted, #718078);
   }
-  :where(
-    input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not(
-        [type="button"]
-      ):not([type="submit"]):not([type="file"]):not([data-slot]),
-    select:not([data-slot]),
-    textarea:not([data-slot])
-  ) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not(
+      [type="button"]
+    ):not([type="submit"]):not([type="file"]):not([data-slot]),
+  select:not([data-slot]),
+  textarea:not([data-slot]) {
     width: 100%;
-    padding: 12px;
+    min-height: 42px;
+    padding: 10px 14px;
     border: 1px solid var(--line, #e8e7e0);
     background: #fcfcf8;
     color: var(--ink, #1e3249);
     border-radius: 10px;
     outline: none;
-    font-size: 13px;
+    font-size: 14px;
+    line-height: 1.5;
     transition:
       border 0.16s,
       box-shadow 0.16s;
   }
-  :where(
-    input:not([type="checkbox"]):not([type="radio"]):not([data-slot]):focus,
-    select:not([data-slot]):focus,
-    textarea:not([data-slot]):focus
-  ) {
-    border-color: var(--blue, #315dcb);
-    box-shadow: 0 0 0 3px rgba(49, 93, 203, 0.1);
+  input:not([type="checkbox"]):not([type="radio"]):not([data-slot]):focus,
+  select:not([data-slot]):focus,
+  textarea:not([data-slot]):focus {
+    border-color: var(--green, #3e8f68);
+    box-shadow: 0 0 0 3px rgba(62, 143, 104, 0.15);
   }
 }
 
@@ -838,6 +836,27 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+.transaction-form input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]),
+.transaction-form select,
+.transaction-form textarea {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 14px;
+  font-size: 14px;
+  line-height: 1.5;
+  border-radius: 12px;
+  border: 1px solid var(--line, #e8e7e0);
+  background: #fcfcf8;
+  color: var(--ink, #1e3249);
+  outline: none;
+  transition: border 0.16s ease, box-shadow 0.16s ease;
+}
+.transaction-form input:focus,
+.transaction-form select:focus,
+.transaction-form textarea:focus {
+  border-color: var(--green, #3e8f68);
+  box-shadow: 0 0 0 3px rgba(62, 143, 104, 0.15);
 }
 .transaction-form label,
 .report-filters label {

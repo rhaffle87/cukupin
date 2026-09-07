@@ -10,7 +10,7 @@ Cukupin dirancang menggunakan arsitektur modern berbasis **Next.js 16 (App Route
 
 ```mermaid
 flowchart TD
-    User["Pengguna / Peramban PWA"] -->|"HTTPS / WSS"| Edge["Next.js Edge Middleware"]
+    User["Pengguna / Peramban PWA"] -->|"HTTPS / WSS"| Edge["Next.js Edge Proxy (`proxy.ts`)"]
     Edge -->|"Route Protection & Auth Refresh"| SSR["Next.js 16 App Router"]
     SSR -->|"Client Components"| UI["Quiet Ledger Design System"]
 
@@ -43,7 +43,7 @@ Dikonfigurasi secara terpusat pada `next.config.mjs`:
 - **Referrer-Policy**: `strict-origin-when-cross-origin`.
 - **Information Leakage**: `poweredByHeader: false` menghapus header identifikasi Next.js.
 
-### 2.2. Edge Middleware Protection (`middleware.ts`)
+### 2.2. Edge Proxy Protection (`proxy.ts` - Next.js 16+ Convention)
 - Memvalidasi dan memperbarui sesi autentikasi Supabase secara transparan pada edge runtime sebelum rute halaman dirender.
 - Melindungi rute `/(protected)` (`/dashboard`, `/transactions`, `/reports`, `/goals`, `/wishlist`) dengan pengalihan otomatis ke `/auth/login` bagi pengguna tanpa sesi aktif.
 - Menyediakan bypass otomatis untuk pengujian dan lingkungan pengembangan offline (`localhost`).
