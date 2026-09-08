@@ -66,7 +66,7 @@ WHERE schemaname = 'public';
 SELECT tablename 
 FROM pg_publication_tables 
 WHERE pubname = 'supabase_realtime';
--- Expected output: transactions, saving_goals, recurring_bills, category_budgets
+-- Expected output: category_budgets, recurring_bills, saving_goals, transactions, wishlist
 ```
 
 ---

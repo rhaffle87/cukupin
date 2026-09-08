@@ -47,16 +47,12 @@ Dokumentasi audit keamanan, pemodelan ancaman (STRIDE), mitigasi OWASP Top 10, d
 - **CSV Formula Injection**:
   Jika pengguna mengekspor transaksi yang memiliki deskripsi diawali simbol eksekusi spreadsheet (`=`, `+`, `-`, `@`, `\t`, `\r`), fungsi `escapeCsvField` di [lib/finance.ts](file:///e:/Projects/cukupin-v0/lib/finance.ts) otomatis menyisipkan tanda petik tunggal (`'`) di awal teks agar aplikasi spreadsheet (Excel, Google Sheets, LibreOffice) memperlakukannya murni sebagai string teks dan mematikan eksekusi macro DDE.
   ```typescript
-  export function escapeCsvField(val: string | number | undefined | null): string {
-    let str = String(val ?? '');
-    // Sanitize CSV/Excel formula injection
-    if (/^[=+\-@\t\r]/.test(str)) {
-      str = "'" + str;
-    }
-    if (str.includes(',') || str.includes('"') || str.includes('\n')) {
-      return `"${str.replace(/"/g, '""')}"`;
-    }
-    return str;
+  export function escapeCsvField(val: string | number | null | undefined): string {
+    if (val === null || val === undefined) return '""';
+    const str = String(val);
+    const dangerousChars = ['=', '+', '-', '@', '\t', '\r'];
+    const sanitized = dangerousChars.includes(str.charAt(0)) ? `'${str}` : str;
+    return `"${sanitized.replace(/"/g, '""')}"`;
   }
   ```
 

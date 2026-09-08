@@ -120,9 +120,8 @@ Hal ini mengurangi *First Contentful Paint (FCP)* dan *Total Blocking Time (TBT)
 ## 6. Indeks Dokumentasi Sistem Lengkap
 
 Untuk panduan mendalam lainnya, silakan merujuk ke pustaka dokumentasi resmi di folder `docs/`:
-
-- ?? [**DATABASE_SCHEMA.md**](./DATABASE_SCHEMA.md) � Diagram ERD, spesifikasi tabel, RLS, indeks performa, & publikasi realtime.
-- ?? [**SECURITY_AUDIT.md**](./SECURITY_AUDIT.md) � Pemodelan ancaman (STRIDE), mitigasi OWASP Top 10, CSP, & kepatuhan UU PDP.
-- ?? [**API_AND_DATA_FLOW.md**](./API_AND_DATA_FLOW.md) � Arsitektur alur data, antrean offline-first, backup payload v2.0, & pipeline CSV.
-- ??? [**DEVELOPER_GUIDE.md**](./DEVELOPER_GUIDE.md) � Panduan onboarding developer, setup lokal tanpa Supabase, TDD Vitest, & konvensi kode.
+- 🗄️ [**DATABASE_SCHEMA.md**](./DATABASE_SCHEMA.md) — Diagram ERD, spesifikasi tabel, RLS, indeks performa, & publikasi realtime.
+- 🔒 [**SECURITY_AUDIT.md**](./SECURITY_AUDIT.md) — Pemodelan ancaman (STRIDE), mitigasi OWASP Top 10, CSP, & kepatuhan UU PDP.
+- 🔄 [**API_AND_DATA_FLOW.md**](./API_AND_DATA_FLOW.md) — Arsitektur alur data, antrean offline-first, backup payload v2.0, & pipeline CSV.
+- 🛠️ [**DEVELOPER_GUIDE.md**](./DEVELOPER_GUIDE.md) — Panduan onboarding developer, setup lokal tanpa Supabase, TDD Vitest, & konvensi kode.
 - 🚀 [**SUPABASE_DEPLOYMENT.md**](./SUPABASE_DEPLOYMENT.md) — Panduan migrasi database 1-klik, penyelesaian preview branching, dan konfigurasi produksi.
