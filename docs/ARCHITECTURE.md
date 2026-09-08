@@ -117,11 +117,95 @@ Hal ini mengurangi *First Contentful Paint (FCP)* dan *Total Blocking Time (TBT)
 
 ---
 
-## 6. Indeks Dokumentasi Sistem Lengkap
+## 6. Sistem Keamanan Layar & Kriptografi Biometrik / PIN (`lib/security/`)
+
+Untuk melindungi privasi keuangan pengguna saat PWA dibuka di perangkat bersama (*shared mobile/desktop devices*), Cukupin™ mengimplementasikan lapisan keamanan layar lokal:
+
+```mermaid
+flowchart TD
+    AppMount["AppShell / Protected Layout"] --> InitContext["ScreenLockContext"]
+    InitContext --> CheckConfig{"PIN / Biometrik Aktif?"}
+    CheckConfig -- Tidak --> Unlocked["Layar Terbuka (Normal)"]
+    CheckConfig -- Ya --> CheckSession{"Sesi Masih Aktif?<br/>(Within Auto-Lock Window)"}
+    CheckSession -- Ya --> MonitorIdle["Pasang Idle Listener (5-60 Menit)"]
+    CheckSession -- Tidak --> Lock["Kunci Layar (ScreenLockOverlay)"]
+
+    Lock --> UserOption{"Pilihan Buka Kunci"}
+    UserOption -- "WebAuthn Biometrik" --> PlatformAuth["navigator.credentials.get()"]
+    PlatformAuth -- Sukses --> UnlockScreen["Unlock Sesi & Reset Idle Timer"]
+    PlatformAuth -- Gagal / Dibatalkan --> UserOption
+
+    UserOption -- "Input 6-Digit PIN" --> HashInput["SHA-256(PIN + Salt) via Web Crypto"]
+    HashInput --> VerifyHash{"Cocok dengan Stored Hash?"}
+    VerifyHash -- Ya --> UnlockScreen
+    VerifyHash -- Salah --> ShakeFeedback["Animasi Shake & Toast Error"]
+```
+
+### 6.1. Kriptografi Salted SHA-256 (Web Crypto API)
+- Menggunakan `window.crypto.subtle` bawaan browser standar W3C.
+- Setiap pembuatan/perubahan PIN menghasilkan **salt unik acak 16-byte** (`crypto.getRandomValues(new Uint8Array(16))`).
+- Salt digabungkan dengan PIN numerik 6 digit sebelum di-hash menggunakan algoritma SHA-256.
+- Hash dan salt disimpan secara lokal (`cukupin_screen_lock_hash`, `cukupin_screen_lock_salt`). PIN mentah (plaintext) **tidak pernah disimpan** di disk maupun memori jangka panjang.
+
+### 6.2. Integrasi WebAuthn (Touch ID, Face ID, Windows Hello)
+- Memanfaatkan platform authenticator bawaan (`PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()`).
+- Jika perangkat mendukung biometrik dan pengguna mengaktifkannya, verifikasi biometrik dapat dipicu dengan satu klik tanpa memasukkan 6 digit PIN.
+- PIN 6 digit selalu menjadi opsi pemulihan utama (*fallback*) jika otentikasi biometrik gagal atau dibatalkan.
+
+### 6.3. Manajemen Auto-Lock & Idle Timeout
+- Pengguna dapat memilih interval auto-lock: Segera (`immediately`), 5 menit, 15 menit, 30 menit, atau 60 menit.
+- Aktivitas pengguna dipantau melalui interaksi DOM (`mousemove`, `mousedown`, `keydown`, `touchstart`, `scroll`) yang memperbarui timestamp `cukupin_screen_lock_last_active`.
+
+---
+
+## 7. Arsitektur Automasi Tagihan Rutin (Dual-Layer Worker)
+
+Untuk memastikan tagihan rutin tercatat tepat waktu setiap tanggal jatuh tempo tanpa membebani server atau membutuhkan aplikasi terus terbuka di latar belakang:
+
+```mermaid
+flowchart LR
+    subgraph ServerLayer ["Server Cron Layer (Vercel Cron)"]
+        CronSchedule["Vercel Cron (00:00 UTC / 07:00 WIB)"] --> CronRoute["/api/cron/recurring-bills"]
+        CronRoute --> VerifyBearer{"Bearer CRON_SECRET?"}
+        VerifyBearer -- Valid --> ProcessDueServer["Pindai Semua Tagihan Jatuh Tempo"]
+        ProcessDueServer --> InsertTxServer["Catat ke `transactions` & `saving_goals`"]
+        ProcessDueServer --> UpdateMonthServer["Perbarui `last_logged_month`"]
+    end
+
+    subgraph ClientLayer ["Client Bootstrap Layer (PWA / Browser)"]
+        AppOpen["Pengguna Membuka Aplikasi"] --> Hook["useAutoRecurringBills"]
+        Hook --> Worker["lib/recurringBillsWorker.ts"]
+        Worker --> FilterDueClient{"Ada Tagihan Jatuh Tempo Bulan Ini<br/>(due_day <= currentDay)?"}
+        FilterDueClient -- Ya --> LogTxClient["logRecurringBillAsTransaction()"]
+        FilterDueClient -- Tidak --> Idle["Selesai (No-Op)"]
+    end
+```
+
+### 7.1. Deduping & Idempotency
+- Menggunakan kolom `last_logged_month` (format `YYYY-MM`) pada tabel `recurring_bills`.
+- Tagihan yang sudah tercatat pada bulan berjalan **tidak akan pernah dicatat ulang**, baik oleh Server Cron maupun Client Worker.
+
+### 7.2. Bridging Otomatis ke Target Tabungan (`saving_goals`)
+- Jika tagihan memiliki kategori `'Tabungan'` atau `'Investasi'`, sistem secara cerdas mencari target tabungan yang masih aktif dengan nama yang cocok (atau target tabungan aktif pertama).
+- Mutasi pengeluaran dicatat ke `transactions`, dan saldo `current_amount` pada target tabungan tersebut otomatis bertambah secara atomik.
+
+---
+
+## 8. UX PWA & Pengendali Frekuensi Banner Install
+
+Untuk mencegah gangguan navigasi saat berpindah-pindah halaman, banner instalasi PWA diatur dengan jeda frekuensi 7 hari:
+- **Immediate Timestamp Recording**: Saat banner ditampilkan pertama kali, timestamp `cukupin_install_prompt_last_shown_at` langsung dicatat ke `localStorage`.
+- **7-Day Cooldown Window**: Banner ditekan dan tidak akan muncul kembali selama minimal 7 hari (168 jam) sejak terakhir kali tampil atau ditolak.
+- **Deteksi Mode Terpasang**: Jika aplikasi sudah berjalan dalam mode standalone PWA (`window.matchMedia('(display-mode: standalone)').matches`), banner secara permanen dinonaktifkan.
+
+---
+
+## 9. Indeks Dokumentasi Sistem Lengkap
 
 Untuk panduan mendalam lainnya, silakan merujuk ke pustaka dokumentasi resmi di folder `docs/`:
-- 🗄️ [**DATABASE_SCHEMA.md**](./DATABASE_SCHEMA.md) — Diagram ERD, spesifikasi tabel, RLS, indeks performa, & publikasi realtime.
-- 🔒 [**SECURITY_AUDIT.md**](./SECURITY_AUDIT.md) — Pemodelan ancaman (STRIDE), mitigasi OWASP Top 10, CSP, & kepatuhan UU PDP.
-- 🔄 [**API_AND_DATA_FLOW.md**](./API_AND_DATA_FLOW.md) — Arsitektur alur data, antrean offline-first, backup payload v2.0, & pipeline CSV.
-- 🛠️ [**DEVELOPER_GUIDE.md**](./DEVELOPER_GUIDE.md) — Panduan onboarding developer, setup lokal tanpa Supabase, TDD Vitest, & konvensi kode.
-- 🚀 [**SUPABASE_DEPLOYMENT.md**](./SUPABASE_DEPLOYMENT.md) — Panduan migrasi database 1-klik, penyelesaian preview branching, dan konfigurasi produksi.
+- [**DATABASE_SCHEMA.md**](./DATABASE_SCHEMA.md) — Diagram ERD, spesifikasi tabel, RLS, indeks performa, & publikasi realtime.
+- [**SECURITY_AUDIT.md**](./SECURITY_AUDIT.md) — Pemodelan ancaman (STRIDE), mitigasi OWASP Top 10, CSP, & kepatuhan UU PDP.
+- [**API_AND_DATA_FLOW.md**](./API_AND_DATA_FLOW.md) — Arsitektur alur data, antrean offline-first, backup payload v2.0, & pipeline CSV.
+- [**DEVELOPER_GUIDE.md**](./DEVELOPER_GUIDE.md) — Panduan onboarding developer, setup lokal tanpa Supabase, TDD Vitest, & konvensi kode.
+- [**SUPABASE_DEPLOYMENT.md**](./SUPABASE_DEPLOYMENT.md) — Panduan migrasi database 1-klik, penyelesaian preview branching, dan konfigurasi produksi.
+

@@ -7,6 +7,7 @@ import { AppShell } from '@/components/layout/AppShell'
 import { Brand } from '@/components/ui/Brand'
 
 import { FinanceProvider } from '@/context/FinanceContext'
+import { ScreenLockProvider } from '@/context/ScreenLockContext'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
@@ -95,27 +96,29 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <FinanceProvider supabase={supabase} user={user}>
-      <AppShell
-        user={user}
-        onSignOut={async () => {
-          if (typeof window !== 'undefined') {
-            localStorage.removeItem('cukupin_offline_queue')
-            if (user?.id === 'local-dev-user') {
-              localStorage.setItem('cukupin_dev_logged_out', 'true')
+      <ScreenLockProvider>
+        <AppShell
+          user={user}
+          onSignOut={async () => {
+            if (typeof window !== 'undefined') {
+              localStorage.removeItem('cukupin_offline_queue')
+              if (user?.id === 'local-dev-user') {
+                localStorage.setItem('cukupin_dev_logged_out', 'true')
+              }
             }
-          }
-          if (user?.id === 'local-dev-user') {
+            if (user?.id === 'local-dev-user') {
+              setUser(null)
+              router.push('/auth/login')
+              return
+            }
+            await supabase?.auth.signOut()
             setUser(null)
             router.push('/auth/login')
-            return
-          }
-          await supabase?.auth.signOut()
-          setUser(null)
-          router.push('/auth/login')
-        }}
-      >
-        {children}
-      </AppShell>
+          }}
+        >
+          {children}
+        </AppShell>
+      </ScreenLockProvider>
     </FinanceProvider>
   )
 }

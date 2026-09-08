@@ -42,6 +42,7 @@ Aplikasi akan aktif di `http://localhost:3000`.
 cukupin-v0/
 ├── app/                        # Next.js 16 App Router (Rute & Halaman)
 │   ├── (protected)/            # Rute terproteksi sesi (Dashboard, Transaksi, Laporan, Goals, Wishlist)
+│   ├── api/cron/               # Endpoint cron terjadwal (Otomatisasi Tagihan Rutin)
 │   ├── auth/login/             # Halaman autentikasi (Magic Link & Kata Sandi)
 │   ├── legal/                  # Halaman kepatuhan (Syarat Ketentuan & Privasi)
 │   ├── error.tsx               # Client Error Boundary global
@@ -53,23 +54,27 @@ cukupin-v0/
 │   ├── auth/                   # Layar login & register dengan fallback guest dev
 │   ├── finance/                # Modul inti finansial (Form, Tabel, Grafik, Dialog, Laporan)
 │   ├── layout/                 # Shell navigasi desktop & mobile bottom bar
-│   ├── pwa/                    # Pendaftaran Service Worker & prompt instalasi
+│   ├── pwa/                    # Pendaftaran Service Worker & prompt instalasi 7-day cooldown
+│   ├── security/               # Layar kunci PIN 6 digit (Overlay) & modal konfigurasi biometrik
 │   ├── seo/                    # Structured data Schema.org JSON-LD
 │   └── ui/                     # Primitives UI (Modal, Brand, Eyebrow, StatCard, CookieConsent)
-├── context/                    # React Context Global (FinanceContext)
+├── context/                    # React Context Global (FinanceContext, ScreenLockContext)
 ├── docs/                       # Dokumentasi Arsitektur, Basis Data, Keamanan, & Panduan Dev
-├── hooks/                      # Custom Hooks (useFinanceData - Single Source of Truth)
+├── hooks/                      # Custom Hooks (useFinanceData, useAutoRecurringBills)
 ├── lib/                        # Utilitas Logika Bisnis & Infrastruktur Data
 │   ├── analytics.ts            # Perekam event kustom terproteksi
 │   ├── backup.ts               # Mesin cadangan & pemulihan JSON v2.0 divalidasi Zod
 │   ├── database.types.ts       # Definisi tipe TypeScript skema Supabase
 │   ├── finance.ts              # Kalkulasi matematika 50/30/20, saldo, & sanitasi CSV
 │   ├── offlineQueue.ts         # Antrean sinkronisasi aksi offline (Offline-First)
+│   ├── recurringBillsWorker.ts # Evaluasi dan eksekusi batch otomatisasi tagihan jatuh tempo
+│   ├── security/               # SHA-256 + salt PIN hashing & WebAuthn biometrik
 │   ├── constants/              # Konstanta kunci storage, metadata, & navigasi
 │   └── validations/            # Skema validasi Zod untuk form & data entry
 ├── public/                     # Aset statis, ikon PWA, dan Service Worker (sw.js)
 ├── supabase/                   # Konfigurasi CLI & skrip migrasi PostgreSQL SQL
 ├── tests/                      # Suite pengujian otomatis Vitest & Playwright
+├── vercel.json                 # Konfigurasi Vercel Daily Cron (/api/cron/recurring-bills)
 ├── proxy.ts                    # Next.js 16 Edge Reverse Proxy & Session Refresher
 └── next.config.mjs             # Konfigurasi Next.js, Security Headers, & CSP
 ```
@@ -102,7 +107,7 @@ Cukupin™ menggunakan filosofi desain **Quiet Ledger** (buku besar finansial ya
 Sebelum melakukan commit atau pull request, selalu jalankan segitiga validasi kualitas:
 
 ```bash
-# 1. Jalankan pengujian unit otomatis (80 tests across 8 suites)
+# 1. Jalankan pengujian unit otomatis (113 tests across 11 suites)
 npm test
 
 # 2. Periksa kesesuaian tipe TypeScript (harus 0 error)
@@ -117,7 +122,10 @@ npm run test:e2e
 
 ### Cakupan Pengujian di `tests/`
 Pengujian unit dan komponen menggunakan **Vitest** dengan konfigurasi di `vitest.config.mts`:
-- `tests/finance.test.ts`: 24 tests kalkulasi keuangan (totals, 50/30/20, daily safe spend, CSV sanitasi).
+- `tests/security.test.ts`: 16 tests kriptografi (salt, SHA-256 PIN hashing, WebAuthn, auto-lock timeout).
+- `tests/recurringWorker.test.ts`: 8 tests evaluasi tanggal jatuh tempo & eksekusi batch otomatisasi tagihan.
+- `tests/installPrompt.test.ts`: 6 tests pembatasan frekuensi instalasi mingguan (7-day cooldown gate).
+- `tests/finance.test.ts`: 27 tests kalkulasi keuangan (totals, 50/30/20, daily safe spend, pace target tabungan, CSV sanitasi).
 - `tests/validations.test.ts`: 19 tests skema Zod (transaksi, target tabungan, wishlist, tagihan, budget).
 - `tests/offlineQueue.test.ts`: 5 tests antrean sinkronisasi offline.
 - `tests/backup.test.ts`: 6 tests generator & validator berkas cadangan JSON v2.0.
@@ -126,6 +134,7 @@ Pengujian unit dan komponen menggunakan **Vitest** dengan konfigurasi di `vitest
 - `tests/flows/guestModeAndStorage.test.ts`: 5 tests flow mode lokal tamu & ketahanan storage.
 - `tests/flows/dataLifecycle.test.ts`: 3 tests alur cadangkan & pulihkan data.
 - `tests/e2e/test_user_flows.py`: 6 user journeys Playwright (Desktop & Mobile).
+- `tests/e2e/test_security_and_recurring.py`: Regression Playwright untuk alur kunci PIN & visual verification.
 
 ---
 

@@ -3,7 +3,7 @@
 import React, { useMemo, useState, useRef } from 'react'
 import type { SavingGoal, Transaction } from '@/lib/database.types'
 import { currency, escapeCsvField, shortCurrency } from '@/lib/finance'
-import { Download, FileSpreadsheet, X } from 'lucide-react'
+import { Download, FileSpreadsheet, Sparkles, X } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface MonthlyExpenseTemplateProps {
@@ -233,9 +233,9 @@ export function MonthlyExpenseTemplate({
       <div className="mb-6 text-center">
         <div className="flex items-center justify-center gap-2 text-[12px] font-semibold tracking-widest text-[#4B5563] uppercase">
           <span>MONTH OF</span>
-          <span className="text-[#1E3249]">✦</span>
+          <Sparkles className="w-3.5 h-3.5 text-[#1E3249] shrink-0" />
           <span className="font-bold text-[#111827]">{monthName} {yearName}</span>
-          <span className="text-[#1E3249]">✦</span>
+          <Sparkles className="w-3.5 h-3.5 text-[#1E3249] shrink-0" />
         </div>
         <h1 className="mt-1 font-display text-2xl md:text-3xl font-extrabold tracking-wider text-[#111827] uppercase">
           MONTHLY EXPENSE TRACKER

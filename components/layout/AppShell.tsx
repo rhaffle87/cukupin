@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import { Brand } from '@/components/ui/Brand'
-import { Bell, FileText, Home as HomeIcon, LogOut, Menu, Plus, Receipt, ShoppingBag, Sparkles, Target, WifiOff, X } from 'lucide-react'
+import { Bell, FileText, Home as HomeIcon, Lock, LogOut, Menu, Plus, Receipt, ShieldCheck, ShoppingBag, Sparkles, Target, WifiOff, X } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { DailyReminderModal } from '@/components/finance/DailyReminderModal'
 import { InstallPrompt } from '@/components/pwa/InstallPrompt'
+import { ScreenLockOverlay } from '@/components/security/ScreenLockOverlay'
+import { SecuritySettingsModal } from '@/components/security/SecuritySettingsModal'
+import { useScreenLock } from '@/context/ScreenLockContext'
+import { useAutoRecurringBills } from '@/hooks/useAutoRecurringBills'
 import { syncOfflineQueue } from '@/lib/offlineQueue'
 import { useFinance } from '@/context/FinanceContext'
 import { toast } from 'sonner'
@@ -26,10 +30,19 @@ const navItems = [
 export function AppShell({ children, user, onSignOut }: AppShellProps) {
   const [open, setOpen] = useState(false)
   const [showReminderModal, setShowReminderModal] = useState(false)
+  const [showSecurityModal, setShowSecurityModal] = useState(false)
   const [isOffline, setIsOffline] = useState(false)
   const pathname = usePathname()
   const router = useRouter()
-  const { supabase, refresh } = useFinance()
+  const { supabase, refresh, bills, logRecurringBillAsTransaction, loading } = useFinance()
+  const { isConfigured, lockScreen } = useScreenLock()
+
+  // Bootstrap automated background worker for recurring bills
+  useAutoRecurringBills({
+    bills,
+    logRecurringBillAsTransaction,
+    loading,
+  })
 
   const handleOpenNewTx = () => {
     if (pathname === '/transactions') {
@@ -159,6 +172,24 @@ export function AppShell({ children, user, onSignOut }: AppShellProps) {
           </div>
           <button 
             className="mb-1 flex w-full items-center justify-start md:justify-center lg:justify-start gap-2.5 rounded-xl p-2.5 lg:px-3 lg:py-2 text-xs font-semibold text-muted transition-colors hover:bg-black/5 hover:text-ink cursor-pointer" 
+            onClick={() => setShowSecurityModal(true)}
+            title="Keamanan PIN & Biometrik"
+          >
+            <ShieldCheck size={16} className="text-emerald-600 shrink-0" />
+            <span className="inline md:hidden lg:inline">Kunci PIN &amp; Biometrik</span>
+          </button>
+          {isConfigured && (
+            <button 
+              className="mb-1 flex w-full items-center justify-start md:justify-center lg:justify-start gap-2.5 rounded-xl p-2.5 lg:px-3 lg:py-2 text-xs font-semibold text-muted transition-colors hover:bg-black/5 hover:text-ink cursor-pointer" 
+              onClick={lockScreen}
+              title="Kunci Layar Sekarang"
+            >
+              <Lock size={16} className="text-ink shrink-0" />
+              <span className="inline md:hidden lg:inline">Kunci Layar</span>
+            </button>
+          )}
+          <button 
+            className="mb-1 flex w-full items-center justify-start md:justify-center lg:justify-start gap-2.5 rounded-xl p-2.5 lg:px-3 lg:py-2 text-xs font-semibold text-muted transition-colors hover:bg-black/5 hover:text-ink cursor-pointer" 
             onClick={() => setShowReminderModal(true)}
             title="Pengingat Harian"
           >
@@ -196,14 +227,26 @@ export function AppShell({ children, user, onSignOut }: AppShellProps) {
               </span>
             )}
           </div>
-          <button 
-            className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl bg-ink !text-white shadow-xs transition-transform active:scale-95 cursor-pointer" 
-            onClick={handleOpenNewTx}
-            aria-label="Tambah catatan baru"
-            title="Tambah catatan baru"
-          >
-            <Plus size={20} />
-          </button>
+          <div className="flex items-center gap-2">
+            {isConfigured && (
+              <button 
+                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border border-line bg-card text-ink shadow-2xs transition-transform active:scale-95 cursor-pointer hover:bg-black/5" 
+                onClick={lockScreen}
+                aria-label="Kunci Layar Sekarang"
+                title="Kunci Layar Sekarang"
+              >
+                <Lock size={18} />
+              </button>
+            )}
+            <button 
+              className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl bg-ink !text-white shadow-xs transition-transform active:scale-95 cursor-pointer" 
+              onClick={handleOpenNewTx}
+              aria-label="Tambah catatan baru"
+              title="Tambah catatan baru"
+            >
+              <Plus size={20} />
+            </button>
+          </div>
         </header>
         
         <main className="flex-1 overflow-y-auto p-3.5 sm:p-4 md:p-5 lg:p-8 bg-paper">
@@ -246,6 +289,15 @@ export function AppShell({ children, user, onSignOut }: AppShellProps) {
       {showReminderModal && (
         <DailyReminderModal onClose={() => setShowReminderModal(false)} />
       )}
+
+      {showSecurityModal && (
+        <SecuritySettingsModal
+          isOpen={showSecurityModal}
+          onClose={() => setShowSecurityModal(false)}
+        />
+      )}
+
+      <ScreenLockOverlay />
 
       <InstallPrompt />
     </div>

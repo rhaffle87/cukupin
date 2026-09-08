@@ -1,35 +1,122 @@
 'use client'
 
+/**
+ * PWA Install Prompt Banner
+ *
+ * Prompts eligible mobile/desktop users to install Cukupin as a standalone PWA.
+ *
+ * Frequency Constraint:
+ * - Pops up AT MOST 1 time every week (7-day cooldown enforced via localStorage).
+ * - Immediately records display timestamp upon appearance so page transitions do NOT re-trigger it.
+ * - Suppressed permanently if installed or running in standalone mode.
+ *
+ * Note: Strictly NO raw unicode emojis.
+ */
+
 import { useEffect, useState } from 'react'
 import { Download, X, Share2, Smartphone } from 'lucide-react'
 
-const DISMISS_KEY = 'cukupin_install_prompt_dismissed_at'
-const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000
+export const INSTALL_PROMPT_LAST_SHOWN_KEY = 'cukupin_install_prompt_last_shown_at'
+export const INSTALL_PROMPT_DISMISS_KEY = 'cukupin_install_prompt_dismissed_at'
+export const INSTALL_PROMPT_INSTALLED_KEY = 'cukupin_pwa_installed'
+export const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000
+
+/**
+ * Safely detect if running as an installed standalone PWA across browsers/environments
+ */
+export function checkIsRunningStandalone(): boolean {
+  if (typeof window === 'undefined') return false
+  try {
+    const mediaMatches =
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(display-mode: standalone)')?.matches
+
+    const navStandalone =
+      (window.navigator as unknown as { standalone?: boolean })?.standalone === true
+
+    const isAndroidApp =
+      typeof document !== 'undefined' &&
+      Boolean(document.referrer?.includes('android-app://'))
+
+    return Boolean(mediaMatches || navStandalone || isAndroidApp)
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Evaluates whether the install prompt is eligible to pop up.
+ * Returns true only if at least 7 days have elapsed since it was last shown or dismissed.
+ */
+export function shouldShowInstallPrompt(): boolean {
+  if (typeof window === 'undefined') return false
+
+  // 1. Check if running as installed standalone PWA
+  if (checkIsRunningStandalone()) return false
+
+  // 2. Check if already marked as installed
+  if (localStorage.getItem(INSTALL_PROMPT_INSTALLED_KEY) === 'true') {
+    return false
+  }
+
+  // 3. Enforce 7-day cooldown from either last shown or last dismissed
+  const lastShownStr = localStorage.getItem(INSTALL_PROMPT_LAST_SHOWN_KEY)
+  const dismissedStr = localStorage.getItem(INSTALL_PROMPT_DISMISS_KEY)
+
+  const lastShownAt = lastShownStr ? parseInt(lastShownStr, 10) : 0
+  const dismissedAt = dismissedStr ? parseInt(dismissedStr, 10) : 0
+  const mostRecentTimestamp = Math.max(lastShownAt, dismissedAt)
+
+  if (mostRecentTimestamp > 0 && Date.now() - mostRecentTimestamp < SEVEN_DAYS_MS) {
+    return false
+  }
+
+  return true
+}
+
+/**
+ * Record that the install prompt has been presented to the user
+ */
+export function recordInstallPromptShown(): void {
+  if (typeof window === 'undefined') return
+  localStorage.setItem(INSTALL_PROMPT_LAST_SHOWN_KEY, Date.now().toString())
+}
+
+/**
+ * Record that the install prompt was dismissed by the user
+ */
+export function recordInstallPromptDismissed(): void {
+  if (typeof window === 'undefined') return
+  const nowStr = Date.now().toString()
+  localStorage.setItem(INSTALL_PROMPT_LAST_SHOWN_KEY, nowStr)
+  localStorage.setItem(INSTALL_PROMPT_DISMISS_KEY, nowStr)
+}
+
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>
+}
 
 export function InstallPrompt() {
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [isIOS, setIsIOS] = useState(false)
   const [isStandalone, setIsStandalone] = useState(false)
   const [visible, setVisible] = useState(false)
   const [showIOSGuide, setShowIOSGuide] = useState(false)
 
   useEffect(() => {
-    // Check if running as installed standalone PWA
-    const isRunningStandalone =
-      window.matchMedia('(display-mode: standalone)').matches ||
-      (window.navigator as any).standalone === true ||
-      document.referrer.includes('android-app://')
+    if (typeof window === 'undefined') return
 
-    setIsStandalone(isRunningStandalone)
-    if (isRunningStandalone) return
-
-    // Check if previously dismissed within 7 days
-    const dismissedAt = localStorage.getItem(DISMISS_KEY)
-    if (dismissedAt && Date.now() - parseInt(dismissedAt, 10) < SEVEN_DAYS_MS) {
+    // Quick initial check for 7-day frequency gate
+    if (!shouldShowInstallPrompt()) {
       return
     }
 
-    // Detect iOS
+    const runningStandalone = checkIsRunningStandalone()
+    setIsStandalone(runningStandalone)
+    if (runningStandalone) return
+
+    // Detect iOS Safari
     const ua = window.navigator.userAgent.toLowerCase()
     const isAppleDevice = /iphone|ipad|ipod/.test(ua)
     const isSafari = ua.includes('safari') && !ua.includes('chrome') && !ua.includes('crios')
@@ -37,15 +124,24 @@ export function InstallPrompt() {
     if (isAppleDevice && isSafari) {
       setIsIOS(true)
       // Slight delay so user sees dashboard first
-      const timer = setTimeout(() => setVisible(true), 3000)
+      const timer = setTimeout(() => {
+        if (shouldShowInstallPrompt()) {
+          setVisible(true)
+          recordInstallPromptShown()
+        }
+      }, 3000)
       return () => clearTimeout(timer)
     }
 
     // Android / Chromium beforeinstallprompt handler
     const handler = (e: Event) => {
       e.preventDefault()
-      setDeferredPrompt(e)
-      setVisible(true)
+      setDeferredPrompt(e as BeforeInstallPromptEvent)
+
+      if (shouldShowInstallPrompt()) {
+        setVisible(true)
+        recordInstallPromptShown()
+      }
     }
 
     window.addEventListener('beforeinstallprompt', handler)
@@ -54,7 +150,7 @@ export function InstallPrompt() {
 
   const dismiss = () => {
     setVisible(false)
-    localStorage.setItem(DISMISS_KEY, Date.now().toString())
+    recordInstallPromptDismissed()
   }
 
   const handleInstallClick = async () => {
@@ -64,10 +160,13 @@ export function InstallPrompt() {
     }
 
     if (!deferredPrompt) return
-    deferredPrompt.prompt()
+    await deferredPrompt.prompt()
     const { outcome } = await deferredPrompt.userChoice
     if (outcome === 'accepted') {
       setVisible(false)
+      localStorage.setItem(INSTALL_PROMPT_INSTALLED_KEY, 'true')
+    } else {
+      dismiss()
     }
     setDeferredPrompt(null)
   }
@@ -83,7 +182,7 @@ export function InstallPrompt() {
         <button
           onClick={dismiss}
           aria-label="Tutup promo pemasangan"
-          className="absolute top-3 right-3 text-stone-400 hover:text-stone-700 p-1 rounded-full transition-colors"
+          className="absolute top-3 right-3 text-stone-400 hover:text-stone-700 p-1 rounded-full transition-colors cursor-pointer"
         >
           <X className="w-4 h-4" />
         </button>
@@ -120,14 +219,14 @@ export function InstallPrompt() {
             <div className="mt-3 flex items-center gap-2">
               <button
                 onClick={handleInstallClick}
-                className="px-3.5 py-1.5 bg-[#1E3249] hover:bg-[#152333] text-white text-xs font-semibold rounded-lg shadow-sm transition-colors flex items-center gap-1.5"
+                className="px-3.5 py-1.5 bg-[#1E3249] hover:bg-[#152333] text-white text-xs font-semibold rounded-lg shadow-sm transition-colors flex items-center gap-1.5 cursor-pointer"
               >
                 <Download className="w-3.5 h-3.5" />
                 {isIOS ? (showIOSGuide ? 'Mengerti' : 'Cara Pasang') : 'Pasang Sekarang'}
               </button>
               <button
                 onClick={dismiss}
-                className="px-2.5 py-1.5 text-xs text-stone-500 hover:text-stone-800 transition-colors"
+                className="px-2.5 py-1.5 text-xs text-stone-500 hover:text-stone-800 transition-colors cursor-pointer"
               >
                 Nanti saja
               </button>

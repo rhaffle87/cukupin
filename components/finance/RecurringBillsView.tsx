@@ -6,6 +6,7 @@ import { SupabaseClient } from '@supabase/supabase-js'
 import {
   AlertTriangle,
   Calendar,
+  CalendarClock,
   Check,
   CheckCircle2,
   Clock,
@@ -19,11 +20,18 @@ import {
   Target,
   Trash2,
   X,
+  Zap,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { currency } from '@/lib/finance'
 import { formatRupiahInput, sanitizeNumericInput } from '@/lib/validations/finance'
 import { Modal } from '@/components/ui/Modal'
+import {
+  isAutoRecurringLoggingEnabled,
+  setAutoRecurringLoggingEnabled,
+  getDueBillsToAutoLog,
+  executeBatchAutoLog,
+} from '@/lib/recurringBillsWorker'
 
 interface RecurringBillsViewProps {
   supabase: SupabaseClient | null
@@ -82,8 +90,32 @@ export function RecurringBillsView({
   const [dueDay, setDueDay] = useState(15)
   const [paymentMethod, setPaymentMethod] = useState('Transfer Bank')
 
+  const [autoEnabled, setAutoEnabled] = useState(() => isAutoRecurringLoggingEnabled())
+  const [isAutoProcessing, setIsAutoProcessing] = useState(false)
+
   const currentMonthStr = new Date().toISOString().slice(0, 7) // '2026-09'
   const currentDay = new Date().getDate()
+
+  // Automated recurring bills filtering
+  const dueBillsToAutoLog = getDueBillsToAutoLog(bills, currentDay, currentMonthStr)
+
+  const handleProcessDueNow = async () => {
+    if (dueBillsToAutoLog.length === 0 || isAutoProcessing) return
+    setIsAutoProcessing(true)
+    try {
+      const result = await executeBatchAutoLog(
+        dueBillsToAutoLog,
+        logRecurringBillAsTransaction
+      )
+      if (result.loggedCount > 0) {
+        toast.success(
+          `${result.loggedCount} tagihan jatuh tempo berhasil dicatat ke transaksi!`
+        )
+      }
+    } finally {
+      setIsAutoProcessing(false)
+    }
+  }
 
   // Metrics
   const totalMonthlyCommitment = bills
@@ -312,6 +344,69 @@ export function RecurringBillsView({
           <div className="mt-0.5 text-xs text-muted">
             {currency(pendingAmount)} menunggu pencatatan
           </div>
+        </div>
+      </div>
+
+      {/* Automated Recurring Bill Logging Control Card */}
+      <div className="rounded-2xl border border-line bg-card p-4 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-start sm:items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-emerald-100/80 border border-emerald-200 text-emerald-800 flex items-center justify-center shrink-0">
+            <CalendarClock className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h4 className="text-xs sm:text-sm font-bold text-ink">
+                Otomatisasi Tagihan Jatuh Tempo
+              </h4>
+              <span
+                className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                  autoEnabled
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    : 'bg-gray-100 text-muted border-gray-200'
+                }`}
+              >
+                {autoEnabled ? 'Aktif' : 'Nonaktif'}
+              </span>
+            </div>
+            <p className="text-xs text-muted mt-0.5 max-w-xl">
+              {autoEnabled
+                ? 'Tagihan aktif otomatis dicatat ke transaksi dan dialokasikan ke target tabungan saat tanggal jatuh tempo tiba di latar belakang.'
+                : 'Pencatatan otomatis dinonaktifkan. Tagihan harus dicatat secara manual.'}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 self-end sm:self-center">
+          {dueBillsToAutoLog.length > 0 && (
+            <button
+              type="button"
+              disabled={isAutoProcessing}
+              onClick={handleProcessDueNow}
+              className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all active:scale-95 cursor-pointer"
+            >
+              <Zap className="w-3.5 h-3.5" />
+              {isAutoProcessing ? 'Memproses...' : `Catat ${dueBillsToAutoLog.length} Jatuh Tempo`}
+            </button>
+          )}
+
+          <label className="relative inline-flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              checked={autoEnabled}
+              onChange={(e) => {
+                const nextVal = e.target.checked
+                setAutoEnabled(nextVal)
+                setAutoRecurringLoggingEnabled(nextVal)
+                toast.success(
+                  nextVal
+                    ? 'Pencatatan tagihan otomatis diaktifkan.'
+                    : 'Pencatatan tagihan otomatis dinonaktifkan.'
+                )
+              }}
+              className="sr-only peer"
+            />
+            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+          </label>
         </div>
       </div>
 

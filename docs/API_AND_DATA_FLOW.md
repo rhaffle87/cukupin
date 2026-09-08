@@ -165,3 +165,81 @@ Tanggal,Tipe,Kategori,Deskripsi,Jumlah,Metode Pembayaran,Catatan
 - Melakukan pembersihan format angka Rupiah (mengabaikan titik ribuan `.` dan simbol `Rp`).
 - Menampilkan jendela pratinjau (*Live Preview Table*) sebelum data disimpan permanen ke basis data.
 - **Offline & Local-Dev Fallback**: Mendukung penyimpanan langsung ke `cukupin_local_transactions` saat login sebagai `local-dev-user` atau saat jaringan offline.
+
+---
+
+## 6. Alur Automasi Tagihan Rutin (Automated Recurring Bills Flow)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Trigger as Client Bootstrap / Server Cron
+    participant Worker as recurringBillsWorker.ts / cron route
+    participant Bills as recurring_bills (Supabase / Local)
+    participant Tx as transactions
+    participant Goals as saving_goals
+
+    Trigger->>Worker: processDueRecurringBills(bills, currentDay, currentMonth)
+    Worker->>Bills: Filter: is_active == true && due_day <= currentDay && last_logged_month != currentMonth
+    loop Setiap Tagihan Jatuh Tempo
+        Worker->>Tx: Insert mutasi pengeluaran (amount, category, payment_method, name)
+        opt Kategori == 'Tabungan' atau 'Investasi'
+            Worker->>Goals: Cari goal aktif -> Update current_amount += bill.amount
+        end
+        Worker->>Bills: Update last_logged_month = currentMonth
+    end
+    Worker-->>Trigger: Return processedCount & updated bills state
+```
+
+### Karakteristik & Aturan Bisnis:
+1. **Pencegahan Duplikasi (Deduping)**:
+   - Kondisi eksekusi memeriksa `bill.last_logged_month !== currentMonthKey` (contoh: `'2026-09'`).
+   - Apabila tagihan jatuh tempo tanggal 5, dan pengguna baru membuka aplikasi tanggal 8, tagihan tetap otomatis dicatat tepat 1 kali untuk bulan September.
+2. **Pengaturan Preferensi Pengguna**:
+   - Pengguna dapat mengaktifkan atau menonaktifkan pencatatan otomatis melalui toggle UI pada tab Tagihan Rutin (`cukupin_auto_log_bills_enabled`).
+3. **Endpoint Server Cron**:
+   - Rute `/api/cron/recurring-bills` dilindungi oleh header otentikasi `Authorization: Bearer <CRON_SECRET>` yang dikonfigurasi pada `vercel.json` untuk dieksekusi terjadwal setiap pukul 00:00 UTC (07:00 WIB).
+
+---
+
+## 7. Alur Kriptografi Keamanan Layar & WebAuthn / PIN
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Pengguna
+    participant ScreenLock as ScreenLockContext
+    participant Crypto as lib/security/crypto.ts (Web Crypto)
+    participant WebAuthn as lib/security/webauthn.ts
+    participant Storage as LocalStorage (cukupin_screen_lock_*)
+
+    Note over User,Storage: Alur Registrasi PIN 6-Digit
+    User->>ScreenLock: Input PIN baru (6-digit)
+    ScreenLock->>Crypto: hashPin(pin)
+    Crypto->>Crypto: Generate random 16-byte salt via crypto.getRandomValues()
+    Crypto->>Crypto: SHA-256(PIN + Salt) via crypto.subtle.digest()
+    Crypto-->>ScreenLock: { hash, salt }
+    ScreenLock->>Storage: Simpan salt, hash, & config (enabled=true)
+
+    Note over User,Storage: Alur Buka Kunci (Unlock)
+    alt Opsi 1: Verifikasi PIN
+        User->>ScreenLock: Input PIN (6-digit)
+        ScreenLock->>Crypto: verifyPin(pin, storedSalt, storedHash)
+        Crypto->>Crypto: SHA-256(inputPin + storedSalt)
+        Crypto-->>ScreenLock: true / false
+    else Opsi 2: Verifikasi WebAuthn Biometrik
+        User->>ScreenLock: Klik "Buka dengan Biometrik"
+        ScreenLock->>WebAuthn: verifyBiometrics() -> navigator.credentials.get()
+        WebAuthn-->>ScreenLock: true / false
+    end
+    ScreenLock->>ScreenLock: Jika valid -> setIsLocked(false), recordActivity()
+```
+
+### Parameter Konfigurasi Keamanan Layar:
+- `cukupin_screen_lock_enabled`: Flag boolean (`true` / `false`).
+- `cukupin_screen_lock_salt`: Hex string 16-byte acak cryptographic salt.
+- `cukupin_screen_lock_hash`: Hex string 32-byte SHA-256 hash.
+- `cukupin_screen_lock_biometrics`: Flag boolean (`true` / `false`) untuk aktivasi WebAuthn.
+- `cukupin_screen_lock_timeout`: Pilihan durasi timeout: `immediately`, `5m`, `15m`, `30m`, `60m`.
+- `cukupin_screen_lock_last_active`: Timestamp epoch millisecond aktivitas pengguna terakhir.
+
