@@ -35,11 +35,11 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Cukupin: Catat santai, tahu arah uangmu',
+  title: 'Cukupin™: Catat santai, tahu arah uangmu',
   description: 'Catat pengeluaran harian, pantau uang masuk-keluar, dan atur keuangan dengan santai.',
-  applicationName: 'Cukupin',
-  authors: [{ name: 'Cukupin' }],
-  generator: 'Cukupin',
+  applicationName: 'Cukupin™',
+  authors: [{ name: 'Cukupin™' }],
+  generator: 'Cukupin™',
   metadataBase: new URL('https://cukupin.app'),
   keywords: [
     'aplikasi keuangan',
@@ -67,22 +67,22 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: 'Cukupin: Catat santai, tahu arah uangmu',
+    title: 'Cukupin™: Catat santai, tahu arah uangmu',
     description: 'Catat pengeluaran harian, pantau uang masuk-keluar, dan atur keuangan dengan santai.',
     url: 'https://cukupin.app',
-    siteName: 'Cukupin',
+    siteName: 'Cukupin™',
     locale: 'id_ID',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Cukupin: Catat santai, tahu arah uangmu',
+    title: 'Cukupin™: Catat santai, tahu arah uangmu',
     description: 'Catat pengeluaran harian, pantau uang masuk-keluar, dan atur keuangan dengan santai.',
   },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'Cukupin',
+    title: 'Cukupin™',
   },
   icons: {
     icon: [

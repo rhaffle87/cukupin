@@ -14,13 +14,13 @@ describe('UI Primitives Unit Tests', () => {
   describe('Brand component', () => {
     it('renders full brand identity by default', () => {
       render(<Brand />)
-      expect(screen.getByText('Cukupin')).toBeDefined()
+      expect(screen.getByText('Cukupin™')).toBeDefined()
       expect(screen.getByText('catat santai')).toBeDefined()
     })
 
     it('renders compact logo without text when compact is true', () => {
       render(<Brand compact={true} />)
-      expect(screen.queryByText('Cukupin')).toBeNull()
+      expect(screen.queryByText('Cukupin™')).toBeNull()
       expect(screen.queryByText('catat santai')).toBeNull()
     })
   })

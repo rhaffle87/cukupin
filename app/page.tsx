@@ -30,20 +30,20 @@ export default function LandingPage() {
 
   const faqs = [
     {
-      q: 'Apakah Cukupin benar-benar gratis?',
-      a: 'Ya, Cukupin 100% gratis digunakan tanpa biaya langganan, tanpa masa percobaan berbayar, dan tanpa fitur tersembunyi. Kamu bisa langsung menggunakan semua fitur tanpa batas.',
+      q: 'Apakah Cukupin™ benar-benar gratis?',
+      a: 'Ya, Cukupin™ 100% gratis digunakan tanpa biaya langganan, tanpa masa percobaan berbayar, dan tanpa fitur tersembunyi. Kamu bisa langsung menggunakan semua fitur tanpa batas.',
     },
     {
-      q: 'Apakah Cukupin meminta akses ke rekening bank saya?',
-      a: 'Tidak sama sekali. Cukupin tidak meminta nomor rekening, PIN, atau kata sandi bank. Kamu mencatat pengeluaran secara mandiri demi keamanan dan privasi penuh.',
+      q: 'Apakah Cukupin™ meminta akses ke rekening bank saya?',
+      a: 'Tidak sama sekali. Cukupin™ tidak meminta nomor rekening, PIN, atau kata sandi bank. Kamu mencatat pengeluaran secara mandiri demi keamanan dan privasi penuh.',
     },
     {
       q: 'Apa itu fitur Budget Harian Aman?',
       a: 'Budget Harian Aman membagi sisa saldomu dengan sisa hari dalam bulan berjalan secara otomatis, sehingga kamu langsung tahu batas uang yang aman dibelanjakan tiap hari.',
     },
     {
-      q: 'Apakah Cukupin bisa digunakan di smartphone?',
-      a: 'Bisa. Cukupin adalah Progressive Web App (PWA) yang bisa langsung dipasang di ponsel Android maupun iPhone tanpa perlu unduh dari App Store yang berat.',
+      q: 'Apakah Cukupin™ bisa digunakan di smartphone?',
+      a: 'Bisa. Cukupin™ adalah Progressive Web App (PWA) yang bisa langsung dipasang di ponsel Android maupun iPhone tanpa perlu unduh dari App Store yang berat.',
     },
     {
       q: 'Bagaimana keamanan data keuangan saya?',
@@ -116,9 +116,9 @@ export default function LandingPage() {
           {/* AEO Extraction Sentence (Strictly 25-40 words for AI citations & SERP snippets) */}
           <blockquote className="my-2 max-w-2xl rounded-2xl border border-green/25 bg-green-soft/40 px-5 py-4 text-left text-xs sm:text-sm leading-relaxed text-ink shadow-xs">
             <strong className="block text-[11px] uppercase tracking-wider text-green font-bold mb-1">
-              Tentang Cukupin
+              Tentang Cukupin™
             </strong>
-            Cukupin adalah aplikasi pencatat keuangan harian gratis yang dirancang santai dan sederhana untuk memantau uang masuk, pengeluaran harian, dan budget aman tanpa rumus rumit atau integrasi bank yang membingungkan.
+            Cukupin™ adalah aplikasi pencatat keuangan harian gratis yang dirancang santai dan sederhana untuk memantau uang masuk, pengeluaran harian, dan budget aman tanpa rumus rumit atau integrasi bank yang membingungkan.
           </blockquote>
 
           {/* Micro Social Proof & Security Badges */}
@@ -197,7 +197,7 @@ export default function LandingPage() {
                 <em className="text-mint not-italic">Tahu batas amanmu tiap hari.</em>
               </h2>
               <p className="mt-4 text-xs sm:text-sm leading-relaxed text-[#C0CBC4]">
-                Cukupin membuang semua kerumitan finansial yang berlebihan. Kamu hanya perlu mencatat apa yang keluar dan masuk, lalu sistem otomatis memberi tahu berapa budget aman yang boleh kamu belanjakan hari ini.
+                Cukupin™ membuang semua kerumitan finansial yang berlebihan. Kamu hanya perlu mencatat apa yang keluar dan masuk, lalu sistem otomatis memberi tahu berapa budget aman yang boleh kamu belanjakan hari ini.
               </p>
               <div className="mt-6 flex items-center gap-3">
                 <Link
@@ -311,7 +311,7 @@ export default function LandingPage() {
               </span>
               <h3 className="font-display text-base font-bold text-ink">Catat dalam 3 Detik</h3>
               <p className="mt-2 text-xs leading-relaxed text-muted">
-                Buka Cukupin dari home screen HP. Masukkan nominal dan nama pengeluaran saat kamu baru saja selesai transaksi.
+                Buka Cukupin™ dari home screen HP. Masukkan nominal dan nama pengeluaran saat kamu baru saja selesai transaksi.
               </p>
             </div>
 
@@ -344,10 +344,10 @@ export default function LandingPage() {
           <div className="text-center max-w-2xl mx-auto mb-12">
             <p className="text-[10px] font-bold tracking-widest text-slate uppercase">PERBANDINGAN JUJUR</p>
             <h2 className="mt-2 font-display text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-ink">
-              Bagaimana Cukupin dibanding alternatif lain?
+              Bagaimana Cukupin™ dibanding alternatif lain?
             </h2>
             <p className="mt-3 text-sm text-muted">
-              Kami percaya transparansi. Ini perbedaan nyata antara Cukupin, aplikasi perbankan konvensional, dan catatan manual di Excel.
+              Kami percaya transparansi. Ini perbedaan nyata antara Cukupin™, aplikasi perbankan konvensional, dan catatan manual di Excel.
             </p>
           </div>
 
@@ -361,7 +361,7 @@ export default function LandingPage() {
               <thead>
                 <tr className="border-b border-line bg-paper/80">
                   <th scope="col" className="p-4 font-bold text-ink">Kriteria</th>
-                  <th scope="col" className="p-4 font-bold text-green bg-green-soft/40">Cukupin</th>
+                  <th scope="col" className="p-4 font-bold text-green bg-green-soft/40">Cukupin™</th>
                   <th scope="col" className="p-4 font-bold text-muted">Aplikasi Bank & Fintech</th>
                   <th scope="col" className="p-4 font-bold text-muted">Excel & Buku Kas</th>
                 </tr>
@@ -418,7 +418,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             <div className="rounded-2xl border border-line bg-card p-6 shadow-xs flex flex-col justify-between">
               <p className="text-xs leading-relaxed text-ink italic">
-                "Dulu malas banget catat pengeluaran karena aplikasi lain ribet harus bikin akun berbelit-belit. Di Cukupin tampilannya adem, cepet, dan nggak ada iklan sama sekali."
+                "Dulu malas banget catat pengeluaran karena aplikasi lain ribet harus bikin akun berbelit-belit. Di Cukupin™ tampilannya adem, cepet, dan nggak ada iklan sama sekali."
               </p>
               <div className="mt-4 pt-4 border-t border-line/60">
                 <strong className="block text-xs font-bold text-ink">Dian P.</strong>
@@ -458,7 +458,7 @@ export default function LandingPage() {
               Ada yang ingin kamu tanyakan?
             </h2>
             <p className="mt-2 text-sm text-muted">
-              Jawaban singkat dan jelas seputar cara kerja, privasi, dan fitur Cukupin.
+              Jawaban singkat dan jelas seputar cara kerja, privasi, dan fitur Cukupin™.
             </p>
           </div>
 
@@ -647,7 +647,7 @@ export default function LandingPage() {
 
           {/* Bottom Bar */}
           <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-muted">
-            <p>&copy; {new Date().getFullYear()} Cukupin. Hak Cipta Dilindungi.</p>
+            <p>&copy; {new Date().getFullYear()} Cukupin™. Hak Cipta Dilindungi.</p>
             <p className="text-center sm:text-left text-[11px]">
               Dibuat dengan cermat untuk ketenangan finansial harian.
             </p>

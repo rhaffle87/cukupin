@@ -65,7 +65,7 @@ export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> 
               onClick={() => setShowWrapped(true)}
               className="inline-flex items-center gap-2 rounded-xl border border-line bg-card px-3.5 py-2 text-xs font-bold text-ink shadow-2xs transition-all hover:bg-black/5 active:scale-95 cursor-pointer"
             >
-              <Sparkles size={15} className="text-green" /> Rapor Cukupin
+              <Sparkles size={15} className="text-green" /> Rapor Cukupin™
             </button>
             <button
               onClick={() => setShowTemplate(true)}

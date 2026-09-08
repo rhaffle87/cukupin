@@ -1,6 +1,6 @@
-# Cukupin Security Architecture, Threat Model & Compliance Audit
+# Cukupin™ Security Architecture, Threat Model & Compliance Audit
 
-Dokumentasi audit keamanan, pemodelan ancaman (STRIDE), mitigasi OWASP Top 10, dan evaluasi kepatuhan regulasi perlindungan data pribadi untuk aplikasi Cukupin.
+Dokumentasi audit keamanan, pemodelan ancaman (STRIDE), mitigasi OWASP Top 10, dan evaluasi kepatuhan regulasi perlindungan data pribadi untuk aplikasi Cukupin™.
 
 ---
 
@@ -19,7 +19,7 @@ Dokumentasi audit keamanan, pemodelan ancaman (STRIDE), mitigasi OWASP Top 10, d
 
 ## 2. Pemodelan Ancaman (STRIDE Analysis)
 
-| Kategori Ancaman (STRIDE) | Risiko Spesifik pada Aplikasi Keuangan | Mitigasi yang Diimplementasikan di Cukupin |
+| Kategori Ancaman (STRIDE) | Risiko Spesifik pada Aplikasi Keuangan | Mitigasi yang Diimplementasikan di Cukupin™ |
 | :--- | :--- | :--- |
 | **Spoofing** (Penyamaran Identitas) | Penyerang memalsukan sesi login untuk mengakses pembukuan orang lain. | Autentikasi berbasis JWT aman melalui Supabase SSR, cookie bertipe `HttpOnly`, `SameSite=Lax`, dan `Secure`. Edge proxy me-refresh token secara periodik. |
 | **Tampering** (Manipulasi Data) | Pengguna mengubah ID transaksi untuk memodifikasi data penyewa lain. | Row Level Security (RLS) memvalidasi `auth.uid() = user_id` di tingkat kernel database. Upaya update ID milik akun lain otomatis mengembalikan 0 row / ditolak. |
@@ -99,7 +99,7 @@ form-action 'self';
 
 ## 5. Kepatuhan Regulasi Privasi & UU PDP No. 27 Tahun 2022
 
-Aplikasi Cukupin dirancang sesuai dengan mandat **Undang-Undang Perlindungan Data Pribadi (UU PDP No. 27/2022)** Republik Indonesia dan prinsip **GDPR**:
+Aplikasi Cukupin™ dirancang sesuai dengan mandat **Undang-Undang Perlindungan Data Pribadi (UU PDP No. 27/2022)** Republik Indonesia dan prinsip **GDPR**:
 
 1. **Hak Pengakhiran & Penghapusan Data (Right to Erasure / Pasal 39 UU PDP)**:
    - Fitur **"Hapus Seluruh Data" (Purge Data)** di halaman transaksi memungkinkan pengguna menghapus permanen seluruh riwayat finansial, target tabungan, tagihan rutin, dan wishlist mereka dari database dengan konfirmasi ketik nama.

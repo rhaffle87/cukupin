@@ -12,7 +12,7 @@ export default function NotFound() {
             C
           </div>
           <span className="font-display font-bold text-lg tracking-tight text-ink">
-            Cukupin<span className="text-green">.</span>
+            Cukupin™<span className="text-green">.</span>
           </span>
         </Link>
         <Link
@@ -74,7 +74,7 @@ export default function NotFound() {
 
       {/* Footer */}
       <footer className="border-t border-line/60 py-6 text-center text-[11px] text-muted">
-        <p>© {new Date().getFullYear()} Cukupin. Catat santai, tahu arah uangmu.</p>
+        <p>© {new Date().getFullYear()} Cukupin™. Catat santai, tahu arah uangmu.</p>
       </footer>
     </div>
   )

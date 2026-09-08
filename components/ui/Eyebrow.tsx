@@ -22,7 +22,7 @@ export function Eyebrow({
   return (
     <p
       className={cn(
-        'flex items-center gap-1.5 text-[10px] font-bold tracking-widest uppercase before:block before:h-[1px] before:w-[19px] before:bg-blue after:block after:-ml-[5px] after:h-[4px] after:w-[4px] after:rounded-full after:bg-green',
+        'flex items-center gap-1.5 text-[11px] sm:text-xs font-bold tracking-wider uppercase before:block before:h-[1px] before:w-[19px] before:bg-blue after:block after:-ml-[5px] after:h-[4px] after:w-[4px] after:rounded-full after:bg-green',
         colorClass,
         className
       )}

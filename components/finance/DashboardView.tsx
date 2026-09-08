@@ -197,10 +197,10 @@ export function DashboardView({ data, user, supabase }: DashboardViewProps) {
           {/* Middle Section: Balance & Live Status */}
           <div className="relative z-10 my-auto py-1">
             <div className="flex items-center justify-between">
-              <span className="text-[9px] font-bold tracking-widest text-white/60 uppercase">
+              <span className="text-[11px] sm:text-xs font-bold tracking-wider text-white/80 uppercase">
                 Sisa Saldo
               </span>
-              <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-bold tracking-wide uppercase ${
+              <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] sm:text-[11px] font-bold tracking-wide uppercase ${
                 stats.balance >= 0 
                   ? 'bg-green/20 text-mint border border-mint/20' 
                   : 'bg-coral/20 text-coral-light border border-coral/30'
@@ -256,7 +256,7 @@ export function DashboardView({ data, user, supabase }: DashboardViewProps) {
             <Sparkles size={16} />
           </div>
           <p className="text-xs leading-relaxed text-muted">
-            <strong className="text-ink font-bold">Catatan Cukupin: </strong>
+            <strong className="text-ink font-bold">Catatan Cukupin™: </strong>
             {insight}
           </p>
         </div>

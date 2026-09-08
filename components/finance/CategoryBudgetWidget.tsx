@@ -122,19 +122,19 @@ export function CategoryBudgetWidget({
               >
                 <div>
                   <div className="flex items-center justify-between gap-2">
-                    <span className="font-semibold text-sm text-ink">{b.category}</span>
+                    <span className="font-bold text-sm sm:text-base text-ink">{b.category}</span>
                     {statusBadge}
                   </div>
 
                   <div className="mt-3 flex items-baseline justify-between">
                     <div>
-                      <span className="text-[10px] uppercase font-mono text-muted">Terpakai</span>
+                      <span className="text-[11px] sm:text-xs font-semibold text-muted uppercase tracking-wider">Terpakai</span>
                       <div className={`font-numeric tabular-nums font-bold text-base ${textColor}`}>
                         {currency(spent)}
                       </div>
                     </div>
                     <div className="text-right">
-                      <span className="text-[10px] uppercase font-mono text-muted">Batas Maksimal</span>
+                      <span className="text-[11px] sm:text-xs font-semibold text-muted uppercase tracking-wider">Batas Maksimal</span>
                       <div className="font-numeric tabular-nums text-xs font-semibold text-ink">
                         {currency(limit)}
                       </div>

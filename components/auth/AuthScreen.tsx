@@ -70,7 +70,7 @@ export function AuthScreen({ supabase }: AuthScreenProps) {
               <span className="h-1 w-4 -rotate-45 translate-y-[3px] -translate-x-[1px] rounded bg-green" />
             </div>
             <div className="flex flex-col">
-              <strong className="font-display text-[20px] leading-none tracking-tight">Cukupin</strong>
+              <strong className="font-display text-[20px] leading-none tracking-tight">Cukupin™</strong>
             </div>
           </div>
         </div>

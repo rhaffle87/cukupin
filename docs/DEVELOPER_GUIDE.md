@@ -1,6 +1,6 @@
-# Cukupin Developer Onboarding & Engineering Handbook
+# Cukupin™ Developer Onboarding & Engineering Handbook
 
-Panduan teknis bagi perekayasa perangkat lunak untuk mengembangkan, menguji, dan memelihara aplikasi Cukupin.
+Panduan teknis bagi perekayasa perangkat lunak untuk mengembangkan, menguji, dan memelihara aplikasi Cukupin™.
 
 ---
 
@@ -32,7 +32,7 @@ Aplikasi akan aktif di `http://localhost:3000`.
 
 > [!TIP]
 > **Guest & Standalone Local Mode**:
-> Jika Anda belum memiliki akun Supabase, Cukupin tetap dapat dijalankan penuh di `http://localhost:3000`! Edge reverse proxy (`proxy.ts`) dan sistem finance data secara otomatis mendeteksi ketiadaan kredensial dan beralih ke **Mode Lokal (LocalStorage + In-Memory Mock)**, sehingga seluruh fitur transaksi, grafik, dan laporan tetap dapat diuji.
+> Jika Anda belum memiliki akun Supabase, Cukupin™ tetap dapat dijalankan penuh di `http://localhost:3000`! Edge reverse proxy (`proxy.ts`) dan sistem finance data secara otomatis mendeteksi ketiadaan kredensial dan beralih ke **Mode Lokal (LocalStorage + In-Memory Mock)**, sehingga seluruh fitur transaksi, grafik, dan laporan tetap dapat diuji.
 
 ---
 
@@ -78,7 +78,7 @@ cukupin-v0/
 
 ## 3. Sistem Desain: "Quiet Ledger"
 
-Cukupin menggunakan filosofi desain **Quiet Ledger** (buku besar finansial yang tenang, hangat, dan berwibawa):
+Cukupin™ menggunakan filosofi desain **Quiet Ledger** (buku besar finansial yang tenang, hangat, dan berwibawa):
 
 ### 3.1. Palet Token Warna
 - `--paper`: `#f7f6f0` — Latar belakang permukaan hangat ramah mata.

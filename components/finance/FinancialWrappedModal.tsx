@@ -16,7 +16,7 @@ export function FinancialWrappedModal({
   isOpen,
   onClose,
   transactions,
-  userName = 'Teman Cukupin',
+  userName = 'Teman Cukupin™',
 }: FinancialWrappedModalProps) {
   const cardRef = useRef<HTMLDivElement>(null)
   const [isExporting, setIsExporting] = useState(false)
@@ -161,7 +161,7 @@ export function FinancialWrappedModal({
       link.href = dataUrl
       link.download = `rapor-cukupin-${new Date().toISOString().slice(0, 7)}.png`
       link.click()
-      toast.success('Rapor Cukupin berhasil diunduh sebagai gambar PNG!')
+      toast.success('Rapor Cukupin™ berhasil diunduh sebagai gambar PNG!')
     } catch (err) {
       console.error('Failed to export card image:', err)
       toast.error('Gagal mengunduh gambar. Coba ulangi kembali.')
@@ -171,7 +171,7 @@ export function FinancialWrappedModal({
   }
 
   return (
-    <Modal title="Rapor Keuangan Cukupin" onClose={onClose} className="!w-[min(540px,100%)] !max-w-[540px]">
+    <Modal title="Rapor Keuangan Cukupin™" onClose={onClose} className="!w-[min(540px,100%)] !max-w-[540px]">
       <div className="flex flex-col gap-5">
         {/* Shareable Card Area */}
         <div

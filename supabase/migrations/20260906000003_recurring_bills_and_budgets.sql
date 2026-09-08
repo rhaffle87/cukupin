@@ -1,5 +1,5 @@
 -- ==============================================================================
--- Cukupin Production Database Schema Migration
+-- Cukupin™ Production Database Schema Migration
 -- Features: Recurring Bills (Tagihan Rutin) & Category Budget Limits
 -- Author: Antigravity Agentic Engineer
 -- Date: 2026-09-06

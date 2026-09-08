@@ -337,45 +337,45 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
       <div className="mb-4 grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
         <div className="rounded-[18px] border border-line bg-card p-3 sm:p-4 shadow-2xs">
           <div className="flex items-center justify-between text-muted text-xs">
-            <span className="font-bold text-[10px] uppercase tracking-wider">Total Nilai</span>
+            <span className="font-bold text-xs sm:text-[13px] text-ink/80 tracking-normal">Total Nilai</span>
             <div className="flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-lg bg-blue-soft text-blue">
-              <ShoppingBag size={14} />
+              <ShoppingBag size={16} />
             </div>
           </div>
           <strong className="mt-1.5 block !font-numeric tabular-nums !text-sm sm:!text-[15px] md:!text-base lg:!text-xl xl:!text-2xl tracking-tight sm:tracking-tighter lg:tracking-tight font-bold text-ink truncate" title={currency(totalWishlistValue)}>
             {currency(totalWishlistValue)}
           </strong>
-          <small className="mt-0.5 block text-[10px] sm:text-[11px] text-muted">
+          <small className="mt-0.5 block text-[11px] sm:text-xs text-muted">
             {data.wishlist.length} barang tersimpan
           </small>
         </div>
 
         <div className="rounded-[18px] border border-line bg-card p-3 sm:p-4 shadow-2xs">
           <div className="flex items-center justify-between text-muted text-xs">
-            <span className="font-bold text-[10px] uppercase tracking-wider">Siap Dibeli</span>
+            <span className="font-bold text-xs sm:text-[13px] text-ink/80 tracking-normal">Siap Dibeli</span>
             <div className="flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-lg bg-green-soft text-green">
-              <Sparkles size={14} />
+              <Sparkles size={16} />
             </div>
           </div>
           <strong className="mt-1.5 block !font-numeric tabular-nums !text-sm sm:!text-[15px] md:!text-base lg:!text-xl xl:!text-2xl tracking-tight sm:tracking-tighter lg:tracking-tight font-bold text-green">
             {affordableCount} Barang
           </strong>
-          <small className="mt-0.5 block text-[10px] sm:text-[11px] text-muted truncate">
+          <small className="mt-0.5 block text-[11px] sm:text-xs text-muted truncate">
             Saldo cukup ({currency(currentBalance)})
           </small>
         </div>
 
         <div className="col-span-2 sm:col-span-1 rounded-[18px] border border-line bg-card p-3 sm:p-4 shadow-2xs">
           <div className="flex items-center justify-between text-muted text-xs">
-            <span className="font-bold text-[10px] uppercase tracking-wider">Saldo Kas Tersedia</span>
+            <span className="font-bold text-xs sm:text-[13px] text-ink/80 tracking-normal">Saldo Kas Tersedia</span>
             <div className="flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-lg bg-paper text-ink">
-              <Wallet size={14} />
+              <Wallet size={16} />
             </div>
           </div>
           <strong className={`mt-1.5 block !font-numeric tabular-nums !text-sm sm:!text-[15px] md:!text-base lg:!text-xl xl:!text-2xl tracking-tight sm:tracking-tighter lg:tracking-tight font-bold truncate ${currentBalance >= 0 ? 'text-ink' : 'text-coral'}`} title={currency(currentBalance)}>
             {currency(currentBalance)}
           </strong>
-          <small className="mt-0.5 block text-[10px] sm:text-[11px] text-muted">
+          <small className="mt-0.5 block text-[11px] sm:text-xs text-muted">
             {currentBalance >= 0 ? 'Kondisi kas aman untuk belanja' : 'Arus kas minus, tunda dulu'}
           </small>
         </div>

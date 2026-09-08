@@ -1,6 +1,6 @@
-# Cukupin API, Data Lifecycle & State Architecture
+# Cukupin™ API, Data Lifecycle & State Architecture
 
-Dokumentasi alur data menyeluruh (End-to-End Data Flow), arsitektur sinkronisasi *Offline-First*, format data cadangan v2.0, serta spesifikasi impor/ekspor CSV pada aplikasi Cukupin.
+Dokumentasi alur data menyeluruh (End-to-End Data Flow), arsitektur sinkronisasi *Offline-First*, format data cadangan v2.0, serta spesifikasi impor/ekspor CSV pada aplikasi Cukupin™.
 
 ---
 
@@ -103,7 +103,7 @@ export interface QueuedAction {
 
 ## 4. Spesifikasi Cadangan Data Standar v2.0 (`lib/backup.ts`)
 
-Cukupin menggunakan format berkas JSON v2.0 dengan struktur *flat* yang divalidasi ketat menggunakan pustaka **Zod** (`backupPayloadSchema`):
+Cukupin™ menggunakan format berkas JSON v2.0 dengan struktur *flat* yang divalidasi ketat menggunakan pustaka **Zod** (`backupPayloadSchema`):
 
 ```json
 {

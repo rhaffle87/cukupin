@@ -19,8 +19,8 @@ import {
 } from 'lucide-react'
 
 export const metadata = {
-  title: 'Syarat & Ketentuan - Cukupin',
-  description: 'Syarat dan Ketentuan Penggunaan aplikasi Cukupin. Ketentuan transparan, batasan tanggung jawab, dan penafian finansial mandiri.',
+  title: 'Syarat & Ketentuan - Cukupin™',
+  description: 'Syarat dan Ketentuan Penggunaan aplikasi Cukupin™. Ketentuan transparan, batasan tanggung jawab, dan penafian finansial mandiri.',
 }
 
 export default function TermsOfServicePage() {
@@ -74,7 +74,7 @@ export default function TermsOfServicePage() {
             Syarat & Ketentuan Penggunaan
           </h1>
           <p className="mt-4 text-sm sm:text-base text-muted max-w-2xl mx-auto leading-relaxed">
-            Selamat datang di Cukupin. Ketentuan ini memuat hak, kewajiban, batasan tanggung jawab, dan pedoman penggunaan layanan kami secara adil, transparan, dan saling menghargai.
+            Selamat datang di Cukupin™. Ketentuan ini memuat hak, kewajiban, batasan tanggung jawab, dan pedoman penggunaan layanan kami secara adil, transparan, dan saling menghargai.
           </p>
 
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-xs text-muted">
@@ -98,7 +98,7 @@ export default function TermsOfServicePage() {
             </div>
             <h3 className="font-display text-sm font-bold text-ink">Bukan Penasihat Finansial</h3>
             <p className="mt-1.5 text-[11px] leading-relaxed text-muted">
-              Cukupin adalah alat pencatatan mandiri. Kalkulasi sistem tidak merupakan nasihat investasi atau perencanaan finansial OJK.
+              Cukupin™ adalah alat pencatatan mandiri. Kalkulasi sistem tidak merupakan nasihat investasi atau perencanaan finansial OJK.
             </p>
           </div>
 
@@ -172,7 +172,7 @@ export default function TermsOfServicePage() {
                 1. Penerimaan Ketentuan & Ruang Lingkup Perjanjian
               </h2>
               <p>
-                Dengan mendaftar, mengakses, atau menggunakan aplikasi web dan layanan <strong>Cukupin</strong> (selanjutnya disebut &ldquo;<strong>Layanan</strong>&rdquo; atau &ldquo;<strong>Aplikasi</strong>&rdquo;), Anda menyatakan bahwa Anda telah membaca, memahami, dan menyetujui untuk terikat secara hukum oleh Syarat dan Ketentuan ini beserta <Link href="/legal/privacy" className="text-green font-bold hover:underline">Kebijakan Privasi</Link> kami.
+                Dengan mendaftar, mengakses, atau menggunakan aplikasi web dan layanan <strong>Cukupin™</strong> (selanjutnya disebut &ldquo;<strong>Layanan</strong>&rdquo; atau &ldquo;<strong>Aplikasi</strong>&rdquo;), Anda menyatakan bahwa Anda telah membaca, memahami, dan menyetujui untuk terikat secara hukum oleh Syarat dan Ketentuan ini beserta <Link href="/legal/privacy" className="text-green font-bold hover:underline">Kebijakan Privasi</Link> kami.
               </p>
               <p>
                 Apabila Anda tidak menyetujui salah satu bagian dari ketentuan ini, Anda dipersilakan untuk tidak melanjutkan pendaftaran atau menghentikan penggunaan Layanan kami.
@@ -188,7 +188,7 @@ export default function TermsOfServicePage() {
                 2. Deskripsi Layanan & Sifat Pencatatan Mandiri
               </h2>
               <p>
-                Cukupin adalah perangkat lunak berbasis Progressive Web App (PWA) yang dirancang untuk mempermudah pencatatan arus kas pribadi secara mandiri. Layanan ini mencakup:
+                Cukupin™ adalah perangkat lunak berbasis Progressive Web App (PWA) yang dirancang untuk mempermudah pencatatan arus kas pribadi secara mandiri. Layanan ini mencakup:
               </p>
               <ul className="list-disc pl-5 space-y-1.5 text-xs text-muted">
                 <li>Pencatatan transaksi pengeluaran dan pemasukan harian dengan klasifikasi kategori otomatis.</li>
@@ -197,7 +197,7 @@ export default function TermsOfServicePage() {
                 <li>Daftar keinginan anti-impulsif (Wishlist) dan ekspor laporan buku kas ke dalam format PDF dan CSV.</li>
               </ul>
               <p>
-                Cukupin <strong>tidak terhubung</strong> secara langsung ke sistem perbankan nasional, Open Banking API, payment gateway eksternal, atau lembaga kliring keuangan mana pun.
+                Cukupin™ <strong>tidak terhubung</strong> secara langsung ke sistem perbankan nasional, Open Banking API, payment gateway eksternal, atau lembaga kliring keuangan mana pun.
               </p>
             </section>
 
@@ -214,7 +214,7 @@ export default function TermsOfServicePage() {
                   CUKUPIN BUKAN LEMBAGA KEUANGAN ATAU PENASIHAT INVESTASI
                 </strong>
                 <p className="leading-relaxed">
-                  Semua grafik, estimasi, pembagian budget harian, dan metrik yang disajikan dalam Cukupin dihitung secara matematis deterministik berdasarkan input mandiri yang Anda masukkan.
+                  Semua grafik, estimasi, pembagian budget harian, dan metrik yang disajikan dalam Cukupin™ dihitung secara matematis deterministik berdasarkan input mandiri yang Anda masukkan.
                 </p>
                 <p className="leading-relaxed">
                   Informasi yang diberikan tidak boleh dianggap atau ditafsirkan sebagai nasihat keuangan profesional, rekomendasi investasi, anjuran perpajakan, maupun penawaran produk keuangan berlisensi Otoritas Jasa Keuangan (OJK). Segala keputusan keuangan, pengeluaran, investasi, atau pinjaman yang Anda ambil adalah tanggung jawab pribadi Anda seutuhnya.
@@ -248,10 +248,10 @@ export default function TermsOfServicePage() {
                 5. Kepemilikan Data & Konten Pengguna
               </h2>
               <p>
-                Anda memegang hak kepemilikan mutlak atas seluruh data keuangan, deskripsi belanja, target tabungan, dan file CSV yang Anda unggah ke Cukupin:
+                Anda memegang hak kepemilikan mutlak atas seluruh data keuangan, deskripsi belanja, target tabungan, dan file CSV yang Anda unggah ke Cukupin™:
               </p>
               <p>
-                Dengan menggunakan Layanan, Anda hanya memberikan lisensi terbatas, non-eksklusif, dan bebas royalti kepada Cukupin semata-mata untuk menyimpan, menampilkan, dan menghitung data tersebut di layar perangkat Anda sesuai permintaan fungsionalitas aplikasi.
+                Dengan menggunakan Layanan, Anda hanya memberikan lisensi terbatas, non-eksklusif, dan bebas royalti kepada Cukupin™ semata-mata untuk menyimpan, menampilkan, dan menghitung data tersebut di layar perangkat Anda sesuai permintaan fungsionalitas aplikasi.
               </p>
               <p>
                 Kami <strong>tidak pernah mengklaim hak cipta</strong> atas isi catatan keuangan Anda dan tidak menggunakan data transaksi pribadi Anda untuk melatih model AI publik atau menjualnya ke pihak periklanan.
@@ -266,12 +266,12 @@ export default function TermsOfServicePage() {
               <h2 className="font-display text-xl sm:text-2xl font-bold text-ink">
                 6. Batasan Penggunaan yang Diperbolehkan (Acceptable Use)
               </h2>
-              <p>Saat menggunakan Cukupin, Anda setuju untuk TIDAK:</p>
+              <p>Saat menggunakan Cukupin™, Anda setuju untuk TIDAK:</p>
               <ul className="list-disc pl-5 space-y-1.5 text-xs text-muted">
                 <li>Melakukan reverse-engineering, dekompilasi, atau mencoba membongkar kode sumber backend secara melawan hukum.</li>
                 <li>Menggunakan bot, scraper otomatis, atau script otomatisasi berlebihan yang dapat membebani kapasitas server kami (Denial of Service).</li>
                 <li>Menyalahgunakan fitur impor CSV untuk menyuntikkan payload berbahaya (malicious code, SQL injection, XSS).</li>
-                <li>Menggunakan Cukupin untuk memfasilitasi aktivitas pencucian uang, pendanaan terorisme, atau kegiatan kriminal lainnya yang bertentangan dengan hukum Republik Indonesia.</li>
+                <li>Menggunakan Cukupin™ untuk memfasilitasi aktivitas pencucian uang, pendanaan terorisme, atau kegiatan kriminal lainnya yang bertentangan dengan hukum Republik Indonesia.</li>
               </ul>
             </section>
 
@@ -284,7 +284,7 @@ export default function TermsOfServicePage() {
                 7. Ketersediaan Layanan & Pencadangan Mandiri (As-Is / SLA)
               </h2>
               <p>
-                Layanan Cukupin disediakan secara <strong>&ldquo;SEBAGAIMANA ADANYA&rdquo; (AS-IS)</strong> dan <strong>&ldquo;SEBAGAIMANA TERSEDIA&rdquo; (AS-AVAILABLE)</strong> tanpa jaminan garansi eksplisit maupun implisit.
+                Layanan Cukupin™ disediakan secara <strong>&ldquo;SEBAGAIMANA ADANYA&rdquo; (AS-IS)</strong> dan <strong>&ldquo;SEBAGAIMANA TERSEDIA&rdquo; (AS-AVAILABLE)</strong> tanpa jaminan garansi eksplisit maupun implisit.
               </p>
               <p>
                 Meskipun kami berupaya keras menjaga ketersediaan sistem 99.9% dan menyediakan kemampuan offline via PWA, kami tidak dapat menjamin bahwa layanan akan bebas dari pemeliharaan terjadwal, gangguan jaringan internet global, atau bencana di luar kendali wajar (force majeure).
@@ -304,10 +304,10 @@ export default function TermsOfServicePage() {
                 8. Hak Kekayaan Intelektual (HAKI)
               </h2>
               <p>
-                Seluruh logo, merek dagang &ldquo;<strong>Cukupin</strong>&rdquo;, desain antarmuka, tata letak visual, ikonografi, dan kode sumber aplikasi dilindungi oleh Undang-Undang Hak Cipta dan peraturan kekayaan intelektual yang berlaku di Republik Indonesia.
+                Seluruh logo, merek dagang &ldquo;<strong>Cukupin™</strong>&rdquo;, desain antarmuka, tata letak visual, ikonografi, dan kode sumber aplikasi dilindungi oleh Undang-Undang Hak Cipta dan peraturan kekayaan intelektual yang berlaku di Republik Indonesia.
               </p>
               <p>
-                Anda tidak diperkenankan menyalin, memodifikasi, mendistribusikan ulang, atau menggunakan elemen merek Cukupin untuk kepentingan komersial tanpa izin tertulis dari pemilik hak cipta Cukupin.
+                Anda tidak diperkenankan menyalin, memodifikasi, mendistribusikan ulang, atau menggunakan elemen merek Cukupin™ untuk kepentingan komersial tanpa izin tertulis dari pemilik hak cipta Cukupin™.
               </p>
             </section>
 
@@ -320,7 +320,7 @@ export default function TermsOfServicePage() {
                 9. Pembatasan Tanggung Jawab (Limitation of Liability)
               </h2>
               <p>
-                Sepanjang diperbolehkan oleh hukum yang berlaku, Cukupin, pengembang, dan afiliasinya tidak bertanggung jawab atas:
+                Sepanjang diperbolehkan oleh hukum yang berlaku, Cukupin™, pengembang, dan afiliasinya tidak bertanggung jawab atas:
               </p>
               <ul className="list-disc pl-5 space-y-1.5 text-xs text-muted">
                 <li>Segala kerugian finansial, kegagalan berhemat, denda utang, atau keputusan belanja yang timbul dari ketergantungan pada simulasi budget dalam aplikasi.</li>
@@ -338,7 +338,7 @@ export default function TermsOfServicePage() {
                 10. Pengakhiran Akun & Penutupan Layanan
               </h2>
               <p>
-                Anda berhak menutup atau menghapus akun Anda kapan saja melalui permohonan ke saluran resmi kami. Setelah penutupan akun diproses, hak Anda untuk mengakses data di server Cukupin akan dihentikan dan data dimusnahkan sesuai Kebijakan Privasi.
+                Anda berhak menutup atau menghapus akun Anda kapan saja melalui permohonan ke saluran resmi kami. Setelah penutupan akun diproses, hak Anda untuk mengakses data di server Cukupin™ akan dihentikan dan data dimusnahkan sesuai Kebijakan Privasi.
               </p>
               <p>
                 Kami juga berhak menangguhkan atau mengakhiri akses akun Anda secara sepihak apabila terbukti melakukan pelanggaran berat terhadap Syarat & Ketentuan ini atau terindikasi melakukan tindakan peretasan yang merugikan pengguna lain.
@@ -376,7 +376,7 @@ export default function TermsOfServicePage() {
               <div className="rounded-xl border border-line bg-paper/60 p-5 space-y-2 text-xs">
                 <div className="flex items-center gap-2">
                   <strong className="text-ink">Layanan:</strong>
-                  <span className="text-muted">Cukupin (Catat Santai)</span>
+                  <span className="text-muted">Cukupin™ (Catat Santai)</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <strong className="text-ink">Email Urusan Hukum:</strong>
@@ -400,7 +400,7 @@ export default function TermsOfServicePage() {
       {/* Bottom Footer */}
       <footer className="border-t border-line/60 bg-paper py-8 text-center text-xs text-muted">
         <div className="mx-auto max-w-5xl px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p>&copy; {new Date().getFullYear()} Cukupin. Hak Cipta Dilindungi.</p>
+          <p>&copy; {new Date().getFullYear()} Cukupin™. Hak Cipta Dilindungi.</p>
           <div className="flex items-center gap-6 font-medium">
             <Link href="/" className="hover:text-ink transition-colors">Beranda</Link>
             <Link href="/legal/privacy" className="hover:text-ink transition-colors">Kebijakan Privasi</Link>

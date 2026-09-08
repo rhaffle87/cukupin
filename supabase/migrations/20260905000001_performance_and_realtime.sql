@@ -1,4 +1,4 @@
--- Performance indexes for Cukupin (postgres-best-practices)
+-- Performance indexes for Cukupin™ (postgres-best-practices)
 -- Speeds up category aggregations, monthly reports, and sorted goal/wishlist listings
 
 -- 1. Index for category analytics (breakdown by category per user)

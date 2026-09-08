@@ -110,7 +110,7 @@ export function BudgetSettingModal({
     <Modal title="Atur Batas Budget Bulanan" onClose={onClose}>
       <form onSubmit={handleSave} className="space-y-4">
         <p className="text-xs text-muted leading-relaxed">
-          Tentukan batas maksimal pengeluaran bulanan per kategori. Cukupin akan memberi tanda jika pengeluaranmu mendekati atau melebihi limit.
+          Tentukan batas maksimal pengeluaran bulanan per kategori. Cukupin™ akan memberi tanda jika pengeluaranmu mendekati atau melebihi limit.
         </p>
 
         <div className="space-y-3 pt-2">

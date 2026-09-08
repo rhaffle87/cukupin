@@ -1,6 +1,6 @@
 # Supabase Deployment & GitHub Integration Guide
 
-Panduan lengkap konfigurasi produksi, migrasi basis data, dan penyelesaian masalah GitHub Preview Branching untuk **Cukupin**.
+Panduan lengkap konfigurasi produksi, migrasi basis data, dan penyelesaian masalah GitHub Preview Branching untuk **Cukupin™**.
 
 ---
 
@@ -49,7 +49,7 @@ Tersedia file migrasi konsolidasi lengkap yang siap dieksekusi dalam 1 kali klik
 Setelah menjalankan migrasi, jalankan query berikut di SQL Editor untuk memastikan semua tabel dan RLS aktif:
 
 ```sql
--- 1. Cek semua tabel publik Cukupin
+-- 1. Cek semua tabel publik Cukupin™
 SELECT table_name 
 FROM information_schema.tables 
 WHERE table_schema = 'public' 

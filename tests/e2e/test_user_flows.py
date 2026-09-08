@@ -1,5 +1,5 @@
 """
-End-to-End (E2E) Browser Test Suite for Cukupin Web Application.
+End-to-End (E2E) Browser Test Suite for Cukupin™ Web Application.
 Uses Python Playwright to validate all user journeys, responsiveness, and visual elements.
 Auto-boots Next.js development server if not already running on localhost:3000.
 """
@@ -74,7 +74,7 @@ def test_cukupin_flows():
             response = page.goto(f"{BASE_URL}/", wait_until="domcontentloaded")
             assert response.status == 200, f"Expected status 200, got {response.status}"
             
-            page.wait_for_selector("text=Cukupin", timeout=15000)
+            page.wait_for_selector("text=Cukupin™", timeout=15000)
             print("  [OK] Landing page brand heading found")
             
             cta = page.locator("text=Buka Dashboard").first
@@ -120,8 +120,8 @@ def test_cukupin_flows():
             rep_response = page.goto(f"{BASE_URL}/reports", wait_until="domcontentloaded")
             assert rep_response.status == 200
             
-            page.wait_for_selector("button:has-text('Rapor Cukupin')", timeout=20000)
-            print("  [OK] 'Rapor Cukupin' action button rendered")
+            page.wait_for_selector("button:has-text('Rapor Cukupin™')", timeout=20000)
+            print("  [OK] 'Rapor Cukupin™' action button rendered")
             
             template_btn = page.locator("button:has-text('Format Bulanan')").first
             expect(template_btn).to_be_visible()

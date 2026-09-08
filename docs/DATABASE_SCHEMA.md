@@ -1,12 +1,12 @@
-# Cukupin Database Architecture & Schema Specification
+# Cukupin™ Database Architecture & Schema Specification
 
-Dokumentasi resmi arsitektur basis data, Entity-Relationship Diagram (ERD), aturan Row Level Security (RLS), indeks performa, dan konfigurasi replikasi real-time untuk aplikasi Cukupin.
+Dokumentasi resmi arsitektur basis data, Entity-Relationship Diagram (ERD), aturan Row Level Security (RLS), indeks performa, dan konfigurasi replikasi real-time untuk aplikasi Cukupin™.
 
 ---
 
 ## 1. Entity-Relationship Diagram (ERD)
 
-Arsitektur database Cukupin mengadopsi model multi-tenant berbasis `auth.users(id)` dari Supabase Engine. Setiap record data terikat erat pada akun pengguna terautentikasi melalui foreign key `user_id` dengan aksi cascading delete (`ON DELETE CASCADE`).
+Arsitektur database Cukupin™ mengadopsi model multi-tenant berbasis `auth.users(id)` dari Supabase Engine. Setiap record data terikat erat pada akun pengguna terautentikasi melalui foreign key `user_id` dengan aksi cascading delete (`ON DELETE CASCADE`).
 
 ```mermaid
 erDiagram

@@ -18,8 +18,8 @@ import {
 } from 'lucide-react'
 
 export const metadata = {
-  title: 'Kebijakan Privasi - Cukupin',
-  description: 'Kebijakan Privasi Cukupin. Komitmen perlindungan data pribadi sesuai UU PDP No. 27 Tahun 2022 dan prinsip GDPR. Tanpa akses rekening, tanpa penjualan data.',
+  title: 'Kebijakan Privasi - Cukupin™',
+  description: 'Kebijakan Privasi Cukupin™. Komitmen perlindungan data pribadi sesuai UU PDP No. 27 Tahun 2022 dan prinsip GDPR. Tanpa akses rekening, tanpa penjualan data.',
 }
 
 export default function PrivacyPolicyPage() {
@@ -69,10 +69,10 @@ export default function PrivacyPolicyPage() {
             <ShieldCheck size={14} /> DOKUMEN HUKUM & PRIVASI · VERSI 1.2
           </div>
           <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-ink leading-tight">
-            Kebijakan Privasi Cukupin
+            Kebijakan Privasi Cukupin™
           </h1>
           <p className="mt-4 text-sm sm:text-base text-muted max-w-2xl mx-auto leading-relaxed">
-            Data keuangan harian adalah informasi yang sangat personal. Kami merancang Cukupin dengan arsitektur <em>privacy-first</em>: tanpa meminta akses rekening bank, tanpa menghubungkan mutasi, dan tanpa pernah menjual data Anda kepada pihak ketiga.
+            Data keuangan harian adalah informasi yang sangat personal. Kami merancang Cukupin™ dengan arsitektur <em>privacy-first</em>: tanpa meminta akses rekening bank, tanpa menghubungkan mutasi, dan tanpa pernah menjual data Anda kepada pihak ketiga.
           </p>
 
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-xs text-muted">
@@ -180,7 +180,7 @@ export default function PrivacyPolicyPage() {
                 1. Landasan Hukum & Komitmen Kedaulatan Data
               </h2>
               <p>
-                Kebijakan Privasi ini disusun sebagai bentuk transparansi dan kepatuhan hukum Cukupin (selanjutnya disebut &ldquo;<strong>Kami</strong>&rdquo; atau &ldquo;<strong>Layanan</strong>&rdquo;) terhadap peraturan perundang-undangan yang berlaku di Republik Indonesia, khususnya:
+                Kebijakan Privasi ini disusun sebagai bentuk transparansi dan kepatuhan hukum Cukupin™ (selanjutnya disebut &ldquo;<strong>Kami</strong>&rdquo; atau &ldquo;<strong>Layanan</strong>&rdquo;) terhadap peraturan perundang-undangan yang berlaku di Republik Indonesia, khususnya:
               </p>
               <ul className="list-disc pl-5 space-y-1.5 text-xs text-muted">
                 <li>
@@ -207,7 +207,7 @@ export default function PrivacyPolicyPage() {
                 2. Kategori Data Pribadi yang Kami Kumpulkan
               </h2>
               <p>
-                Cukupin menerapkan asas <strong>Minimalisasi Data (Data Minimization)</strong>. Kami hanya mengumpulkan data yang mutlak diperlukan untuk mengoperasikan fungsi aplikasi:
+                Cukupin™ menerapkan asas <strong>Minimalisasi Data (Data Minimization)</strong>. Kami hanya mengumpulkan data yang mutlak diperlukan untuk mengoperasikan fungsi aplikasi:
               </p>
 
               <div className="space-y-3">
@@ -259,7 +259,7 @@ export default function PrivacyPolicyPage() {
                   <strong className="text-ink">Penyediaan Layanan Inti:</strong> Melakukan kalkulasi matematis otomatis seperti <em>Budget Harian Aman (Daily Safe Spend)</em>, pembagian rasio anggaran 50/30/20, serta agregasi laporan bulanan.
                 </li>
                 <li>
-                  <strong className="text-ink">Sinkronisasi Antar-Perangkat:</strong> Memungkinkan catatan pengeluaran Anda dapat diakses secara sinkron saat membuka Cukupin di peramban ponsel, tablet, maupun desktop.
+                  <strong className="text-ink">Sinkronisasi Antar-Perangkat:</strong> Memungkinkan catatan pengeluaran Anda dapat diakses secara sinkron saat membuka Cukupin™ di peramban ponsel, tablet, maupun desktop.
                 </li>
                 <li>
                   <strong className="text-ink">Pencegahan Penyalahgunaan & Keamanan:</strong> Memverifikasi identitas pengguna saat masuk serta mencegah serangan brute-force dan aktivitas bot berbahaya.
@@ -288,7 +288,7 @@ export default function PrivacyPolicyPage() {
                 </div>
                 <div className="rounded-xl border border-line bg-paper/50 p-4">
                   <strong className="block text-ink font-bold mb-1">Enkripsi Transit TLS 1.3</strong>
-                  Seluruh komunikasi data antara peramban Anda dan server Cukupin dilindungi enkripsi HTTPS menggunakan sertifikat TLS modern berderajat tinggi.
+                  Seluruh komunikasi data antara peramban Anda dan server Cukupin™ dilindungi enkripsi HTTPS menggunakan sertifikat TLS modern berderajat tinggi.
                 </div>
                 <div className="rounded-xl border border-line bg-paper/50 p-4">
                   <strong className="block text-ink font-bold mb-1">Infrastruktur Terpercaya</strong>
@@ -365,7 +365,7 @@ export default function PrivacyPolicyPage() {
                 7. Kuki (Cookies) & Kebijakan Analitik
               </h2>
               <p>
-                Cukupin menggunakan kuki seminimal mungkin:
+                Cukupin™ menggunakan kuki seminimal mungkin:
               </p>
               <ul className="list-disc pl-5 space-y-1.5 text-xs text-muted">
                 <li>
@@ -403,7 +403,7 @@ export default function PrivacyPolicyPage() {
                 9. Perlindungan Privasi Anak di Bawah Umur
               </h2>
               <p>
-                Layanan Cukupin ditujukan bagi individu yang telah berusia minimal 18 tahun atau telah cakap melakukan perbuatan hukum menurut peraturan perundang-undangan di Indonesia. Jika orang tua atau wali mengetahui bahwa anak di bawah umur memberikan data pribadinya tanpa persetujuan, silakan hubungi kami untuk tindakan penghapusan segera.
+                Layanan Cukupin™ ditujukan bagi individu yang telah berusia minimal 18 tahun atau telah cakap melakukan perbuatan hukum menurut peraturan perundang-undangan di Indonesia. Jika orang tua atau wali mengetahui bahwa anak di bawah umur memberikan data pribadinya tanpa persetujuan, silakan hubungi kami untuk tindakan penghapusan segera.
               </p>
             </section>
 
@@ -435,7 +435,7 @@ export default function PrivacyPolicyPage() {
               <div className="rounded-xl border border-line bg-paper/60 p-5 space-y-2 text-xs">
                 <div className="flex items-center gap-2">
                   <strong className="text-ink">Nama Layanan:</strong>
-                  <span className="text-muted">Cukupin (Catat Santai)</span>
+                  <span className="text-muted">Cukupin™ (Catat Santai)</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <strong className="text-ink">Email Khusus Privasi & DPO:</strong>
@@ -463,7 +463,7 @@ export default function PrivacyPolicyPage() {
       {/* Bottom Footer */}
       <footer className="border-t border-line/60 bg-paper py-8 text-center text-xs text-muted">
         <div className="mx-auto max-w-5xl px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p>&copy; {new Date().getFullYear()} Cukupin. Hak Cipta Dilindungi.</p>
+          <p>&copy; {new Date().getFullYear()} Cukupin™. Hak Cipta Dilindungi.</p>
           <div className="flex items-center gap-6 font-medium">
             <Link href="/" className="hover:text-ink transition-colors">Beranda</Link>
             <Link href="/legal/terms" className="hover:text-ink transition-colors">Syarat & Ketentuan</Link>

@@ -717,15 +717,15 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
           {filtered.length > 0 && (
             <div className="mb-4 grid grid-cols-2 gap-x-3 gap-y-2 sm:grid-cols-3 rounded-xl bg-paper/80 p-3 border border-line/60 text-xs shadow-2xs">
               <div className="col-span-2 sm:col-span-1">
-                <span className="block text-[10px] font-bold text-muted uppercase">Pemasukan</span>
+                <span className="block text-[11px] sm:text-xs font-semibold text-ink/80 uppercase tracking-wider">Pemasukan</span>
                 <strong className="text-green !font-numeric tabular-nums font-bold text-sm">{currency(filteredStats.income)}</strong>
               </div>
               <div>
-                <span className="block text-[10px] font-bold text-muted uppercase">Pengeluaran</span>
+                <span className="block text-[11px] sm:text-xs font-semibold text-ink/80 uppercase tracking-wider">Pengeluaran</span>
                 <strong className="text-coral !font-numeric tabular-nums font-bold text-sm">{currency(filteredStats.expense)}</strong>
               </div>
               <div>
-                <span className="block text-[10px] font-bold text-muted uppercase">Net Sisa</span>
+                <span className="block text-[11px] sm:text-xs font-semibold text-ink/80 uppercase tracking-wider">Net Sisa</span>
                 <strong className={`!font-numeric tabular-nums font-bold text-sm ${filteredStats.balance >= 0 ? 'text-blue' : 'text-coral'}`}>
                   {currency(filteredStats.balance)}
                 </strong>
@@ -814,7 +814,7 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
           </div>
           
           <div className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between text-[10px] text-white/60">
-            <span>Wawasan Cukupin</span>
+            <span>Wawasan Cukupin™</span>
             {companionInsights.length > 1 && (
               <button
                 type="button"

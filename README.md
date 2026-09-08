@@ -1,4 +1,4 @@
-# Cukupin
+# Cukupin™
 
 > **Catat santai, tahu arah uangmu.**  
 > Aplikasi pencatatan keuangan pribadi dengan pendekatan *Quiet Ledger* — tenang, berfokus pada kebiasaan sehat, ramah privasi, dan mendukung penggunaan offline (PWA).
@@ -8,7 +8,7 @@
 ## ✨ Fitur Utama
 
 - **Hero ATM / Debit Card**: Visualisasi saldo kas realtime dengan sentuhan kartu ATM elegan (chip emas EMV, indikator NFC, status aman/menipis, dan nomor kartu tersamar).
-- **Rapor Keuangan Cukupin (Wrapped & Scorecard)**: Penilaian kesehatan finansial 100 poin (Tingkat Tabungan, Kepatuhan Anggaran, Disiplin Catat, Rasio 50/30/20) dan kartu rapor yang dapat diunduh (PNG) untuk dibagikan.
+- **Rapor Keuangan Cukupin™ (Wrapped & Scorecard)**: Penilaian kesehatan finansial 100 poin (Tingkat Tabungan, Kepatuhan Anggaran, Disiplin Catat, Rasio 50/30/20) dan kartu rapor yang dapat diunduh (PNG) untuk dibagikan.
 - **Pola Pengeluaran 50/30/20**: Distribusi otomatis pengeluaran ke kategori Kebutuhan (*Needs*), Keinginan (*Wants*), dan Tabungan (*Savings*).
 - **Tagihan Rutin & Pengingat**: Kelola pengeluaran berulang bulanan/tahunan dengan peringatan tagihan tertunda langsung di Dashboard.
 - **Limit Anggaran Kategori**: Tetapkan batas belanja per kategori dengan indikator visual sisa/defisit anggaran.
@@ -16,7 +16,7 @@
 - **PWA & Offline-First Resilience**: Tetap bisa mencatat saat tanpa internet; transaksi dan aksi otomatis disinkronkan kembali saat online melalui antrean lokal (`offlineQueue`).
 - **Penyimpanan Lokal & Cloud**: Mendukung mode pengembang/tamu berbasis penyimpanan lokal (`local-dev-user`) serta integrasi Supabase PostgreSQL dengan Row-Level Security (RLS).
 - **Sistem Cadangan & Pemulihan (Disaster Recovery)**: Impor data via CSV (dengan mitigasi injeksi formula OWASP) dan cadangkan/pulihkan seluruh data via JSON v2.0 tervalidasi skema Zod.
-- **Halaman Galat & 404 Kustom**: Antarmuka 404 dan *error boundary* yang ramah, informatif, dan terintegrasi dengan palet desain Cukupin.
+- **Halaman Galat & 404 Kustom**: Antarmuka 404 dan *error boundary* yang ramah, informatif, dan terintegrasi dengan palet desain Cukupin™.
 
 ---
 

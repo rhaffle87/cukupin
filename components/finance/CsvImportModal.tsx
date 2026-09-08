@@ -214,7 +214,7 @@ export function CsvImportModal({ supabase, userId, onClose, onSuccess }: CsvImpo
     <Modal title="Impor Transaksi CSV" onClose={onClose}>
       <div className="flex flex-col gap-4 text-xs">
         <p className="text-muted">
-          Pilih file CSV dari mutasi rekening, e-wallet, atau aplikasi pencatat lain untuk dimasukkan sekaligus ke Cukupin.
+          Pilih file CSV dari mutasi rekening, e-wallet, atau aplikasi pencatat lain untuk dimasukkan sekaligus ke Cukupin™.
         </p>
 
         {rows.length === 0 ? (

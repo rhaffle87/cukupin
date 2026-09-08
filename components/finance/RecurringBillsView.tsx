@@ -189,7 +189,7 @@ export function RecurringBillsView({
       {/* Metric Cards Banner */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className="rounded-2xl border border-line bg-card p-4 shadow-2xs">
-          <div className="text-[11px] font-mono uppercase tracking-wider text-muted">
+          <div className="text-xs sm:text-[13px] font-semibold text-ink/80 tracking-normal">
             Total Komitmen Rutin
           </div>
           <div className="mt-1 font-numeric tabular-nums text-2xl font-bold text-ink">
@@ -201,10 +201,10 @@ export function RecurringBillsView({
         </div>
 
         <div className="rounded-2xl border border-line bg-card p-4 shadow-2xs">
-          <div className="text-[11px] font-mono uppercase tracking-wider text-muted">
+          <div className="text-xs sm:text-[13px] font-semibold text-ink/80 tracking-normal">
             Sudah Dicatat Bulan Ini
           </div>
-          <div className="mt-1 font-serif text-2xl font-bold text-green">
+          <div className="mt-1 font-numeric tabular-nums text-2xl font-bold text-green">
             {loggedBills.length} Tagihan
           </div>
           <div className="mt-0.5 text-xs text-muted">
@@ -213,10 +213,10 @@ export function RecurringBillsView({
         </div>
 
         <div className="rounded-2xl border border-line bg-card p-4 shadow-2xs">
-          <div className="text-[11px] font-mono uppercase tracking-wider text-muted">
+          <div className="text-xs sm:text-[13px] font-semibold text-ink/80 tracking-normal">
             Belum Dicatat Bulan Ini
           </div>
-          <div className="mt-1 font-serif text-2xl font-bold text-coral">
+          <div className="mt-1 font-numeric tabular-nums text-2xl font-bold text-coral">
             {pendingBills.length} Tagihan
           </div>
           <div className="mt-0.5 text-xs text-muted">
@@ -275,7 +275,7 @@ export function RecurringBillsView({
                         <Receipt size={18} className="text-green" />
                       </div>
                       <div>
-                        <h4 className="font-semibold text-sm text-ink leading-tight">{bill.name}</h4>
+                        <h4 className="font-bold text-sm sm:text-base text-ink leading-tight">{bill.name}</h4>
                         <div className="mt-0.5 flex items-center gap-2 text-xs text-muted">
                           <span className="font-mono">{bill.category}</span>
                           <span>•</span>

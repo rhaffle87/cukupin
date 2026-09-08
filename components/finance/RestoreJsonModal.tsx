@@ -165,7 +165,7 @@ export function RestoreJsonModal({
         transactions_count: txs.length,
       })
 
-      toast.success('Data Cukupin berhasil dipulihkan!')
+      toast.success('Data Cukupin™ berhasil dipulihkan!')
       onRestored()
       onClose()
     } catch (err: any) {

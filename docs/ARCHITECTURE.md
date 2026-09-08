@@ -1,12 +1,12 @@
-# Cukupin: Technical Architecture & System Design Documentation
+# Cukupin™: Technical Architecture & System Design Documentation
 
-Dokumentasi arsitektur teknis, pola rekayasa perangkat lunak, dan infrastruktur data untuk aplikasi **Cukupin**.
+Dokumentasi arsitektur teknis, pola rekayasa perangkat lunak, dan infrastruktur data untuk aplikasi **Cukupin™**.
 
 ---
 
 ## 1. Ikhtisar Sistem (High-Level Architecture)
 
-Cukupin dirancang menggunakan arsitektur modern berbasis **Next.js 16 (App Router)** dengan pendekatan *hybrid offline-first* dan integrasi cloud **Supabase (PostgreSQL)**.
+Cukupin™ dirancang menggunakan arsitektur modern berbasis **Next.js 16 (App Router)** dengan pendekatan *hybrid offline-first* dan integrasi cloud **Supabase (PostgreSQL)**.
 
 ```mermaid
 flowchart TD
@@ -56,7 +56,7 @@ Dikonfigurasi secara terpusat pada `next.config.mjs`:
 
 ## 3. Infrastruktur Data & Disaster Recovery (Backup & Restore)
 
-Cukupin menyediakan sistem pemulihan bencana terpusat pada `lib/backup.ts` untuk memastikan pengguna memiliki kendali penuh atas data mereka.
+Cukupin™ menyediakan sistem pemulihan bencana terpusat pada `lib/backup.ts` untuk memastikan pengguna memiliki kendali penuh atas data mereka.
 
 ### 3.1. Spesifikasi Payload Cadangan v2.0
 ```typescript

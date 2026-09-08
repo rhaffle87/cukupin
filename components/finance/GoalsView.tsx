@@ -383,13 +383,13 @@ export function GoalsView({ supabase, data, userId }: GoalsViewProps) {
                   {/* Amounts */}
                   <div className="mt-2.5 flex items-baseline justify-between">
                     <div>
-                      <span className="text-[10px] font-semibold text-muted uppercase tracking-wider block">Terkumpul</span>
+                      <span className="text-[11px] sm:text-xs font-semibold text-muted uppercase tracking-wider block">Terkumpul</span>
                       <strong className="text-xl !font-numeric tabular-nums font-bold text-ink">
                         {currency(current)}
                       </strong>
                     </div>
                     <div className="text-right">
-                      <span className="text-[10px] font-semibold text-muted uppercase tracking-wider block">Target</span>
+                      <span className="text-[11px] sm:text-xs font-semibold text-muted uppercase tracking-wider block">Target</span>
                       <span className="text-sm !font-numeric tabular-nums font-bold text-muted">
                         {currency(targetAmt)}
                       </span>

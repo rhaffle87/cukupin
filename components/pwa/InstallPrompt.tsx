@@ -95,7 +95,7 @@ export function InstallPrompt() {
 
           <div className="flex-1 pr-4">
             <div className="text-xs font-mono font-semibold tracking-wider text-[#3E8F68] uppercase">
-              PWA Cukupin
+              PWA Cukupin™
             </div>
             <h4 className="font-serif font-bold text-sm text-[#1E3249] mt-0.5">
               Pasang di Layar Utama

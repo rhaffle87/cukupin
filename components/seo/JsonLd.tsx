@@ -5,7 +5,7 @@ export function JsonLd() {
     {
       '@context': 'https://schema.org',
       '@type': 'Organization',
-      name: 'Cukupin',
+      name: 'Cukupin™',
       url: 'https://cukupin.app',
       logo: 'https://cukupin.app/icon.png',
       description: 'Aplikasi pencatatan keuangan pribadi dengan pendekatan Quiet Ledger — ramah privasi, offline-ready, dan tanpa iklan.',
@@ -14,8 +14,8 @@ export function JsonLd() {
     {
       '@context': 'https://schema.org',
       '@type': 'SoftwareApplication',
-      name: 'Cukupin',
-      alternateName: 'Cukupin App',
+      name: 'Cukupin™',
+      alternateName: 'Cukupin™ App',
       url: 'https://cukupin.app',
       applicationCategory: 'FinanceApplication',
       operatingSystem: 'All, Android, iOS, Windows, macOS, Linux',
@@ -49,18 +49,18 @@ export function JsonLd() {
       mainEntity: [
         {
           '@type': 'Question',
-          name: 'Apakah Cukupin benar-benar gratis?',
+          name: 'Apakah Cukupin™ benar-benar gratis?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Ya, Cukupin 100% gratis digunakan tanpa biaya langganan, tanpa uji coba berbayar, dan tanpa fitur tersembunyi.',
+            text: 'Ya, Cukupin™ 100% gratis digunakan tanpa biaya langganan, tanpa uji coba berbayar, dan tanpa fitur tersembunyi.',
           },
         },
         {
           '@type': 'Question',
-          name: 'Apakah Cukupin meminta akses ke rekening bank saya?',
+          name: 'Apakah Cukupin™ meminta akses ke rekening bank saya?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Tidak sama sekali. Cukupin tidak meminta nomor rekening, PIN, atau kata sandi bank. Kamu mencatat pengeluaran secara mandiri demi keamanan dan privasi penuh.',
+            text: 'Tidak sama sekali. Cukupin™ tidak meminta nomor rekening, PIN, atau kata sandi bank. Kamu mencatat pengeluaran secara mandiri demi keamanan dan privasi penuh.',
           },
         },
         {
@@ -73,10 +73,10 @@ export function JsonLd() {
         },
         {
           '@type': 'Question',
-          name: 'Apakah Cukupin bisa digunakan di smartphone?',
+          name: 'Apakah Cukupin™ bisa digunakan di smartphone?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Bisa. Cukupin adalah Progressive Web App (PWA) yang bisa langsung di-install di HP Android maupun iPhone tanpa perlu download dari App Store yang berat.',
+            text: 'Bisa. Cukupin™ adalah Progressive Web App (PWA) yang bisa langsung di-install di HP Android maupun iPhone tanpa perlu download dari App Store yang berat.',
           },
         },
         {

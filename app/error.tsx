@@ -13,7 +13,7 @@ export default function GlobalError({
 }) {
   useEffect(() => {
     // Log unexpected runtime client error for debugging
-    console.error('[Cukupin App Runtime Error]:', error)
+    console.error('[Cukupin™ App Runtime Error]:', error)
   }, [error])
 
   return (
