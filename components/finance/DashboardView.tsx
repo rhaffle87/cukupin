@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useRef } from 'react'
 import type { Transaction } from '@/lib/database.types'
 import { ArrowDownLeft, ArrowUpRight, BarChart3, ChevronRight, CircleDollarSign, Plus, Wallet, Receipt, Sparkles } from 'lucide-react'
 import Link from 'next/link'
@@ -100,6 +100,211 @@ function RecentTransactions({ transactions }: { transactions: Transaction[] }) {
   )
 }
 
+interface CategoryPieChartProps {
+  breakdown: Array<{ name: string; value: number }>
+  totalExpense: number
+  colors: string[]
+}
+
+function CategoryPieChart({ breakdown, totalExpense, colors }: CategoryPieChartProps) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [activeItem, setActiveItem] = useState<{
+    name: string
+    value: number
+    color: string
+    percent: number
+  } | null>(null)
+  const [cursorPos, setCursorPos] = useState<{ x: number; y: number } | null>(null)
+
+  const total = totalExpense || breakdown.reduce((sum, item) => sum + item.value, 0)
+
+  const handleContainerMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!containerRef.current) return
+    const rect = containerRef.current.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
+    setCursorPos({ x, y })
+
+    // Distance check from center: cy=110, cx=width/2
+    const cx = rect.width / 2
+    const cy = rect.height / 2
+    const dist = Math.hypot(x - cx, y - cy)
+    // If mouse moves into the donut center hole or outside outer radius, clear active item
+    if (dist < 58 || dist > 108) {
+      setActiveItem(null)
+    }
+  }
+
+  const handleContainerMouseLeave = () => {
+    setCursorPos(null)
+    setActiveItem(null)
+  }
+
+  return (
+    <div className="flex flex-1 flex-col justify-between">
+      <div
+        ref={containerRef}
+        onMouseMove={handleContainerMouseMove}
+        onMouseLeave={handleContainerMouseLeave}
+        onPointerLeave={handleContainerMouseLeave}
+        className="relative h-[220px] w-full select-none"
+      >
+        {/* Center label */}
+        <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center z-10">
+          <strong className="block font-display text-xl sm:text-2xl font-bold text-ink leading-none">
+            {shortCurrency(totalExpense)}
+          </strong>
+          <small className="mt-1 block text-[10px] font-semibold text-muted tracking-wider uppercase">
+            total
+          </small>
+        </div>
+
+        {/* Floating cursor-following tooltip */}
+        {activeItem && cursorPos && (
+          <div
+            className="pointer-events-none absolute z-30 transition-transform duration-75 ease-out"
+            style={{
+              left: 0,
+              top: 0,
+              transform: (() => {
+                const width = containerRef.current?.clientWidth || 300
+                const height = containerRef.current?.clientHeight || 220
+                const tooltipW = 145
+                const tooltipH = 52
+                let tx = cursorPos.x + 12
+                let ty = cursorPos.y + 12
+
+                if (cursorPos.x + 12 + tooltipW > width - 6) {
+                  tx = cursorPos.x - tooltipW - 12
+                }
+
+                if (cursorPos.y + 12 + tooltipH > height - 6) {
+                  ty = cursorPos.y - tooltipH - 12
+                }
+
+                tx = Math.max(4, Math.min(tx, width - tooltipW - 4))
+                ty = Math.max(4, Math.min(ty, height - tooltipH - 4))
+                return `translate3d(${tx}px, ${ty}px, 0)`
+              })(),
+            }}
+          >
+            <div className="min-w-[145px] rounded-xl border border-line bg-card/95 px-3 py-2 shadow-[0_8px_24px_rgba(0,0,0,0.12)] backdrop-blur-md">
+              <div className="flex items-center gap-2">
+                <span
+                  className="h-2.5 w-2.5 rounded-full shrink-0 shadow-xs"
+                  style={{ backgroundColor: activeItem.color }}
+                />
+                <span className="text-xs font-bold text-ink truncate max-w-[95px]">
+                  {activeItem.name}
+                </span>
+                <span className="ml-auto text-[10px] font-semibold text-muted">
+                  {activeItem.percent}%
+                </span>
+              </div>
+              <div
+                className="mt-1 font-numeric text-xs font-bold tabular-nums"
+                style={{ color: activeItem.color }}
+              >
+                {currency(activeItem.value)}
+              </div>
+            </div>
+          </div>
+        )}
+
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={breakdown}
+              innerRadius={68}
+              outerRadius={95}
+              paddingAngle={3}
+              dataKey="value"
+              isAnimationActive={true}
+              animationDuration={500}
+              onMouseEnter={(_, index) => {
+                const item = breakdown[index]
+                if (item) {
+                  const pct = total > 0 ? Math.round((item.value / total) * 100) : 0
+                  setActiveItem({
+                    name: item.name,
+                    value: item.value,
+                    color: colors[index % colors.length],
+                    percent: pct,
+                  })
+                }
+              }}
+              onMouseMove={(_, index, e) => {
+                const item = breakdown[index]
+                if (item && (!activeItem || activeItem.name !== item.name)) {
+                  const pct = total > 0 ? Math.round((item.value / total) * 100) : 0
+                  setActiveItem({
+                    name: item.name,
+                    value: item.value,
+                    color: colors[index % colors.length],
+                    percent: pct,
+                  })
+                }
+                if (containerRef.current && e) {
+                  const rect = containerRef.current.getBoundingClientRect()
+                  setCursorPos({
+                    x: e.clientX - rect.left,
+                    y: e.clientY - rect.top,
+                  })
+                }
+              }}
+              onMouseLeave={() => {
+                setActiveItem(null)
+              }}
+            >
+              {breakdown.map((_, i) => (
+                <Cell
+                  key={i}
+                  fill={colors[i % colors.length]}
+                  className="transition-all duration-200 cursor-pointer outline-none hover:opacity-90"
+                />
+              ))}
+            </Pie>
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+
+      <div className="mt-auto flex flex-col gap-2 border-t border-line pt-3">
+        {breakdown.slice(0, 4).map((item, i) => (
+          <div
+            key={item.name}
+            className="flex items-center justify-between text-[11px] text-ink cursor-pointer rounded-lg px-2 py-1 -mx-2 transition-colors hover:bg-black/5"
+            onMouseEnter={() => {
+              const pct = total > 0 ? Math.round((item.value / total) * 100) : 0
+              setActiveItem({
+                name: item.name,
+                value: item.value,
+                color: colors[i % colors.length],
+                percent: pct,
+              })
+              setCursorPos({ x: 150, y: 110 })
+            }}
+            onMouseLeave={() => {
+              setActiveItem(null)
+              setCursorPos(null)
+            }}
+          >
+            <span className="flex items-center gap-2">
+              <i className="h-2 w-2 rounded-full" style={{ background: colors[i % colors.length] }} />
+              <span className="font-medium">{item.name}</span>
+            </span>
+            <strong
+              className="font-bold tabular-nums"
+              style={{ color: colors[i % colors.length] }}
+            >
+              {shortCurrency(item.value)}
+            </strong>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 interface DashboardViewProps {
   data: ReturnType<typeof useFinanceData>
   user: { id?: string; email?: string } | null
@@ -108,6 +313,7 @@ interface DashboardViewProps {
 
 export function DashboardView({ data, user, supabase }: DashboardViewProps) {
   const [showWrapped, setShowWrapped] = useState(false)
+  const [barRange, setBarRange] = useState<'30d' | '7d'>('30d')
 
   const { monthTx, stats, series, breakdown, insight, safeSpend } = useMemo(() => {
     const current = monthBounds()
@@ -306,42 +512,100 @@ export function DashboardView({ data, user, supabase }: DashboardViewProps) {
       })()}
 
       <div className="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1.55fr)_minmax(270px,0.85fr)]">
-        <section className="min-h-[320px] rounded-[18px] border border-line bg-card p-5 shadow-[0_5px_20px_rgba(30,50,73,0.025)] md:min-h-[347px] md:p-6 animate-in slide-in-from-bottom-2 duration-500 delay-100 fill-mode-both">
+        <section className="flex flex-col min-h-[320px] rounded-[18px] border border-line bg-card p-5 shadow-[0_5px_20px_rgba(30,50,73,0.025)] md:min-h-[347px] md:p-6 animate-in slide-in-from-bottom-2 duration-500 delay-100 fill-mode-both">
           <div className="mb-5 flex items-start justify-between gap-3 md:mb-6">
             <div>
               <Eyebrow>GRAFIK HARIAN</Eyebrow>
               <h2 className="mt-1.5 font-display text-xl font-bold tracking-tight">Pemasukan vs pengeluaran</h2>
             </div>
-            <span className="flex items-center gap-1.5 whitespace-nowrap rounded-full border border-line px-2.5 py-1.5 text-[9px] text-muted md:text-[10px]">
-              30 hari terakhir <ChevronRight size={13} />
-            </span>
+            <div className="inline-flex items-center rounded-full border border-line bg-canvas/80 p-0.5 shadow-2xs">
+              <button
+                type="button"
+                onClick={() => setBarRange('7d')}
+                className={`rounded-full px-2.5 py-1 text-[10px] font-bold transition-all ${
+                  barRange === '7d' ? 'bg-card text-ink shadow-xs' : 'text-muted hover:text-ink'
+                }`}
+              >
+                7 hari
+              </button>
+              <button
+                type="button"
+                onClick={() => setBarRange('30d')}
+                className={`rounded-full px-2.5 py-1 text-[10px] font-bold transition-all ${
+                  barRange === '30d' ? 'bg-card text-ink shadow-xs' : 'text-muted hover:text-ink'
+                }`}
+              >
+                30 hari
+              </button>
+            </div>
           </div>
           {monthTx.length ? (
-            <ResponsiveContainer width="100%" height={260}>
-              <BarChart data={series} barGap={2}>
-                <CartesianGrid vertical={false} stroke="#E8E7E0" />
-                <XAxis dataKey="label" tickLine={false} axisLine={false} interval={5} tick={{ fill: '#829087', fontSize: 10 }} />
-                <YAxis tickLine={false} axisLine={false} tick={{ fill: '#829087', fontSize: 11 }} tickFormatter={v => `${Math.round(v / 1000)}k`} />
-                <Tooltip formatter={(v: any) => currency(Number(v))} contentStyle={{ borderRadius: 10, border: '1px solid #E8E7E0', boxShadow: '0 8px 24px #1e324912' }} />
-                <Bar dataKey="income" name="Pemasukan" fill="#3E8F68" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="expense" name="Pengeluaran" fill="#D98362" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            <div className="flex-1 w-full min-h-[260px] h-[260px] lg:h-auto">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={barRange === '7d' ? series.slice(-7) : series}
+                  barGap={barRange === '7d' ? 4 : 2}
+                  margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
+                >
+                  <CartesianGrid vertical={false} stroke="#E8E7E0" strokeDasharray="3 3" />
+                  <XAxis
+                    dataKey="label"
+                    tickLine={false}
+                    axisLine={false}
+                    interval={barRange === '7d' ? 0 : 5}
+                    tick={{ fill: '#829087', fontSize: 10 }}
+                  />
+                  <YAxis
+                    width={44}
+                    tickLine={false}
+                    axisLine={false}
+                    tick={{ fill: '#829087', fontSize: 10 }}
+                    tickFormatter={v => `${Math.round(v / 1000)}k`}
+                  />
+                  <Tooltip
+                    formatter={(v: any) => currency(Number(v))}
+                    contentStyle={{
+                      borderRadius: 12,
+                      border: '1px solid #E8E7E0',
+                      boxShadow: '0 8px 24px rgba(30,50,73,0.08)',
+                      fontSize: 12,
+                      padding: '8px 12px',
+                    }}
+                  />
+                  <Bar
+                    dataKey="income"
+                    name="Pemasukan"
+                    fill="#3E8F68"
+                    radius={[4, 4, 0, 0]}
+                    maxBarSize={barRange === '7d' ? 24 : 14}
+                  />
+                  <Bar
+                    dataKey="expense"
+                    name="Pengeluaran"
+                    fill="#D98362"
+                    radius={[4, 4, 0, 0]}
+                    maxBarSize={barRange === '7d' ? 24 : 14}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           ) : (
-            <EmptyState
-              icon={BarChart3}
-              title="Belum ada data grafik"
-              body="Catat pemasukan atau pengeluaranmu dulu yuk buat lihat grafiknya."
-              action={
-                <Link href="/transactions" className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#EFF3F0] px-4 py-2.5 text-[11px] font-bold text-green transition-transform hover:scale-[0.98]">
-                  <Plus size={15} /> Tambah catatan
-                </Link>
-              }
-            />
+            <div className="flex-1 flex items-center justify-center">
+              <EmptyState
+                icon={BarChart3}
+                title="Belum ada data grafik"
+                body="Catat pemasukan atau pengeluaranmu dulu yuk buat lihat grafiknya."
+                action={
+                  <Link href="/transactions" className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#EFF3F0] px-4 py-2.5 text-[11px] font-bold text-green transition-transform hover:scale-[0.98]">
+                    <Plus size={15} /> Tambah catatan
+                  </Link>
+                }
+              />
+            </div>
           )}
         </section>
 
-        <section className="min-h-[320px] rounded-[18px] border border-line bg-card p-5 shadow-[0_5px_20px_rgba(30,50,73,0.025)] md:min-h-[347px] md:p-6 animate-in slide-in-from-bottom-2 duration-500 delay-100 fill-mode-both">
+        <section className="flex flex-col min-h-[320px] rounded-[18px] border border-line bg-card p-5 shadow-[0_5px_20px_rgba(30,50,73,0.025)] md:min-h-[347px] md:p-6 animate-in slide-in-from-bottom-2 duration-500 delay-100 fill-mode-both">
           <div className="mb-5 flex items-start justify-between gap-3 md:mb-6">
             <div>
               <Eyebrow>PENGELUARAN</Eyebrow>
@@ -349,37 +613,15 @@ export function DashboardView({ data, user, supabase }: DashboardViewProps) {
             </div>
           </div>
           {breakdown.length ? (
-            <>
-              <div className="relative h-[190px]">
-                <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
-                  <strong className="block font-display text-[18px] text-ink">{shortCurrency(stats.expense)}</strong>
-                  <small className="mt-1 block text-[10px] text-muted">total</small>
-                </div>
-                <ResponsiveContainer width="100%" height={190}>
-                  <PieChart>
-                    <Pie data={breakdown} innerRadius={58} outerRadius={78} paddingAngle={3} dataKey="value">
-                      {breakdown.map((_, i) => (
-                        <Cell key={i} fill={colors[i % colors.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip formatter={(v: any) => currency(Number(v))} />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="mt-3 flex flex-col gap-2 border-t border-line pt-3">
-                {breakdown.slice(0, 4).map((item, i) => (
-                  <div key={item.name} className="flex items-center justify-between text-[11px] text-ink">
-                    <span className="flex items-center gap-2">
-                      <i className="h-2 w-2 rounded-full" style={{ background: colors[i % colors.length] }} />
-                      {item.name}
-                    </span>
-                    <strong className="font-bold">{shortCurrency(item.value)}</strong>
-                  </div>
-                ))}
-              </div>
-            </>
+            <CategoryPieChart
+              breakdown={breakdown}
+              totalExpense={stats.expense}
+              colors={colors}
+            />
           ) : (
-            <EmptyState icon={CircleDollarSign} title="Belum ada data belanja" body="Kategori bakal muncul otomatis kalau kamu udah catat pengeluaran." />
+            <div className="flex-1 flex items-center justify-center">
+              <EmptyState icon={CircleDollarSign} title="Belum ada data belanja" body="Kategori bakal muncul otomatis kalau kamu udah catat pengeluaran." />
+            </div>
           )}
         </section>
       </div>
