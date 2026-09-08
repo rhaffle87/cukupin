@@ -489,6 +489,7 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
           bills={data.bills || []}
           setBills={data.setBills}
           logRecurringBillAsTransaction={data.logRecurringBillAsTransaction}
+          goals={data.goals || []}
         />
       ) : (
         <>
@@ -859,6 +860,7 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
       {showExportTemplate && (
         <MonthlyExpenseTemplate
           transactions={data.transactions}
+          goals={data.goals}
           onClose={() => setShowExportTemplate(false)}
         />
       )}

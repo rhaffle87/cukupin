@@ -1,13 +1,14 @@
 'use client'
 
 import React, { useMemo, useState, useRef } from 'react'
-import type { Transaction } from '@/lib/database.types'
+import type { SavingGoal, Transaction } from '@/lib/database.types'
 import { currency, escapeCsvField, shortCurrency } from '@/lib/finance'
 import { Download, FileSpreadsheet, X } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface MonthlyExpenseTemplateProps {
   transactions: Transaction[]
+  goals?: SavingGoal[]
   userEmail?: string
   defaultMonth?: string // YYYY-MM
   onClose: () => void
@@ -15,6 +16,7 @@ interface MonthlyExpenseTemplateProps {
 
 export function MonthlyExpenseTemplate({
   transactions,
+  goals = [],
   userEmail,
   defaultMonth,
   onClose,
@@ -359,6 +361,63 @@ export function MonthlyExpenseTemplate({
           </tfoot>
         </table>
       </div>
+
+      {/* Active Savings Goals & Monthly Pace Section */}
+      {goals && goals.length > 0 && (
+        <div className="mt-6 border border-[#111827] bg-[#F9FAFB] p-4 text-xs w-full">
+          <div className="flex items-center justify-between mb-3 border-b border-[#E5E7EB] pb-2">
+            <h3 className="font-bold text-[11px] tracking-wider uppercase text-[#111827]">
+              TARGET TABUNGAN & RENCANA MASA DEPAN
+            </h3>
+            <span className="text-[10px] text-[#6B7280]">
+              Estimasi ritme tabungan bulanan terencana
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {goals.map((g) => {
+              const current = Number(g.current_amount)
+              const targetAmt = Number(g.target_amount)
+              const progress = targetAmt > 0 ? Math.min(100, (current / targetAmt) * 100) : 0
+              const diff = Math.max(0, targetAmt - current)
+              const monthlyPace = diff > 0 ? Math.ceil(diff / 3) : 0
+              const isCompleted = progress >= 100
+
+              return (
+                <div
+                  key={g.id}
+                  className="rounded border border-[#E5E7EB] bg-white p-3 space-y-1.5"
+                >
+                  <div className="flex items-center justify-between">
+                    <strong className="text-xs font-semibold text-[#111827]">{g.name}</strong>
+                    <span className="text-[10px] font-bold text-[#059669]">
+                      {isCompleted ? 'Target Tercapai' : `${progress.toFixed(0)}%`}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-[11px] font-numeric tabular-nums text-[#4B5563]">
+                    <span>Terkumpul: {currency(current)}</span>
+                    <span className="text-[#6B7280]">Target: {currency(targetAmt)}</span>
+                  </div>
+
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#E5E7EB]">
+                    <div
+                      className={`h-full rounded-full ${isCompleted ? 'bg-[#059669]' : 'bg-[#2563EB]'}`}
+                      style={{ width: `${progress}%` }}
+                    />
+                  </div>
+
+                  {!isCompleted && monthlyPace > 0 && (
+                    <div className="pt-1 text-[10px] text-[#4B5563] border-t border-[#F3F4F6]">
+                      <span>Rekomendasi: Nabung ~{currency(monthlyPace)}/bln untuk capai dalam 3 bulan</span>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Extra Details: Top Categories & Notes Section */}
       <div className="mt-8 grid grid-cols-2 gap-6 pt-4 border-t border-[#D1D5DB] text-xs w-full">

@@ -1,16 +1,22 @@
 'use client'
 
 import React, { useState } from 'react'
-import type { RecurringBill } from '@/lib/database.types'
+import type { RecurringBill, SavingGoal } from '@/lib/database.types'
 import { SupabaseClient } from '@supabase/supabase-js'
 import {
+  AlertTriangle,
   Calendar,
+  Check,
   CheckCircle2,
   Clock,
+  Copy,
   CreditCard,
   Edit2,
+  ExternalLink,
+  PiggyBank,
   Plus,
   Receipt,
+  Target,
   Trash2,
   X,
 } from 'lucide-react'
@@ -25,10 +31,35 @@ interface RecurringBillsViewProps {
   bills: RecurringBill[]
   setBills: React.Dispatch<React.SetStateAction<RecurringBill[]>>
   logRecurringBillAsTransaction: (bill: RecurringBill) => Promise<boolean>
+  goals?: SavingGoal[]
 }
 
-const categories = ['Bills', 'Food', 'Transport', 'Shopping', 'Health', 'Other']
+const categories = ['Bills', 'Food', 'Transport', 'Shopping', 'Health', 'Tabungan', 'Investasi', 'Other']
 const paymentMethods = ['Transfer Bank', 'QRIS', 'E-Wallet', 'Kartu Kredit', 'Cash']
+
+const RECURRING_BILLS_SQL = `-- Jalankan SQL ini di Supabase Dashboard -> SQL Editor:
+create table if not exists public.recurring_bills (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  name text not null check (char_length(name) between 1 and 120),
+  amount numeric(12,2) not null check (amount > 0),
+  category text not null check (char_length(category) between 1 and 40),
+  due_day integer not null check (due_day between 1 and 31),
+  frequency text not null default 'monthly' check (frequency in ('monthly', 'yearly')),
+  payment_method text default 'Transfer Bank',
+  is_active boolean not null default true,
+  last_logged_month text,
+  created_at timestamptz not null default now()
+);
+
+alter table public.recurring_bills enable row level security;
+
+do $$ begin
+  create policy "Users can manage their own recurring bills" 
+    on public.recurring_bills for all to authenticated 
+    using ((select auth.uid()) = user_id)
+    with check ((select auth.uid()) = user_id);
+exception when duplicate_object then null; end $$;`
 
 export function RecurringBillsView({
   supabase,
@@ -36,8 +67,11 @@ export function RecurringBillsView({
   bills,
   setBills,
   logRecurringBillAsTransaction,
+  goals = [],
 }: RecurringBillsViewProps) {
   const [showModal, setShowModal] = useState(false)
+  const [showMigrationModal, setShowMigrationModal] = useState(false)
+  const [copiedSql, setCopiedSql] = useState(false)
   const [editingBill, setEditingBill] = useState<RecurringBill | null>(null)
   const [loggingId, setLoggingId] = useState<string | null>(null)
 
@@ -45,7 +79,7 @@ export function RecurringBillsView({
   const [name, setName] = useState('')
   const [amountStr, setAmountStr] = useState('')
   const [category, setCategory] = useState('Bills')
-  const [dueDay, setDueDay] = useState(1)
+  const [dueDay, setDueDay] = useState(15)
   const [paymentMethod, setPaymentMethod] = useState('Transfer Bank')
 
   const currentMonthStr = new Date().toISOString().slice(0, 7) // '2026-09'
@@ -82,6 +116,17 @@ export function RecurringBillsView({
     setDueDay(bill.due_day)
     setPaymentMethod(bill.payment_method || 'Transfer Bank')
     setShowModal(true)
+  }
+
+  const handleCopySql = async () => {
+    try {
+      await navigator.clipboard.writeText(RECURRING_BILLS_SQL)
+      setCopiedSql(true)
+      toast.success('SQL migration berhasil disalin!')
+      setTimeout(() => setCopiedSql(false), 3000)
+    } catch {
+      toast.error('Gagal menyalin teks secara otomatis.')
+    }
   }
 
   const handleSave = async (e: React.FormEvent) => {
@@ -149,7 +194,42 @@ export function RecurringBillsView({
       toast.success(editingBill ? 'Tagihan berhasil diperbarui.' : 'Tagihan rutin ditambahkan.')
       setShowModal(false)
     } catch (err: any) {
-      toast.error(`Gagal menyimpan tagihan: ${err?.message || 'Terjadi kesalahan'}`)
+      const errMsg = err?.message || ''
+      const isMissingTable =
+        errMsg.includes('schema cache') ||
+        errMsg.includes('Could not find the table') ||
+        errMsg.includes('does not exist') ||
+        err?.code === 'PGRST204'
+
+      if (isMissingTable) {
+        // Resilient fallback to local storage so user flow is never blocked
+        const stored = localStorage.getItem('cukupin_local_bills')
+        const currentList: RecurringBill[] = stored ? JSON.parse(stored) : bills
+
+        let updatedList: RecurringBill[]
+        if (editingBill) {
+          updatedList = currentList.map((b) =>
+            b.id === editingBill.id ? { ...b, ...billPayload } : b
+          )
+        } else {
+          const newBill: RecurringBill = {
+            id: 'bill-' + Date.now(),
+            created_at: new Date().toISOString(),
+            last_logged_month: null,
+            ...billPayload,
+          }
+          updatedList = [...currentList, newBill]
+        }
+
+        localStorage.setItem('cukupin_local_bills', JSON.stringify(updatedList))
+        setBills(updatedList)
+        setShowModal(false)
+        setShowMigrationModal(true)
+        toast.info('Tabel Supabase belum dibuat di server. Tagihan disimpan lokal.')
+        return
+      }
+
+      toast.error(`Gagal menyimpan tagihan: ${errMsg || 'Terjadi kesalahan'}`)
     }
   }
 
@@ -171,7 +251,17 @@ export function RecurringBillsView({
       if (error) throw error
       toast.success('Tagihan dihapus.')
     } catch (err: any) {
-      toast.error(`Gagal menghapus tagihan: ${err?.message || 'Terjadi kesalahan'}`)
+      const errMsg = err?.message || ''
+      if (errMsg.includes('schema cache') || errMsg.includes('Could not find the table') || err?.code === 'PGRST204') {
+        const stored = localStorage.getItem('cukupin_local_bills')
+        const currentList: RecurringBill[] = stored ? JSON.parse(stored) : bills
+        const filtered = currentList.filter((b) => b.id !== billId)
+        localStorage.setItem('cukupin_local_bills', JSON.stringify(filtered))
+        setBills(filtered)
+        toast.success('Tagihan dihapus (penyimpanan lokal).')
+        return
+      }
+      toast.error(`Gagal menghapus tagihan: ${errMsg || 'Terjadi kesalahan'}`)
     }
   }
 
@@ -262,6 +352,7 @@ export function RecurringBillsView({
             const isLoggedThisMonth = bill.last_logged_month === currentMonthStr
             const isOverdue = !isLoggedThisMonth && currentDay > bill.due_day
             const daysLeft = bill.due_day - currentDay
+            const isSavings = bill.category === 'Tabungan' || bill.category === 'Investasi'
 
             return (
               <div
@@ -272,7 +363,11 @@ export function RecurringBillsView({
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-2.5">
                       <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-paper border border-line text-ink shrink-0">
-                        <Receipt size={18} className="text-green" />
+                        {isSavings ? (
+                          <PiggyBank size={18} className="text-green" />
+                        ) : (
+                          <Receipt size={18} className="text-green" />
+                        )}
                       </div>
                       <div>
                         <h4 className="font-bold text-sm sm:text-base text-ink leading-tight">{bill.name}</h4>
@@ -371,11 +466,11 @@ export function RecurringBillsView({
           <form onSubmit={handleSave} className="space-y-4">
             <div>
               <label className="block text-xs font-semibold text-ink mb-1.5">
-                Nama Tagihan
+                Nama Tagihan / Komitmen
               </label>
               <input
                 type="text"
-                placeholder="Contoh: WiFi Rumah, Listrik PLN, Kosan"
+                placeholder="Contoh: WiFi Rumah, Listrik PLN, Tabungan Dana Darurat"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="w-full rounded-xl border border-line bg-paper px-3.5 py-2.5 text-sm text-ink outline-none focus:border-ink focus:ring-1 focus:ring-ink"
@@ -454,22 +549,121 @@ export function RecurringBillsView({
               </div>
             </div>
 
+            {/* Target Tabungan Linker (Opsional) */}
+            {category === 'Tabungan' && goals && goals.length > 0 && (
+              <div className="rounded-xl border border-green/30 bg-green-soft/40 p-3">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-green mb-1.5">
+                  <Target size={14} /> Hubungkan ke Target Tabungan
+                </div>
+                <select
+                  onChange={(e) => {
+                    const selectedGoal = goals.find((g) => g.id === e.target.value)
+                    if (selectedGoal) {
+                      setName(`Tabungan: ${selectedGoal.name}`)
+                      const diff = Math.max(0, Number(selectedGoal.target_amount) - Number(selectedGoal.current_amount))
+                      const suggested = diff > 0 ? Math.ceil(diff / 3) : 0
+                      if (suggested > 0 && !amountStr) {
+                        setAmountStr(formatRupiahInput(suggested.toString()))
+                      }
+                    }
+                  }}
+                  defaultValue=""
+                  className="w-full rounded-lg border border-line bg-paper px-3 py-2 text-xs text-ink outline-none focus:border-green"
+                >
+                  <option value="" disabled>Pilih target tabungan aktif...</option>
+                  {goals
+                    .filter((g) => Number(g.current_amount) < Number(g.target_amount))
+                    .map((g) => (
+                      <option key={g.id} value={g.id}>
+                        {g.name} (Terkumpul {currency(Number(g.current_amount))} / {currency(Number(g.target_amount))})
+                      </option>
+                    ))}
+                </select>
+                <p className="mt-1.5 text-[11px] text-muted leading-relaxed">
+                  Saat tagihan rutin ini dicatat setiap bulan, nominalnya akan langsung mengalir otomatis menambah saldo target tabunganmu.
+                </p>
+              </div>
+            )}
+
             <div className="mt-6 flex items-center justify-end gap-2.5 border-t border-line pt-4">
               <button
                 type="button"
                 onClick={() => setShowModal(false)}
-                className="rounded-xl border border-line px-4 py-2 text-xs font-semibold text-muted hover:bg-paper hover:text-ink transition-colors"
+                className="rounded-xl border border-line px-4 py-2 text-xs font-semibold text-muted hover:bg-paper hover:text-ink transition-colors cursor-pointer"
               >
                 Batal
               </button>
               <button
                 type="submit"
-                className="rounded-xl bg-ink px-4 py-2 text-xs font-bold !text-white shadow-xs hover:bg-ink/90 transition-colors"
+                className="rounded-xl bg-ink px-4 py-2 text-xs font-bold !text-white shadow-xs hover:bg-ink/90 transition-colors cursor-pointer"
               >
                 Simpan Tagihan
               </button>
             </div>
           </form>
+        </Modal>
+      )}
+
+      {/* SQL Migration Guide Modal */}
+      {showMigrationModal && (
+        <Modal
+          title="Panduan Migrasi Database Tagihan Rutin"
+          onClose={() => setShowMigrationModal(false)}
+        >
+          <div className="space-y-4 text-xs text-ink">
+            <div className="rounded-xl border border-coral/30 bg-coral-soft/50 p-3.5 flex items-start gap-3">
+              <AlertTriangle size={18} className="text-coral shrink-0 mt-0.5" />
+              <div>
+                <strong className="block text-xs font-bold text-ink">Tabel Supabase Belum Dibuat</strong>
+                <p className="mt-0.5 text-muted leading-relaxed">
+                  Tagihanmu sudah <strong>aman tersimpan di perangkat lokal</strong> sehingga fitur tetap berfungsi normal. Untuk mengaktifkan sinkronisasi multi-perangkat via Supabase, jalankan SQL migration berikut sekali saja.
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="font-semibold text-muted">SQL Skrip untuk Supabase Dashboard:</span>
+                <button
+                  type="button"
+                  onClick={handleCopySql}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-paper px-2.5 py-1 font-semibold text-ink hover:bg-card transition-colors cursor-pointer"
+                >
+                  {copiedSql ? (
+                    <>
+                      <Check size={12} className="text-green" /> Tersalin
+                    </>
+                  ) : (
+                    <>
+                      <Copy size={12} /> Salin SQL
+                    </>
+                  )}
+                </button>
+              </div>
+              <pre className="max-h-48 overflow-x-auto rounded-xl border border-line bg-paper p-3 font-mono text-[11px] text-ink leading-relaxed">
+                {RECURRING_BILLS_SQL}
+              </pre>
+            </div>
+
+            <div className="rounded-xl border border-line bg-paper/60 p-3 text-[11px] text-muted space-y-1">
+              <strong className="block text-ink font-semibold">Langkah 1 menit:</strong>
+              <ol className="list-decimal list-inside space-y-0.5">
+                <li>Buka Supabase Dashboard proyekmu</li>
+                <li>Klik menu <strong>SQL Editor</strong> di bilah kiri</li>
+                <li>Tempel (paste) skrip di atas, lalu klik <strong>Run</strong></li>
+              </ol>
+            </div>
+
+            <div className="mt-5 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setShowMigrationModal(false)}
+                className="rounded-xl bg-ink px-4 py-2 text-xs font-bold !text-white shadow-xs hover:bg-ink/90 transition-colors cursor-pointer"
+              >
+                Saya Mengerti, Tutup
+              </button>
+            </div>
+          </div>
         </Modal>
       )}
     </div>

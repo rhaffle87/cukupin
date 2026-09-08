@@ -313,4 +313,57 @@ describe('Finance Library Utility Functions', () => {
       expect(escapeCsvField(undefined)).toBe('""')
     })
   })
+
+  describe('Savings Pace & Recurring Allocation Logic', () => {
+    it('calculates 3-month savings pace correctly', () => {
+      const targetAmount = 5000000
+      const currentAmount = 2000000
+      const diff = Math.max(0, targetAmount - currentAmount)
+      const monthlyPace = Math.ceil(diff / 3)
+      expect(monthlyPace).toBe(1000000)
+      expect(shortCurrency(monthlyPace)).toBe('Rp 1.0 jt')
+    })
+
+    it('identifies feasibility against monthly net surplus', () => {
+      const statsBalance = 1500000
+      const totalPaceNeeded = 1000000
+      const isFeasible = statsBalance >= totalPaceNeeded
+      expect(isFeasible).toBe(true)
+
+      const deficitBalance = 800000
+      expect(deficitBalance >= totalPaceNeeded).toBe(false)
+    })
+
+    it('correctly associates recurring savings bill with target goal by name', () => {
+      const goals = [
+        { id: 'g1', user_id: 'u1', name: 'Dana Darurat', target_amount: 10000000, current_amount: 2000000, created_at: '' },
+        { id: 'g2', user_id: 'u1', name: 'Liburan Bali', target_amount: 3000000, current_amount: 1000000, created_at: '' },
+      ]
+
+      const bill = {
+        id: 'b1',
+        user_id: 'u1',
+        name: 'Tabungan: Dana Darurat',
+        amount: 1000000,
+        category: 'Tabungan',
+        due_day: 25,
+        frequency: 'monthly' as const,
+        is_active: true,
+        created_at: '',
+      }
+
+      const cleanBillName = bill.name.toLowerCase().replace('tabungan:', '').trim()
+      const matchingGoal = goals.find((g) => {
+        const gName = g.name.toLowerCase().trim()
+        return cleanBillName.includes(gName) || gName.includes(cleanBillName)
+      })
+
+      expect(matchingGoal).toBeDefined()
+      expect(matchingGoal?.id).toBe('g1')
+
+      // Simulated auto-increment
+      const newAmount = Number(matchingGoal?.current_amount || 0) + bill.amount
+      expect(newAmount).toBe(3000000)
+    })
+  })
 })

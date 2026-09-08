@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react'
-import type { SavingGoal, Transaction } from '@/lib/database.types'
+import type { RecurringBill, SavingGoal, Transaction } from '@/lib/database.types'
 import { SupabaseClient } from '@supabase/supabase-js'
-import { ArrowUpRight, CheckCircle2, Clock, Plus, Sparkles, Target, Trash2 } from 'lucide-react'
+import { ArrowUpRight, Calendar, CheckCircle2, Clock, Plus, Sparkles, Target, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { StatCard } from '@/components/ui/StatCard'
@@ -26,6 +26,11 @@ export function GoalsView({ supabase, data, userId }: GoalsViewProps) {
   const [amount, setAmount] = useState('')
   const [recordAsExpense, setRecordAsExpense] = useState(true)
   const [statusFilter, setStatusFilter] = useState<'all' | 'in_progress' | 'completed'>('all')
+  const [schedulingGoal, setSchedulingGoal] = useState<SavingGoal | null>(null)
+  const [scheduleAmountStr, setScheduleAmountStr] = useState('')
+  const [scheduleDueDay, setScheduleDueDay] = useState(25)
+  const [schedulePaymentMethod, setSchedulePaymentMethod] = useState('Transfer Bank')
+  const [isSubmittingSchedule, setIsSubmittingSchedule] = useState(false)
 
   function triggerCelebration() {
     try {
@@ -250,6 +255,94 @@ export function GoalsView({ supabase, data, userId }: GoalsViewProps) {
     }
   }
 
+  const handleOpenSchedule = (goal: SavingGoal) => {
+    const current = Number(goal.current_amount)
+    const targetAmt = Number(goal.target_amount)
+    const diff = Math.max(0, targetAmt - current)
+    const monthlyPace = diff > 0 ? Math.ceil(diff / 3) : 500000
+    setSchedulingGoal(goal)
+    setScheduleAmountStr(formatRupiahInput(monthlyPace.toString()))
+    setScheduleDueDay(25)
+    setSchedulePaymentMethod('Transfer Bank')
+  }
+
+  const handleSaveSchedule = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!schedulingGoal) return
+
+    const numAmount = sanitizeNumericInput(scheduleAmountStr)
+    if (numAmount <= 0) {
+      toast.error('Jumlah alokasi rutin harus lebih dari 0.')
+      return
+    }
+
+    setIsSubmittingSchedule(true)
+    const billPayload = {
+      name: `Tabungan: ${schedulingGoal.name}`,
+      amount: numAmount,
+      category: 'Tabungan',
+      due_day: Number(scheduleDueDay),
+      frequency: 'monthly' as const,
+      payment_method: schedulePaymentMethod,
+      is_active: true,
+      user_id: userId || 'local-dev-user',
+    }
+
+    try {
+      if (userId === 'local-dev-user' || !supabase) {
+        const stored = localStorage.getItem('cukupin_local_bills')
+        const currentList: RecurringBill[] = stored ? JSON.parse(stored) : data.bills || []
+        const newBill: RecurringBill = {
+          id: 'bill-' + Date.now(),
+          created_at: new Date().toISOString(),
+          last_logged_month: null,
+          ...billPayload,
+        }
+        const updated = [...currentList, newBill]
+        localStorage.setItem('cukupin_local_bills', JSON.stringify(updated))
+        data.setBills(updated)
+        toast.success(`Alokasi rutin untuk "${schedulingGoal.name}" berhasil dijadwalkan!`)
+        setSchedulingGoal(null)
+        return
+      }
+
+      const { error } = await supabase.from('recurring_bills').insert(billPayload)
+      if (error) {
+        const errMsg = error.message || ''
+        const isMissingTable =
+          errMsg.includes('schema cache') ||
+          errMsg.includes('Could not find the table') ||
+          error.code === 'PGRST204'
+
+        if (isMissingTable) {
+          const stored = localStorage.getItem('cukupin_local_bills')
+          const currentList: RecurringBill[] = stored ? JSON.parse(stored) : data.bills || []
+          const newBill: RecurringBill = {
+            id: 'bill-' + Date.now(),
+            created_at: new Date().toISOString(),
+            last_logged_month: null,
+            ...billPayload,
+          }
+          const updated = [...currentList, newBill]
+          localStorage.setItem('cukupin_local_bills', JSON.stringify(updated))
+          data.setBills(updated)
+          toast.success(`Alokasi rutin untuk "${schedulingGoal.name}" disimpan lokal (tabel Supabase belum dibuat).`)
+          setSchedulingGoal(null)
+          return
+        }
+        throw error
+      }
+
+      toast.success(`Alokasi rutin untuk "${schedulingGoal.name}" berhasil dijadwalkan!`)
+      setSchedulingGoal(null)
+      data.refresh()
+    } catch (err: any) {
+      toast.error(`Gagal menjadwalkan: ${err?.message || 'Terjadi kesalahan'}`)
+    } finally {
+      setIsSubmittingSchedule(false)
+    }
+  }
+
   return (
     <>
       <PageHeader
@@ -424,17 +517,38 @@ export function GoalsView({ supabase, data, userId }: GoalsViewProps) {
                 </div>
 
                 {/* Bottom Action */}
-                <div className="mt-5 pt-3.5 border-t border-line/60 flex items-center justify-between">
-                  <span className="text-[10px] text-muted">
-                    {new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(goal.created_at))}
-                  </span>
+                <div className="mt-5 pt-3.5 border-t border-line/60 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <span className="text-[10px] text-muted truncate">
+                      {new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(goal.created_at))}
+                    </span>
+                    {(data.bills || []).some(
+                      (b) =>
+                        b.is_active &&
+                        (b.name.toLowerCase().includes(goal.name.toLowerCase()) ||
+                          goal.name.toLowerCase().includes(b.name.replace('tabungan:', '').trim()))
+                    ) && (
+                      <span className="inline-flex items-center gap-1 rounded-md bg-green-soft px-1.5 py-0.5 text-[10px] font-semibold text-green shrink-0">
+                        <CheckCircle2 size={11} /> Rutin Aktif
+                      </span>
+                    )}
+                  </div>
                   {!isCompleted ? (
-                    <button
-                      onClick={() => setAdding(goal)}
-                      className="inline-flex items-center gap-1.5 rounded-xl bg-ink px-3.5 py-2 text-xs font-bold !text-white shadow-2xs hover:bg-ink/90 active:scale-95 transition-all cursor-pointer"
-                    >
-                      <Plus size={14} /> Tambah Dana
-                    </button>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        onClick={() => handleOpenSchedule(goal)}
+                        className="inline-flex items-center gap-1.5 rounded-xl border border-line bg-paper px-2.5 py-1.5 text-xs font-semibold text-ink hover:bg-card hover:border-ink/20 active:scale-95 transition-all cursor-pointer"
+                        title="Jadwalkan ke Tagihan Rutin Bulanan"
+                      >
+                        <Calendar size={13} className="text-muted" /> Jadwalkan Rutin
+                      </button>
+                      <button
+                        onClick={() => setAdding(goal)}
+                        className="inline-flex items-center gap-1.5 rounded-xl bg-ink px-3 py-1.5 text-xs font-bold !text-white shadow-2xs hover:bg-ink/90 active:scale-95 transition-all cursor-pointer"
+                      >
+                        <Plus size={14} /> Tambah Dana
+                      </button>
+                    </div>
                   ) : (
                     <span className="inline-flex items-center gap-1 text-xs font-bold text-green">
                       <CheckCircle2 size={14} /> Selesai
@@ -456,6 +570,94 @@ export function GoalsView({ supabase, data, userId }: GoalsViewProps) {
             </button>
           }
         />
+      )}
+
+      {/* Schedule Recurring Goal Modal */}
+      {schedulingGoal && (
+        <Modal
+          title={`Jadwalkan Alokasi Bulanan`}
+          onClose={() => setSchedulingGoal(null)}
+        >
+          <form onSubmit={handleSaveSchedule} className="space-y-4">
+            <div className="rounded-xl border border-blue/20 bg-blue-soft/50 p-3 text-xs text-ink flex items-start gap-2.5">
+              <Calendar size={16} className="text-blue shrink-0 mt-0.5" />
+              <div>
+                <strong className="block text-xs font-bold text-ink">Alokasi Otomatis ke "{schedulingGoal.name}"</strong>
+                <p className="mt-0.5 text-muted leading-relaxed">
+                  Tagihan rutin bulanan akan dibuat dengan kategori <strong>Tabungan</strong>. Saat kamu klik catat lunas setiap bulan, saldo tabungan akan bertambah secara otomatis tanpa perlu tambah dana manual.
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-ink mb-1.5">
+                Nominal Rutin Tiap Bulan (Rp)
+              </label>
+              <div className="relative">
+                <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-xs font-mono text-muted select-none">Rp</span>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="0"
+                  value={scheduleAmountStr}
+                  onChange={(e) => setScheduleAmountStr(formatRupiahInput(e.target.value))}
+                  className="w-full rounded-xl border border-line bg-paper !pl-9 pr-3.5 py-2.5 text-sm font-numeric tabular-nums text-ink outline-none focus:border-ink"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-semibold text-ink mb-1.5">
+                  Tanggal Alokasi (1 - 31)
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  max={31}
+                  value={scheduleDueDay}
+                  onChange={(e) => setScheduleDueDay(Math.min(31, Math.max(1, Number(e.target.value))))}
+                  className="w-full rounded-xl border border-line bg-paper px-3.5 py-2.5 text-sm font-numeric tabular-nums text-ink outline-none focus:border-ink"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-ink mb-1.5">
+                  Metode Pembayaran
+                </label>
+                <select
+                  value={schedulePaymentMethod}
+                  onChange={(e) => setSchedulePaymentMethod(e.target.value)}
+                  className="w-full rounded-xl border border-line bg-paper px-3 py-2.5 text-sm text-ink outline-none focus:border-ink"
+                >
+                  <option value="Transfer Bank">Transfer Bank</option>
+                  <option value="QRIS">QRIS</option>
+                  <option value="E-Wallet">E-Wallet</option>
+                  <option value="Cash">Cash</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="mt-6 flex items-center justify-end gap-2.5 border-t border-line pt-4">
+              <button
+                type="button"
+                onClick={() => setSchedulingGoal(null)}
+                className="rounded-xl border border-line px-4 py-2 text-xs font-semibold text-muted hover:bg-paper hover:text-ink transition-colors cursor-pointer"
+              >
+                Batal
+              </button>
+              <button
+                type="submit"
+                disabled={isSubmittingSchedule}
+                className="rounded-xl bg-ink px-4 py-2 text-xs font-bold !text-white shadow-xs hover:bg-ink/90 transition-colors cursor-pointer disabled:opacity-50"
+              >
+                {isSubmittingSchedule ? 'Menjadwalkan...' : 'Jadwalkan Alokasi'}
+              </button>
+            </div>
+          </form>
+        </Modal>
       )}
 
       {show && (

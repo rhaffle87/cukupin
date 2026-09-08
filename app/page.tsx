@@ -405,50 +405,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Social Proof & Testimonials */}
-      <section className="border-t border-line/60 bg-white/[0.4] px-6 py-16 md:py-24">
-        <div className="mx-auto max-w-4xl">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <p className="text-[10px] font-bold tracking-widest text-slate uppercase">TESTIMONI PENGGUNA</p>
-            <h2 className="mt-2 font-display text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-ink">
-              Cerita santai dari mereka yang sudah mencoba
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            <div className="rounded-2xl border border-line bg-card p-6 shadow-xs flex flex-col justify-between">
-              <p className="text-xs leading-relaxed text-ink italic">
-                "Dulu malas banget catat pengeluaran karena aplikasi lain ribet harus bikin akun berbelit-belit. Di Cukupin™ tampilannya adem, cepet, dan nggak ada iklan sama sekali."
-              </p>
-              <div className="mt-4 pt-4 border-t border-line/60">
-                <strong className="block text-xs font-bold text-ink">Dian P.</strong>
-                <small className="text-[10px] text-muted">Freelance Illustrator, Bandung</small>
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-line bg-card p-6 shadow-xs flex flex-col justify-between">
-              <p className="text-xs leading-relaxed text-ink italic">
-                "Fitur Budget Harian Aman beneran nolong banget buat saya. Begitu tahu sisa budget harian Rp 45 ribu, langsung otomatis ngerem jajan yang nggak penting."
-              </p>
-              <div className="mt-4 pt-4 border-t border-line/60">
-                <strong className="block text-xs font-bold text-ink">Rizky A.</strong>
-                <small className="text-[10px] text-muted">Product Specialist, Jakarta</small>
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-line bg-card p-6 shadow-xs flex flex-col justify-between">
-              <p className="text-xs leading-relaxed text-ink italic">
-                "Wishlist-nya ngebantu banget nahan godaan flash sale marketplace. Barang yang masuk wishlist ternyata 80% nggak beneran saya butuhin."
-              </p>
-              <div className="mt-4 pt-4 border-t border-line/60">
-                <strong className="block text-xs font-bold text-ink">Sarah N.</strong>
-                <small className="text-[10px] text-muted">Mahasiswi, Surabaya</small>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Interactive FAQ Section with Schema-ready items */}
       <section id="faq" className="border-t border-line/60 bg-paper px-6 py-16 md:py-24">
         <div className="mx-auto max-w-3xl">

@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import { ArrowDownLeft, ArrowUpRight, ChevronLeft, ChevronRight, FileSpreadsheet, FileText, PieChart, Sparkles, TrendingDown, TrendingUp, Wallet } from 'lucide-react'
+import { AlertCircle, ArrowDownLeft, ArrowUpRight, CheckCircle2, ChevronLeft, ChevronRight, FileSpreadsheet, FileText, PieChart, Sparkles, Target, TrendingDown, TrendingUp, Wallet } from 'lucide-react'
 import { toast } from 'sonner'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { StatCard } from '@/components/ui/StatCard'
@@ -8,7 +8,7 @@ import { Eyebrow } from '@/components/ui/Eyebrow'
 import { TransactionRow } from './TransactionRow'
 import { useFinanceData } from '@/hooks/useFinanceData'
 import dynamic from 'next/dynamic'
-import { budgetRule503020, comparator, currency, isoDate, monthBounds, paymentMethodBreakdown, totals } from '@/lib/finance'
+import { budgetRule503020, comparator, currency, isoDate, monthBounds, paymentMethodBreakdown, shortCurrency, totals } from '@/lib/finance'
 
 const MonthlyExpenseTemplate = dynamic(
   () => import('./MonthlyExpenseTemplate').then(mod => mod.MonthlyExpenseTemplate),
@@ -290,6 +290,133 @@ export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> 
         )}
       </section>
       
+      {/* Target Tabungan & Rencana Masa Depan */}
+      {data.goals && data.goals.length > 0 && (
+        <section className="mb-4 rounded-[18px] border border-line bg-card p-5 shadow-[0_5px_20px_rgba(30,50,73,0.025)] md:p-6">
+          <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <Eyebrow>TARGET TABUNGAN & RENCANA MASA DEPAN</Eyebrow>
+              <h2 className="mt-1 font-display text-lg sm:text-xl font-bold tracking-tight text-ink">
+                Progres & Estimasi Pencapaian
+              </h2>
+            </div>
+            <span className="self-start sm:self-auto rounded-full border border-line bg-paper px-3 py-1 text-[10px] font-bold text-muted">
+              {data.goals.filter(g => Number(g.current_amount) < Number(g.target_amount)).length} Target Aktif
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {data.goals.map((goal) => {
+              const current = Number(goal.current_amount)
+              const targetAmt = Number(goal.target_amount)
+              const progress = targetAmt > 0 ? Math.min(100, (current / targetAmt) * 100) : 0
+              const isCompleted = progress >= 100
+              const diff = Math.max(0, targetAmt - current)
+              const monthlyPace = diff > 0 ? Math.ceil(diff / 3) : 0
+
+              return (
+                <div
+                  key={goal.id}
+                  className="rounded-2xl border border-line bg-paper/50 p-4 transition-all"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2.5">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-card border border-line text-ink shrink-0">
+                        <Target size={16} className="text-green" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-sm text-ink leading-tight">{goal.name}</h4>
+                        <span className="text-[11px] font-numeric tabular-nums text-muted">
+                          {currency(current)} dari {currency(targetAmt)}
+                        </span>
+                      </div>
+                    </div>
+
+                    <span
+                      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold ${
+                        isCompleted ? 'bg-green-soft text-green' : 'bg-blue-soft text-blue'
+                      }`}
+                    >
+                      {isCompleted ? (
+                        <>
+                          <CheckCircle2 size={11} /> Tercapai
+                        </>
+                      ) : (
+                        `${progress.toFixed(0)}%`
+                      )}
+                    </span>
+                  </div>
+
+                  {/* Progress Bar */}
+                  <div className="mt-3">
+                    <div className="h-2 w-full overflow-hidden rounded-full bg-line">
+                      <div
+                        className={`h-full rounded-full transition-all ${
+                          isCompleted ? 'bg-green' : 'bg-blue'
+                        }`}
+                        style={{ width: `${progress}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Smart Monthly Pace Note - Strictly Icons, NO emojis */}
+                  {!isCompleted && monthlyPace > 0 && (
+                    <div className="mt-3 flex items-center gap-1.5 rounded-xl border border-line/60 bg-card px-2.5 py-1.5 text-[11px] text-muted">
+                      <Sparkles size={13} className="text-green shrink-0" />
+                      <span>
+                        Nabung ~{shortCurrency(monthlyPace)}/bln untuk capai dalam 3 bulan
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Feasibility Highlight vs Period Net Surplus */}
+          {(() => {
+            const totalMonthlyPaceNeeded = data.goals
+              .filter((g) => Number(g.current_amount) < Number(g.target_amount))
+              .reduce((sum, g) => {
+                const diff = Math.max(0, Number(g.target_amount) - Number(g.current_amount))
+                return sum + (diff > 0 ? Math.ceil(diff / 3) : 0)
+              }, 0)
+
+            if (totalMonthlyPaceNeeded === 0) return null
+
+            const isFeasible = stats.balance >= totalMonthlyPaceNeeded
+
+            return (
+              <div
+                className={`mt-4 rounded-xl border p-3 flex items-start gap-2.5 text-xs ${
+                  isFeasible
+                    ? 'border-green/30 bg-green-soft/40 text-green'
+                    : 'border-coral/30 bg-coral-soft/40 text-coral'
+                }`}
+              >
+                {isFeasible ? (
+                  <CheckCircle2 size={16} className="shrink-0 mt-0.5" />
+                ) : (
+                  <AlertCircle size={16} className="shrink-0 mt-0.5" />
+                )}
+                <div>
+                  <strong className="block text-xs font-bold text-ink">
+                    {isFeasible
+                      ? `Surplus Periode Ini Mencukupi (${currency(stats.balance)})`
+                      : `Surplus Belum Mencukupi Target Bulanan (${currency(stats.balance)})`}
+                  </strong>
+                  <p className="mt-0.5 text-muted leading-relaxed">
+                    {isFeasible
+                      ? `Sisa bersih periode ini cukup untuk mendanai komitmen seluruh target tabungan aktif (~${shortCurrency(totalMonthlyPaceNeeded)}/bln). Pertahankan ritme ini!`
+                      : `Kebutuhan tabungan terencana adalah ~${shortCurrency(totalMonthlyPaceNeeded)}/bln. Pertimbangkan untuk mengurangi belanja non-esensial.`}
+                  </p>
+                </div>
+              </div>
+            )
+          })()}
+        </section>
+      )}
+
       {/* Filtered Transactions Table */}
       <section className="rounded-[18px] border border-line bg-card p-5 shadow-[0_5px_20px_rgba(30,50,73,0.025)] md:p-6">
         <div className="mb-4">
@@ -310,6 +437,7 @@ export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> 
       {showTemplate && (
         <MonthlyExpenseTemplate
           transactions={data.transactions}
+          goals={data.goals}
           defaultMonth={from.slice(0, 7)}
           onClose={() => setShowTemplate(false)}
         />

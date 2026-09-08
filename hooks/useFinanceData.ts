@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import type { Transaction, SavingGoal, WishlistItem, RecurringBill, CategoryBudget } from '@/lib/database.types'
 import { SupabaseClient } from '@supabase/supabase-js'
 import { toast } from 'sonner'
+import { currency } from '@/lib/finance'
 
 const DEFAULT_LOCAL_TRANSACTIONS: Transaction[] = [
   {
@@ -315,6 +316,16 @@ export function useFinanceData(supabase: SupabaseClient | null, userId?: string)
         payment_method: bill.payment_method || 'Transfer Bank',
       }
 
+      // Check if this recurring bill is linked to a saving goal
+      const isSavingsBill = bill.category === 'Tabungan' || bill.category === 'Investasi'
+      const cleanBillName = bill.name.toLowerCase().replace('tabungan:', '').replace('alokasi:', '').trim()
+      const matchingGoal = isSavingsBill
+        ? goals.find((g) => {
+            const gName = g.name.toLowerCase().trim()
+            return cleanBillName.includes(gName) || gName.includes(cleanBillName)
+          })
+        : null
+
       if (userId === 'local-dev-user' || !supabase) {
         // Save transaction to local storage
         const storedTx = localStorage.getItem('cukupin_local_transactions')
@@ -337,7 +348,23 @@ export function useFinanceData(supabase: SupabaseClient | null, userId?: string)
         localStorage.setItem('cukupin_local_bills', JSON.stringify(updatedBills))
         setBills(updatedBills)
 
-        toast.success(`Tagihan "${bill.name}" berhasil dicatat ke transaksi!`)
+        // If linked to saving goal, auto-increment goal's current_amount
+        if (matchingGoal) {
+          const storedGoals = localStorage.getItem('cukupin_local_goals')
+          const currentGoals: SavingGoal[] = storedGoals ? JSON.parse(storedGoals) : goals
+          const updatedGoals = currentGoals.map((g) =>
+            g.id === matchingGoal.id
+              ? { ...g, current_amount: Number(g.current_amount || 0) + bill.amount }
+              : g
+          )
+          localStorage.setItem('cukupin_local_goals', JSON.stringify(updatedGoals))
+          setGoals(updatedGoals)
+          toast.success(
+            `Tagihan "${bill.name}" dicatat & ${currency(bill.amount)} dialokasikan ke target "${matchingGoal.name}"!`
+          )
+        } else {
+          toast.success(`Tagihan "${bill.name}" berhasil dicatat ke transaksi!`)
+        }
         return true
       }
 
@@ -346,12 +373,43 @@ export function useFinanceData(supabase: SupabaseClient | null, userId?: string)
         const txRes = await supabase.from('transactions').insert(newTxPayload).select().single()
         if (txRes.error) throw txRes.error
 
-        await supabase
+        // Update recurring_bills with fallback if remote table is missing
+        const updateBillRes = await supabase
           .from('recurring_bills')
           .update({ last_logged_month: currentMonth })
           .eq('id', bill.id)
 
-        toast.success(`Tagihan "${bill.name}" berhasil dicatat ke transaksi!`)
+        if (updateBillRes?.error) {
+          const storedBills = localStorage.getItem('cukupin_local_bills')
+          const currentBills: RecurringBill[] = storedBills ? JSON.parse(storedBills) : bills
+          const updatedBills = currentBills.map((b) =>
+            b.id === bill.id ? { ...b, last_logged_month: currentMonth } : b
+          )
+          localStorage.setItem('cukupin_local_bills', JSON.stringify(updatedBills))
+          setBills(updatedBills)
+        }
+
+        // If linked to saving goal, update saving_goals in Supabase
+        if (matchingGoal) {
+          const newCurrentAmount = Number(matchingGoal.current_amount || 0) + bill.amount
+          const goalUpdateRes = await supabase
+            .from('saving_goals')
+            .update({ current_amount: newCurrentAmount })
+            .eq('id', matchingGoal.id)
+
+          if (goalUpdateRes?.error) {
+            setGoals((prev) =>
+              prev.map((g) => (g.id === matchingGoal.id ? { ...g, current_amount: newCurrentAmount } : g))
+            )
+          }
+
+          toast.success(
+            `Tagihan "${bill.name}" dicatat & ${currency(bill.amount)} dialokasikan ke target "${matchingGoal.name}"!`
+          )
+        } else {
+          toast.success(`Tagihan "${bill.name}" berhasil dicatat ke transaksi!`)
+        }
+
         await refresh()
         return true
       } catch (err: any) {
@@ -359,7 +417,7 @@ export function useFinanceData(supabase: SupabaseClient | null, userId?: string)
         return false
       }
     },
-    [userId, supabase, refresh]
+    [userId, supabase, refresh, goals, bills]
   )
 
   useEffect(() => {
