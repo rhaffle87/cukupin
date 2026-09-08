@@ -561,114 +561,122 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
         </div>
 
         {/* Row 2: Date Range + Month Steppers + Presets */}
-        <div className="mt-4 pt-3.5 border-t border-line/50 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+        <div className="mt-4 pt-3.5 border-t border-line/50 flex flex-col lg:flex-row lg:items-center justify-between gap-3.5">
           {/* Date Picker with Month Stepper */}
-          <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2 w-full lg:w-auto">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-muted">Periode:</span>
-            <div className="flex items-center justify-between gap-1 w-full sm:w-auto">
-              <button
-                type="button"
-                onClick={() => stepMonth(-1)}
-                title="Bulan Sebelumnya"
-                className="rounded-lg border border-line bg-paper p-1.5 text-muted hover:bg-black/5 hover:text-ink transition-colors cursor-pointer shrink-0"
-                aria-label="Bulan Sebelumnya"
-              >
-                <ChevronLeft size={15} />
-              </button>
-              <div className="flex items-center gap-1 flex-1 sm:flex-initial min-w-0">
-                <input
-                  type="date"
-                  value={from}
-                  onChange={e => { setFrom(e.target.value); setVisibleCount(10) }}
-                  className="w-full sm:w-[125px] min-w-0 rounded-lg border border-line bg-paper px-1.5 xs:px-2 py-1.5 text-[11px] xs:text-xs text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
-                  aria-label="Dari Tanggal"
-                />
-                <span className="text-[11px] xs:text-xs text-muted shrink-0 px-0.5">s/d</span>
-                <input
-                  type="date"
-                  value={to}
-                  onChange={e => { setTo(e.target.value); setVisibleCount(10) }}
-                  className="w-full sm:w-[125px] min-w-0 rounded-lg border border-line bg-paper px-1.5 xs:px-2 py-1.5 text-[11px] xs:text-xs text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
-                  aria-label="Sampai Tanggal"
-                />
+          <div className="flex flex-col gap-1.5 w-full lg:w-auto">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-muted">Periode:</span>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => stepMonth(-1)}
+                  title="Bulan Sebelumnya"
+                  className="rounded-lg border border-line bg-paper p-1 text-muted hover:bg-black/5 hover:text-ink transition-colors cursor-pointer"
+                  aria-label="Bulan Sebelumnya"
+                >
+                  <ChevronLeft size={14} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => stepMonth(1)}
+                  title="Bulan Berikutnya"
+                  className="rounded-lg border border-line bg-paper p-1 text-muted hover:bg-black/5 hover:text-ink transition-colors cursor-pointer"
+                  aria-label="Bulan Berikutnya"
+                >
+                  <ChevronRight size={14} />
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => stepMonth(1)}
-                title="Bulan Berikutnya"
-                className="rounded-lg border border-line bg-paper p-1.5 text-muted hover:bg-black/5 hover:text-ink transition-colors cursor-pointer shrink-0"
-                aria-label="Bulan Berikutnya"
-              >
-                <ChevronRight size={15} />
-              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 w-full sm:flex sm:items-center sm:w-auto">
+              <input
+                type="date"
+                value={from}
+                onChange={e => { setFrom(e.target.value); setVisibleCount(10) }}
+                className="w-full sm:w-[130px] min-w-0 rounded-lg border border-line bg-paper px-2 py-1.5 text-xs text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green font-medium"
+                aria-label="Dari Tanggal"
+              />
+              <span className="hidden sm:inline-block text-xs text-muted shrink-0">s/d</span>
+              <input
+                type="date"
+                value={to}
+                onChange={e => { setTo(e.target.value); setVisibleCount(10) }}
+                className="w-full sm:w-[130px] min-w-0 rounded-lg border border-line bg-paper px-2 py-1.5 text-xs text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green font-medium"
+                aria-label="Sampai Tanggal"
+              />
             </div>
           </div>
-          {/* Quick Date Presets */}
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-muted mr-1">Preset:</span>
-            <button
-              type="button"
-              onClick={() => setPreset('all')}
-              className={`rounded-lg px-2.5 py-1 text-[11px] font-semibold transition-all cursor-pointer ${
-                !from && !to ? 'bg-ink !text-white' : 'bg-paper border border-line/60 text-muted hover:text-ink'
-              }`}
-            >
-              Semua
-            </button>
-            <button
-              type="button"
-              onClick={() => setPreset('today')}
-              className={`rounded-lg px-2.5 py-1 text-[11px] font-semibold transition-all cursor-pointer ${
-                from === isoDate(new Date()) && to === isoDate(new Date())
-                  ? 'bg-ink !text-white'
-                  : 'bg-paper border border-line/60 text-muted hover:text-ink'
-              }`}
-            >
-              Hari Ini
-            </button>
-            <button
-              type="button"
-              onClick={() => setPreset('month')}
-              className={`rounded-lg px-2.5 py-1 text-[11px] font-semibold transition-all cursor-pointer ${
-                from === monthBounds().start && to === monthBounds().end
-                  ? 'bg-ink !text-white'
-                  : 'bg-paper border border-line/60 text-muted hover:text-ink'
-              }`}
-            >
-              Bulan Ini
-            </button>
-            <button
-              type="button"
-              onClick={() => setPreset('7days')}
-              className={`rounded-lg px-2.5 py-1 text-[11px] font-semibold transition-all cursor-pointer ${
-                from === isoDate(new Date(Date.now() - 7 * 86400000)) && to === isoDate(new Date())
-                  ? 'bg-ink !text-white'
-                  : 'bg-paper border border-line/60 text-muted hover:text-ink'
-              }`}
-            >
-              7 Hari
-            </button>
-            <button
-              type="button"
-              onClick={() => setPreset('30days')}
-              className={`rounded-lg px-2.5 py-1 text-[11px] font-semibold transition-all cursor-pointer ${
-                from === isoDate(new Date(Date.now() - 30 * 86400000)) && to === isoDate(new Date())
-                  ? 'bg-ink !text-white'
-                  : 'bg-paper border border-line/60 text-muted hover:text-ink'
-              }`}
-            >
-              30 Hari
-            </button>
 
-            {isFilterActive && (
+          {/* Quick Date Presets */}
+          <div className="flex flex-col gap-1.5 w-full lg:w-auto">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-muted">Preset:</span>
+              {isFilterActive && (
+                <button
+                  type="button"
+                  onClick={resetFilters}
+                  className="inline-flex items-center gap-1 text-[11px] font-bold text-coral hover:underline cursor-pointer"
+                >
+                  <RotateCcw size={12} /> Reset
+                </button>
+              )}
+            </div>
+
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar sm:flex-wrap">
               <button
                 type="button"
-                onClick={resetFilters}
-                className="ml-2 inline-flex items-center gap-1 text-[11px] font-bold text-coral hover:underline cursor-pointer"
+                onClick={() => setPreset('all')}
+                className={`shrink-0 rounded-lg px-2.5 py-1 text-[11px] font-semibold transition-all cursor-pointer ${
+                  !from && !to ? 'bg-ink !text-white' : 'bg-paper border border-line/60 text-muted hover:text-ink'
+                }`}
               >
-                <RotateCcw size={12} /> Reset
+                Semua
               </button>
-            )}
+              <button
+                type="button"
+                onClick={() => setPreset('today')}
+                className={`shrink-0 rounded-lg px-2.5 py-1 text-[11px] font-semibold transition-all cursor-pointer ${
+                  from === isoDate(new Date()) && to === isoDate(new Date())
+                    ? 'bg-ink !text-white'
+                    : 'bg-paper border border-line/60 text-muted hover:text-ink'
+                }`}
+              >
+                Hari Ini
+              </button>
+              <button
+                type="button"
+                onClick={() => setPreset('month')}
+                className={`shrink-0 rounded-lg px-2.5 py-1 text-[11px] font-semibold transition-all cursor-pointer ${
+                  from === monthBounds().start && to === monthBounds().end
+                    ? 'bg-ink !text-white'
+                    : 'bg-paper border border-line/60 text-muted hover:text-ink'
+                }`}
+              >
+                Bulan Ini
+              </button>
+              <button
+                type="button"
+                onClick={() => setPreset('7days')}
+                className={`shrink-0 rounded-lg px-2.5 py-1 text-[11px] font-semibold transition-all cursor-pointer ${
+                  from === isoDate(new Date(Date.now() - 7 * 86400000)) && to === isoDate(new Date())
+                    ? 'bg-ink !text-white'
+                    : 'bg-paper border border-line/60 text-muted hover:text-ink'
+                }`}
+              >
+                7 Hari
+              </button>
+              <button
+                type="button"
+                onClick={() => setPreset('30days')}
+                className={`shrink-0 rounded-lg px-2.5 py-1 text-[11px] font-semibold transition-all cursor-pointer ${
+                  from === isoDate(new Date(Date.now() - 30 * 86400000)) && to === isoDate(new Date())
+                    ? 'bg-ink !text-white'
+                    : 'bg-paper border border-line/60 text-muted hover:text-ink'
+                }`}
+              >
+                30 Hari
+              </button>
+            </div>
           </div>
         </div>
 
@@ -718,16 +726,16 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
           {filtered.length > 0 && (
             <div className="mb-4 grid grid-cols-2 gap-x-3 gap-y-2 sm:grid-cols-3 rounded-xl bg-paper/80 p-3 border border-line/60 text-xs shadow-2xs">
               <div className="col-span-2 sm:col-span-1">
-                <span className="block text-[11px] sm:text-xs font-semibold text-ink/80 uppercase tracking-wider">Pemasukan</span>
-                <strong className="text-green !font-numeric tabular-nums font-bold text-sm">{currency(filteredStats.income)}</strong>
+                <span className="block text-xs sm:text-xs font-bold text-ink/90 uppercase tracking-wider">Pemasukan</span>
+                <strong className="text-green !font-numeric tabular-nums font-extrabold text-[15px] sm:text-base">{currency(filteredStats.income)}</strong>
               </div>
               <div>
-                <span className="block text-[11px] sm:text-xs font-semibold text-ink/80 uppercase tracking-wider">Pengeluaran</span>
-                <strong className="text-coral !font-numeric tabular-nums font-bold text-sm">{currency(filteredStats.expense)}</strong>
+                <span className="block text-xs sm:text-xs font-bold text-ink/90 uppercase tracking-wider">Pengeluaran</span>
+                <strong className="text-coral !font-numeric tabular-nums font-extrabold text-[15px] sm:text-base">{currency(filteredStats.expense)}</strong>
               </div>
               <div>
-                <span className="block text-[11px] sm:text-xs font-semibold text-ink/80 uppercase tracking-wider">Net Sisa</span>
-                <strong className={`!font-numeric tabular-nums font-bold text-sm ${filteredStats.balance >= 0 ? 'text-blue' : 'text-coral'}`}>
+                <span className="block text-xs sm:text-xs font-bold text-ink/90 uppercase tracking-wider">Net Sisa</span>
+                <strong className={`!font-numeric tabular-nums font-extrabold text-[15px] sm:text-base ${filteredStats.balance >= 0 ? 'text-blue' : 'text-coral'}`}>
                   {currency(filteredStats.balance)}
                 </strong>
               </div>

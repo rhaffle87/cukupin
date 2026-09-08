@@ -12,16 +12,23 @@ interface StatCardProps {
 export function StatCard({ label, value, tone, icon: Icon, note, featured }: StatCardProps) {
   return (
     <div className={`stat-card ${tone}${featured ? ' featured' : ''} flex flex-col justify-between overflow-hidden !p-3 sm:!p-4 lg:!p-5 shadow-2xs`}>
-      <div className="stat-top flex items-center justify-between gap-1.5 text-xs sm:text-[13px] lg:text-sm font-semibold text-ink/85">
-        <span className="font-semibold sm:font-bold truncate tracking-normal">{label}</span>
+      <div className="stat-top flex items-center justify-between gap-1.5 text-[13px] sm:text-sm lg:text-[15px] font-bold text-ink/90">
+        <span className="font-bold truncate tracking-normal text-[13px] sm:text-sm lg:text-[15px]">{label}</span>
         <div className="stat-icon shrink-0">
-          <Icon size={16} className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          <Icon size={17} className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
         </div>
       </div>
-      <strong className="my-1 sm:my-2 block truncate !font-numeric font-bold tabular-nums !text-sm sm:!text-[15px] md:!text-base lg:!text-xl xl:!text-2xl tracking-tight sm:tracking-tighter lg:tracking-tight text-ink" title={value}>
+      <strong
+        className={`my-1 sm:my-2 block truncate !font-numeric font-extrabold tabular-nums tracking-tight sm:tracking-tighter lg:tracking-tight text-ink ${
+          featured
+            ? '!text-lg xs:!text-xl sm:!text-2xl md:!text-2xl lg:!text-[1.75rem]'
+            : '!text-base xs:!text-[17px] sm:!text-lg md:!text-xl lg:!text-2xl'
+        }`}
+        title={value}
+      >
         {value}
       </strong>
-      <small className="block truncate text-[10px] sm:text-xs text-muted font-medium" title={note}>
+      <small className="block truncate text-xs text-muted font-medium" title={note}>
         {note}
       </small>
     </div>

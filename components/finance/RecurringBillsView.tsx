@@ -311,10 +311,10 @@ export function RecurringBillsView({
       {/* Metric Cards Banner */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className="rounded-2xl border border-line bg-card p-4 shadow-2xs">
-          <div className="text-xs sm:text-[13px] font-semibold text-ink/80 tracking-normal">
+          <div className="text-sm sm:text-sm lg:text-[15px] font-bold text-ink/90 tracking-normal">
             Total Komitmen Rutin
           </div>
-          <div className="mt-1 font-numeric tabular-nums text-2xl font-bold text-ink">
+          <div className="mt-1 font-numeric tabular-nums text-xl sm:text-2xl font-extrabold text-ink">
             {currency(totalMonthlyCommitment)}
           </div>
           <div className="mt-0.5 text-xs text-muted">
@@ -323,10 +323,10 @@ export function RecurringBillsView({
         </div>
 
         <div className="rounded-2xl border border-line bg-card p-4 shadow-2xs">
-          <div className="text-xs sm:text-[13px] font-semibold text-ink/80 tracking-normal">
+          <div className="text-sm sm:text-sm lg:text-[15px] font-bold text-ink/90 tracking-normal">
             Sudah Dicatat Bulan Ini
           </div>
-          <div className="mt-1 font-numeric tabular-nums text-2xl font-bold text-green">
+          <div className="mt-1 font-numeric tabular-nums text-xl sm:text-2xl font-extrabold text-green">
             {loggedBills.length} Tagihan
           </div>
           <div className="mt-0.5 text-xs text-muted">
@@ -335,10 +335,10 @@ export function RecurringBillsView({
         </div>
 
         <div className="rounded-2xl border border-line bg-card p-4 shadow-2xs">
-          <div className="text-xs sm:text-[13px] font-semibold text-ink/80 tracking-normal">
+          <div className="text-sm sm:text-sm lg:text-[15px] font-bold text-ink/90 tracking-normal">
             Belum Dicatat Bulan Ini
           </div>
-          <div className="mt-1 font-numeric tabular-nums text-2xl font-bold text-coral">
+          <div className="mt-1 font-numeric tabular-nums text-xl sm:text-2xl font-extrabold text-coral">
             {pendingBills.length} Tagihan
           </div>
           <div className="mt-0.5 text-xs text-muted">

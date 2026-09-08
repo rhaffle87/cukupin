@@ -509,8 +509,8 @@
   align-items: center;
   justify-content: space-between;
   color: #243447;
-  font-size: 13.5px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 700;
 }
 .stat-icon {
   width: 28px;
@@ -549,12 +549,13 @@
     flex: 1;
   }
   .stat-card.featured > strong {
-    font-size: 18px;
+    font-size: 20px;
     margin: 0;
     min-width: 0;
   }
   .stat-card.featured small {
     margin-top: 2px;
+    font-size: 12px;
   }
   .stat-card.featured .stat-icon {
     order: -1;
@@ -1490,8 +1491,8 @@
     white-space: nowrap;
   }
   .stat-top {
-    font-size: 12px;
-    font-weight: 600;
+    font-size: 13.5px;
+    font-weight: 700;
   }
   .stat-icon {
     height: 22px;

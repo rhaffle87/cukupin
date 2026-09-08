@@ -41,7 +41,7 @@ function DashboardSkeleton() {
           <div className="mt-4 h-[32px] w-[75%] rounded-full bg-white/20 md:w-[48%]" />
           <div className="mt-4 h-[12px] w-[58%] rounded-full bg-white/20 md:w-[35%]" />
         </div>
-        <div className="h-[140px] w-full rounded-[22px] border border-white/10 bg-white/5 md:h-[175px] md:w-[280px]" />
+        <div className="h-[140px] w-full max-w-[320px] self-end ml-auto md:ml-0 md:self-auto rounded-[22px] border border-white/10 bg-white/5 md:h-[175px] md:w-[280px]" />
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 md:gap-3">
         {[1, 2, 3].map(i => (
@@ -150,18 +150,18 @@ export function DashboardView({ data, user, supabase }: DashboardViewProps) {
         <div className="pointer-events-none absolute -right-14 -top-20 h-[380px] w-[380px] rounded-full border border-white/[0.08] shadow-[0_0_0_28px_rgba(255,255,255,0.018),0_0_0_64px_rgba(255,255,255,0.012)]" />
 
         <div className="relative z-10 max-w-[500px]">
-          <p className="text-[10px] font-bold tracking-widest text-[#B9C6BD] uppercase">{monthLabel().toUpperCase()}</p>
-          <h1 className="mt-2.5 font-display text-2xl xs:text-3xl sm:text-4xl md:text-[2.2rem] lg:text-[2.45rem] font-bold leading-tight tracking-tight">
+          <p className="text-[11px] font-bold tracking-widest text-[#B9C6BD] uppercase">{monthLabel().toUpperCase()}</p>
+          <h1 className="mt-2.5 font-display text-[1.85rem] xs:text-[2.15rem] sm:text-4xl md:text-[2.35rem] lg:text-[2.6rem] font-bold leading-tight tracking-tight">
             Halo, {firstName}.<br />
             <em className="text-mint not-italic">Cek uangmu bulan ini.</em>
           </h1>
-          <p className="mt-5 max-w-[320px] text-xs leading-relaxed text-[#C0CBC4] md:max-w-[420px]">
+          <p className="mt-4 sm:mt-5 max-w-[340px] text-[13px] sm:text-sm leading-relaxed text-[#C0CBC4] md:max-w-[420px]">
             Pantau pengeluaran hari ini biar tetap santai sampai akhir bulan.
           </p>
         </div>
 
         {/* Authentic Ultra-Premium ATM / Debit Card (Solves Image 4) */}
-        <div className="relative z-10 w-full max-w-[320px] sm:max-w-[340px] aspect-[1.586/1] rounded-[22px] border border-white/20 bg-gradient-to-br from-[#1E2E40] via-[#142230] to-[#0A131C] p-4 sm:p-5 shadow-[0_16px_38px_rgba(0,0,0,0.4),inset_0_1px_1px_rgba(255,255,255,0.25)] flex flex-col justify-between overflow-hidden group select-none transition-all duration-300 hover:border-mint/35 md:mr-1">
+        <div className="relative z-10 w-full max-w-[320px] sm:max-w-[340px] aspect-[1.586/1] self-end ml-auto md:ml-0 md:self-auto rounded-[22px] border border-white/20 bg-gradient-to-br from-[#1E2E40] via-[#142230] to-[#0A131C] p-4 sm:p-5 shadow-[0_16px_38px_rgba(0,0,0,0.4),inset_0_1px_1px_rgba(255,255,255,0.25)] flex flex-col justify-between overflow-hidden group select-none transition-all duration-300 hover:border-mint/35 md:mr-1">
           {/* Subtle Ambient Glows */}
           <div className="pointer-events-none absolute -right-10 -bottom-10 h-32 w-32 rounded-full bg-mint/[0.08] blur-2xl" />
           <div className="pointer-events-none absolute -left-8 -top-8 h-24 w-24 rounded-full bg-blue-500/[0.06] blur-xl" />
