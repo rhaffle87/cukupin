@@ -299,7 +299,7 @@ export function GoalsView({ supabase, data, userId }: GoalsViewProps) {
           className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all cursor-pointer ${
             statusFilter === 'all'
               ? 'bg-ink !text-white shadow-2xs'
-              : 'bg-paper text-muted hover:bg-black/5 hover:text-ink'
+              : 'bg-card border border-line text-muted hover:text-ink hover:border-ink/20 shadow-2xs'
           }`}
         >
           Semua ({counts.all})
@@ -310,7 +310,7 @@ export function GoalsView({ supabase, data, userId }: GoalsViewProps) {
           className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all cursor-pointer ${
             statusFilter === 'in_progress'
               ? 'bg-ink !text-white shadow-2xs'
-              : 'bg-paper text-muted hover:bg-black/5 hover:text-ink'
+              : 'bg-card border border-line text-muted hover:text-ink hover:border-ink/20 shadow-2xs'
           }`}
         >
           Sedang Berjalan ({counts.inProgress})
@@ -321,7 +321,7 @@ export function GoalsView({ supabase, data, userId }: GoalsViewProps) {
           className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all cursor-pointer ${
             statusFilter === 'completed'
               ? 'bg-ink !text-white shadow-2xs'
-              : 'bg-paper text-muted hover:bg-black/5 hover:text-ink'
+              : 'bg-card border border-line text-muted hover:text-ink hover:border-ink/20 shadow-2xs'
           }`}
         >
           Sudah Tercapai ({counts.completed})
@@ -343,7 +343,7 @@ export function GoalsView({ supabase, data, userId }: GoalsViewProps) {
             return (
               <div
                 key={goal.id}
-                className="group relative flex flex-col justify-between rounded-[20px] border border-line bg-card p-5 shadow-[0_4px_16px_rgba(30,50,73,0.025)] hover:shadow-md transition-all"
+                className="group relative flex flex-col justify-between rounded-[20px] border border-line bg-card p-5 shadow-xs hover:shadow-card-hover hover:border-ink/20 transition-all"
               >
                 <div>
                   {/* Top: Status Badge + Delete */}

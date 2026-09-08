@@ -12,9 +12,13 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        paper: '#F7F6F0',
+        sidebar: {
+          DEFAULT: '#ECE9DF',
+          border: '#D8D3C5',
+        },
+        paper: '#FAF9F5',
         card: {
-          DEFAULT: '#FFFEFB',
+          DEFAULT: '#FFFFFF',
           foreground: 'var(--card-foreground, #1E3249)',
         },
         ink: '#1E3249',
@@ -22,13 +26,13 @@ const config: Config = {
           DEFAULT: '#718078',
           foreground: 'var(--muted-foreground, #718078)',
         },
-        line: '#E8E7E0',
+        line: '#DFDCD2',
         mint: '#BEE6CF',
         slate: '#89938A',
-        background: 'var(--background, #F7F6F0)',
+        background: 'var(--background, #FAF9F5)',
         foreground: 'var(--foreground, #1E3249)',
-        border: 'var(--border, #E8E7E0)',
-        input: 'var(--input, #E8E7E0)',
+        border: 'var(--border, #DFDCD2)',
+        input: 'var(--input, #DFDCD2)',
         ring: 'var(--ring, #3E8F68)',
         primary: {
           DEFAULT: 'var(--primary, #1E3249)',
@@ -78,6 +82,13 @@ const config: Config = {
         '2xl': '24px',
         '3xl': '32px',
         full: '9999px',
+      },
+      boxShadow: {
+        '2xs': '0 1px 3px rgba(30, 50, 73, 0.05), 0 2px 8px rgba(30, 50, 73, 0.03)',
+        'xs': '0 1px 3px rgba(30, 50, 73, 0.05), 0 3px 10px rgba(30, 50, 73, 0.035)',
+        'card': '0 1px 3px rgba(30, 50, 73, 0.05), 0 4px 14px rgba(30, 50, 73, 0.04)',
+        'card-hover': '0 4px 20px rgba(30, 50, 73, 0.08)',
+        'panel': '0 1px 3px rgba(30, 50, 73, 0.04), 0 6px 24px rgba(30, 50, 73, 0.04)',
       },
     },
   },

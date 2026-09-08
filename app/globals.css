@@ -28,12 +28,12 @@
     box-sizing: border-box;
   }
   html {
-    background-color: var(--color-paper, #f7f6f0);
+    background-color: var(--color-paper, #faf9f5);
     color: var(--color-ink, #1e3249);
   }
   body {
     margin: 0;
-    background-color: var(--color-paper, #f7f6f0);
+    background-color: var(--color-paper, #faf9f5);
     color: var(--color-ink, #1e3249);
     font-size: 14px;
   }
@@ -114,11 +114,13 @@
    ========================================================================== */
 :root {
   /* Brand Core Tokens */
-  --paper: #f7f6f0;
-  --card: #fffefb;
+  --sidebar: #ece9df;
+  --sidebar-border: #d8d3c5;
+  --paper: #faf9f5;
+  --card: #ffffff;
   --ink: #1e3249;
   --muted: #718078;
-  --line: #e8e7e0;
+  --line: #dfdcd2;
   --green: #3e8f68;
   --green-soft: #e6f0ea;
   --blue: #315dcb;
@@ -129,6 +131,8 @@
   --slate: #89938a;
 
   /* Aliases for color-* CSS variables used in base */
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-border: var(--sidebar-border);
   --color-paper: var(--paper);
   --color-card: var(--card);
   --color-ink: var(--ink);
@@ -175,8 +179,8 @@
 }
 .sidebar {
   width: 238px;
-  background: #f0f1ea;
-  border-right: 1px solid var(--line);
+  background: var(--sidebar, #ece9df);
+  border-right: 1px solid var(--sidebar-border, #d8d3c5);
   padding: 27px 17px 19px;
   display: flex;
   flex-direction: column;
@@ -493,11 +497,12 @@
   margin: 16px 0;
 }
 .stat-card {
-  background: var(--card);
-  border: 1px solid var(--line);
+  background: var(--card, #ffffff);
+  border: 1px solid var(--line, #dfdcd2);
   border-radius: var(--radius);
   padding: 16px;
-  box-shadow: 0 5px 20px rgba(30, 50, 73, 0.025);
+  box-shadow: 0 1px 3px rgba(30, 50, 73, 0.05), 0 3px 12px rgba(30, 50, 73, 0.035);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 .stat-top {
   display: flex;
@@ -578,11 +583,12 @@
   margin: 16px 0;
 }
 .panel {
-  background: var(--card);
-  border: 1px solid var(--line);
+  background: var(--card, #ffffff);
+  border: 1px solid var(--line, #dfdcd2);
   border-radius: var(--radius);
   padding: 24px;
-  box-shadow: 0 5px 20px rgba(30, 50, 73, 0.025);
+  box-shadow: 0 1px 3px rgba(30, 50, 73, 0.05), 0 4px 16px rgba(30, 50, 73, 0.035);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 .panel-heading {
   display: flex;
