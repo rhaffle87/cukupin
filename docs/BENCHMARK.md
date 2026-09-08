@@ -101,6 +101,7 @@ Diuji pada kumpulan data 500 transaksi menggunakan modul Node.js `perf_hooks`:
 | Komponen / Operasi | Lingkungan Eksekusi | Durasi Rata-rata | Batas Maksimum | Margin Keamanan |
 | :--- | :--- | :--- | :--- | :--- |
 | **Agregasi Matematika Klien** | Client CPU (V8 Engine) | **0,12 ms** | 10.000 ms | **>99,99%** |
+| **Sliding-Window Rate Limiter** | In-Memory Edge (`lib/rateLimit.ts`) | **0,03 ms** | 10.000 ms | **>99,99%** |
 | **Edge Proxy Auth Middleware** | Next.js Edge (`proxy.ts`) | **25 ms** | 10.000 ms | **>99,75%** |
 | **Kueri Supabase Terindeks** | PostgreSQL (Supabase) | **78 ms** | 10.000 ms | **>99,22%** |
 | **Server Cron Tagihan Otomatis** | Vercel Serverless Function | **295 ms** | 10.000 ms | **>97,05%** |

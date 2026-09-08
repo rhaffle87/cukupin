@@ -11,6 +11,7 @@ Dokumentasi audit keamanan, pemodelan ancaman (STRIDE), mitigasi OWASP Top 10, d
 | **Transport Layer** | HSTS dengan preload (`max-age=63072000`) | **A+ (Hardened)** |
 | **Edge Network Boundary** | Next.js Edge Proxy (`proxy.ts`) Auth Token Validation | **A+ (Hardened)** |
 | **Content Security Policy** | Strict CSP tanpa inline eval di rute kritis | **A (Compliant)** |
+| **API & Edge Throttling** | In-memory sliding window limiter (`lib/rateLimit.ts`) | **A+ (DDoS Shielded)** |
 | **Database Access Control** | PostgreSQL Row Level Security (RLS) pada semua tabel | **A+ (Zero Leak)** |
 | **Data Export Sanitization** | Mitigasi CSV Formula Injection (OWASP ASVS 5.1.5) | **A+ (Hardened)** |
 | **Kepatuhan Privasi** | UU PDP No. 27 Tahun 2022 & GDPR Right to Erasure | **A+ (Compliant)** |
@@ -73,6 +74,12 @@ Dokumentasi audit keamanan, pemodelan ancaman (STRIDE), mitigasi OWASP Top 10, d
     Cross-Origin-Opener-Policy: 'same-origin'
     ```
 
+### 3.6. A04:2021 & A05:2021 - Rate Limiting & Denial of Service Mitigation
+- **Implementasi**:
+  - Modul in-memory sliding-window di [`lib/rateLimit.ts`](../lib/rateLimit.ts) diintegrasikan pada Edge Proxy ([`proxy.ts`](../proxy.ts)) dan rute cron ([`app/api/cron/recurring-bills/route.ts`](../app/api/cron/recurring-bills/route.ts)).
+  - Mengembalikan status `429 Too Many Requests` disertai header standar RFC (`X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`, `Retry-After`).
+  - **Pengerasan Autorisasi Cron**: Wajib menyertakan `CRON_SECRET` di lingkungan produksi (`NODE_ENV === 'production'`) untuk mencegah pemicuan tanpa izin jika konfigurasi rahasia belum disetel.
+
 ---
 
 ## 4. Analisis Content Security Policy (CSP)
@@ -102,10 +109,22 @@ form-action 'self';
 Aplikasi Cukupin™ dirancang sesuai dengan mandat **Undang-Undang Perlindungan Data Pribadi (UU PDP No. 27/2022)** Republik Indonesia dan prinsip **GDPR**:
 
 1. **Hak Pengakhiran & Penghapusan Data (Right to Erasure / Pasal 39 UU PDP)**:
-   - Fitur **"Hapus Seluruh Data" (Purge Data)** di halaman transaksi memungkinkan pengguna menghapus permanen seluruh riwayat finansial, target tabungan, tagihan rutin, dan wishlist mereka dari database dengan konfirmasi ketik nama.
+   - Fitur **"Hapus Seluruh Data" (Purge Data)** di halaman transaksi memungkinkan pengguna menghapus permanen seluruh riwayat finansial, target tabungan, tagihan rutin, dan wishlist mereka dari database dengan konfirmasi ketik nama `HAPUS`.
 2. **Persetujuan Sadar (Consent Management / Pasal 20 UU PDP)**:
    - Komponen [`CookieConsent.tsx`](../components/ui/CookieConsent.tsx) dan [`AnalyticsConsent.tsx`](../components/analytics/AnalyticsConsent.tsx) memberikan opsi eksplisit bagi pengguna untuk Menerima atau Menolak cookie analitik.
    - Jika pengguna menolak, hook `beforeSend` Vercel Analytics & Speed Insights otomatis membatalkan pengiriman data telemetri.
 3. **Kemandirian & Portabilitas Data (Data Portability / Pasal 41 UU PDP)**:
    - Pengguna memiliki hak mengunduh salinan lengkap data mereka kapan saja dalam format standar JSON (v2.0 Backup Engine) dan format CSV terbuka tanpa terkunci vendor (*zero vendor lock-in*).
+
+---
+
+## 6. Kriptografi Layar & Otentikasi Biometrik Lokal
+
+1. **Web Crypto Salted SHA-256 (`lib/security/crypto.ts`)**:
+   - Menggunakan `crypto.subtle.digest('SHA-256', ...)` standar W3C.
+   - Setiap PIN 6-digit digabungkan dengan **16-byte cryptographically secure random salt** (`crypto.getRandomValues`) sebelum di-hash. Plaintext PIN tidak pernah disimpan di disk atau dikirim melalui jaringan.
+2. **WebAuthn Biometrics (`lib/security/webauthn.ts`)**:
+   - Memanfaatkan Touch ID, Face ID, atau Windows Hello bawaan perangkat melalui `navigator.credentials.get()`.
+3. **Pembersihan Memori Otomatis**:
+   - URL Blob hasil ekspor CSV/JSON otomatis dihapus dari memori peramban via `URL.revokeObjectURL(url)` setelah 150ms.
 

@@ -235,3 +235,7 @@ Seluruh migrasi disimpan dalam folder `supabase/migrations/`:
 4. **`20260906000003_recurring_bills_and_budgets.sql`**:
    - Penambahan tabel `recurring_bills` dan `category_budgets`.
    - RLS, unique constraint, indeks tanggal jatuh tempo, dan pendaftaran realtime.
+5. **`full_schema.sql` (Consolidated Idempotent Production Script v2.0)**:
+   - Skrip konsolidasi lengkap yang menggabungkan seluruh migrasi ke dalam satu berkas terpadu.
+   - Bersifat 100% idempoten (`CREATE TABLE IF NOT EXISTS`, `CREATE INDEX IF NOT EXISTS`, dan blok `DO $$`), siap dieksekusi dengan satu klik di Supabase SQL Editor tanpa risiko menimpa atau merusak data yang telah ada.
+   - Tersinkronisasi penuh dengan antarmuka TypeScript pada [`lib/database.types.ts`](../lib/database.types.ts).

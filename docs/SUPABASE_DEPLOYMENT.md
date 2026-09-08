@@ -91,10 +91,12 @@ Agar fitur login dan email konfirmasi Supabase bekerja mulus di localhost maupun
 
 Pastikan variabel lingkungan berikut telah ditambahkan di **Vercel Dashboard** > **Project Settings** > **Environment Variables**:
 
-| Variable Key | Deskripsi | Sumber di Supabase |
+| Variable Key | Deskripsi | Sumber di Supabase / Server |
 | :--- | :--- | :--- |
 | `NEXT_PUBLIC_SUPABASE_URL` | URL endpoint API project Anda | Project Settings > API > Project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Kunci publik aman browser (Anon/Public) | Project Settings > API > Project API keys (`anon` `public`) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Kunci administratif backend (Opsional untuk cron) | Project Settings > API > Project API keys (`service_role`) |
+| `CRON_SECRET` | Token bearer rahasia untuk eksekusi `/api/cron/*` | Nilai token acak aman (Wajib di environment produksi) |
 
 > [!TIP]
-> Jangan pernah memasukkan `service_role` secret key ke dalam environment variable dengan prefix `NEXT_PUBLIC_`. Kunci `anon` sudah 100% aman karena dilindungi oleh Row Level Security (RLS) pada tingkat engine PostgreSQL.
+> Jangan pernah memasukkan `service_role` secret key ke dalam environment variable dengan prefix `NEXT_PUBLIC_`. Kunci `anon` sudah 100% aman diekspos ke peramban karena dilindungi oleh Row Level Security (RLS) pada tingkat engine PostgreSQL. `CRON_SECRET` dan `SUPABASE_SERVICE_ROLE_KEY` hanya dibaca oleh serverless route handler dan tidak pernah dibundel ke bundle JavaScript klien.

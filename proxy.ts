@@ -1,10 +1,33 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
+import { checkRateLimit, RATE_LIMIT_PRESETS } from '@/lib/rateLimit'
 
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
   })
+
+  const { pathname, hostname } = request.nextUrl
+  const isLocalhost =
+    hostname === 'localhost' || hostname === '127.0.0.1' || hostname.endsWith('.local')
+
+  // Edge rate limiting for API endpoints (DDoS and brute-force mitigation)
+  if (pathname.startsWith('/api/')) {
+    const clientIp = request.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'anon-client'
+    const rateLimitResult = checkRateLimit(clientIp, RATE_LIMIT_PRESETS.API_DEFAULT)
+
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        { error: 'Too Many Requests', message: 'API rate limit exceeded. Please retry later.' },
+        { status: 429, headers: rateLimitResult.headers }
+      )
+    }
+
+    // Attach rate limit telemetry to outgoing response headers
+    Object.entries(rateLimitResult.headers).forEach(([key, value]) => {
+      supabaseResponse.headers.set(key, value)
+    })
+  }
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL
   const key =
@@ -39,10 +62,6 @@ export async function proxy(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser()
-
-  const { pathname, hostname } = request.nextUrl
-  const isLocalhost =
-    hostname === 'localhost' || hostname === '127.0.0.1' || hostname.endsWith('.local')
 
   // Protected route checking
   const isProtectedRoute =

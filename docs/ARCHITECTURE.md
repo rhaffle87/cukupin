@@ -52,6 +52,15 @@ Dikonfigurasi secara terpusat pada `next.config.mjs`:
 - Fungsi `escapeCsvField` pada `lib/finance.ts` menetralkan karakter berbahaya (`=`, `+`, `-`, `@`, `\t`, `\r`) dengan menyisipkan prefiks tanda kutip tunggal (`'`) sebelum diekspor.
 - Ekspor menggunakan Byte Order Mark UTF-8 (`\uFEFF`) dan *blob URL* dengan pembersihan memori otomatis (`URL.revokeObjectURL`).
 
+### 2.4. Edge Rate Limiting & Throttling (`lib/rateLimit.ts` & `proxy.ts`)
+- **Algoritma Sliding-Window**: Menggunakan pencatatan timestamp in-memory beresolusi tinggi tanpa dependensi eksternal, mencegah *boundary burst exploitation*.
+- **Integrasi Edge Proxy**: Mencegat seluruh request `/api/*` di `proxy.ts` dan membatasi laju request per alamat IP klien.
+- **Preset Kebijakan**:
+  - `API_DEFAULT`: 60 request / 60 detik (Rute API publik).
+  - `AUTH_STRICT`: 5 request / 60 detik (Mencegah serangan brute-force login).
+  - `CRON_WEBHOOK`: 12 request / 60 detik (Mencegah spam pemicu cron worker).
+- **Header Standar RFC**: Menghasilkan `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`, dan `Retry-After` dengan response code `429 Too Many Requests`.
+
 ---
 
 ## 3. Infrastruktur Data & Disaster Recovery (Backup & Restore)
@@ -181,9 +190,11 @@ flowchart LR
     end
 ```
 
-### 7.1. Deduping & Idempotency
+### 7.1. Deduping, Idempotency & Keamanan Cron
 - Menggunakan kolom `last_logged_month` (format `YYYY-MM`) pada tabel `recurring_bills`.
 - Tagihan yang sudah tercatat pada bulan berjalan **tidak akan pernah dicatat ulang**, baik oleh Server Cron maupun Client Worker.
+- **Pengerasan Autorisasi Produksi**: Pada environment produksi (`NODE_ENV === 'production'`), konfigurasi `CRON_SECRET` bersifat wajib (*mandatory*). Permintaan tanpa bearer token yang valid ditolak dengan status `401 Unauthorized` atau `500 Misconfigured`.
+- **Throttling Khusus Webhook**: Rute dibatasi maksimal 12 request per 60 detik (`RATE_LIMIT_PRESETS.CRON_WEBHOOK`) untuk mencegah eksekusi berulang yang tidak diinginkan.
 
 ### 7.2. Bridging Otomatis ke Target Tabungan (`saving_goals`)
 - Jika tagihan memiliki kategori `'Tabungan'` atau `'Investasi'`, sistem secara cerdas mencari target tabungan yang masih aktif dengan nama yang cocok (atau target tabungan aktif pertama).

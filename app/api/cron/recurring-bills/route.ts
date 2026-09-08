@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { getDueBillsToAutoLog } from '@/lib/recurringBillsWorker'
 import { RecurringBill } from '@/lib/database.types'
+import { checkRateLimit, RATE_LIMIT_PRESETS } from '@/lib/rateLimit'
 
 /**
  * Automated Cron Endpoint for Recurring Bills
@@ -11,7 +12,9 @@ import { RecurringBill } from '@/lib/database.types'
  * - GitHub Actions or external cron curl request
  *
  * Security:
- * - Validates Authorization: Bearer ${process.env.CRON_SECRET} if CRON_SECRET is set.
+ * - Edge rate limiting: max 12 requests / 60 seconds
+ * - Validates Authorization: Bearer ${process.env.CRON_SECRET}
+ * - Enforces mandatory secret in production
  */
 export async function GET(req: NextRequest) {
   return handleRecurringCron(req)
@@ -22,14 +25,34 @@ export async function POST(req: NextRequest) {
 }
 
 async function handleRecurringCron(req: NextRequest) {
-  // 1. Secret authorization check
+  // 1. Rate limiting & DDoS protection
+  const clientIp = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'cron-client'
+  const rateLimitResult = checkRateLimit(`cron-${clientIp}`, RATE_LIMIT_PRESETS.CRON_WEBHOOK)
+
+  if (!rateLimitResult.success) {
+    return NextResponse.json(
+      { error: 'Too Many Requests: Rate limit exceeded for cron endpoint' },
+      { status: 429, headers: rateLimitResult.headers }
+    )
+  }
+
+  // 2. Secret authorization check
   const authHeader = req.headers.get('authorization')
   const cronSecret = process.env.CRON_SECRET
+  const isProduction = process.env.NODE_ENV === 'production'
+
+  // In production, CRON_SECRET is strictly mandatory to prevent unauthorized triggers
+  if (isProduction && !cronSecret) {
+    return NextResponse.json(
+      { error: 'Misconfigured: CRON_SECRET must be configured in production' },
+      { status: 500, headers: rateLimitResult.headers }
+    )
+  }
 
   if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
     return NextResponse.json(
       { error: 'Unauthorized: Invalid cron bearer secret' },
-      { status: 401 }
+      { status: 401, headers: rateLimitResult.headers }
     )
   }
 

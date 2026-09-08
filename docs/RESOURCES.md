@@ -72,6 +72,12 @@ Supabase menyediakan database PostgreSQL, autentikasi pengguna (Supabase Auth / 
   1. **Skrip Ping Ringan**: Disediakan berkas [`scripts/supabase-keepalive.js`](../scripts/supabase-keepalive.js) yang mengeksekusi kueri `SELECT id FROM transactions LIMIT 1` dalam waktu <300ms.
   2. **Automasi Terjadwal**: Dikonfigurasi workflow GitHub Actions [`.github/workflows/supabase-keepalive.yml`](../.github/workflows/supabase-keepalive.yml) yang berjalan otomatis setiap 5 hari sekali (`0 0 */5 * *`), memastikan proyek Supabase tetap aktif 24/7 tanpa biaya tambahan.
 
+### 3.4. Bottleneck #4: Edge Request Flooding & DoS (1.000.000 Invocations/Bulan)
+- **Masalah**: Serangan bot scanning atau skrip eksternal yang melakukan loop request ke endpoint API atau cron dapat menghabiskan kuota 1.000.000 invocations Vercel dalam hitungan jam, menangguhkan seluruh aplikasi.
+- **Solusi Cukupin™**:
+  1. **In-Memory Sliding-Window Rate Limiter (`lib/rateLimit.ts`)**: Mencegat banjir request langsung di Edge Proxy (`proxy.ts`) sebelum fungsi serverless yang mahal dieksekusi.
+  2. **Preservation of Compute Quota**: Request berbahaya langsung diblokir di Edge dengan HTTP 429 tanpa menyentuh database atau memicu cold-start serverless.
+
 ---
 
 ## 4. Matriks Estimasi Kapasitas Beban Riil Cukupin™

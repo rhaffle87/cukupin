@@ -67,7 +67,9 @@ cukupin-v0/
 │   ├── database.types.ts       # Definisi tipe TypeScript skema Supabase
 │   ├── finance.ts              # Kalkulasi matematika 50/30/20, saldo, & sanitasi CSV
 │   ├── offlineQueue.ts         # Antrean sinkronisasi aksi offline (Offline-First)
+│   ├── rateLimit.ts            # Sliding-window rate limiter & DDoS mitigation (RFC headers)
 │   ├── recurringBillsWorker.ts # Evaluasi dan eksekusi batch otomatisasi tagihan jatuh tempo
+│   ├── resourceBudget.ts       # Pagination math, monthly bounds, & simulasi kapasitas free tier
 │   ├── security/               # SHA-256 + salt PIN hashing & WebAuthn biometrik
 │   ├── constants/              # Konstanta kunci storage, metadata, & navigasi
 │   └── validations/            # Skema validasi Zod untuk form & data entry
@@ -107,7 +109,7 @@ Cukupin™ menggunakan filosofi desain **Quiet Ledger** (buku besar finansial ya
 Sebelum melakukan commit atau pull request, selalu jalankan segitiga validasi kualitas:
 
 ```bash
-# 1. Jalankan pengujian unit otomatis (113 tests across 11 suites)
+# 1. Jalankan pengujian unit otomatis (135 tests across 13 suites)
 npm test
 
 # 2. Periksa kesesuaian tipe TypeScript (harus 0 error)
@@ -122,6 +124,8 @@ npm run test:e2e
 
 ### Cakupan Pengujian di `tests/`
 Pengujian unit dan komponen menggunakan **Vitest** dengan konfigurasi di `vitest.config.mts`:
+- `tests/rateLimit.test.ts`: 6 tests kuota sliding-window, multi-IP isolation, header RFC, dan reset.
+- `tests/resourcesAndLimits.test.ts`: 16 tests model payload byte, matematika paginasi, dan simulasi egress bulanan.
 - `tests/security.test.ts`: 16 tests kriptografi (salt, SHA-256 PIN hashing, WebAuthn, auto-lock timeout).
 - `tests/recurringWorker.test.ts`: 8 tests evaluasi tanggal jatuh tempo & eksekusi batch otomatisasi tagihan.
 - `tests/installPrompt.test.ts`: 6 tests pembatasan frekuensi instalasi mingguan (7-day cooldown gate).

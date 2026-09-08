@@ -199,6 +199,8 @@ sequenceDiagram
    - Pengguna dapat mengaktifkan atau menonaktifkan pencatatan otomatis melalui toggle UI pada tab Tagihan Rutin (`cukupin_auto_log_bills_enabled`).
 3. **Endpoint Server Cron**:
    - Rute `/api/cron/recurring-bills` dilindungi oleh header otentikasi `Authorization: Bearer <CRON_SECRET>` yang dikonfigurasi pada `vercel.json` untuk dieksekusi terjadwal setiap pukul 00:00 UTC (07:00 WIB).
+   - **Enforcement Produksi**: Wajib (`mandatory`) menyertakan secret jika berjalan pada `NODE_ENV === 'production'`.
+   - **Throttling Dedicated**: Dibatasi maksimal 12 panggilan/menit per IP untuk menangkal spam trigger.
 
 ---
 
@@ -242,4 +244,33 @@ sequenceDiagram
 - `cukupin_screen_lock_biometrics`: Flag boolean (`true` / `false`) untuk aktivasi WebAuthn.
 - `cukupin_screen_lock_timeout`: Pilihan durasi timeout: `immediately`, `5m`, `15m`, `30m`, `60m`.
 - `cukupin_screen_lock_last_active`: Timestamp epoch millisecond aktivitas pengguna terakhir.
+
+---
+
+## 8. Arsitektur Pembatasan Laju Permintaan (Rate Limiting & Throttling)
+
+Untuk melindungi infrastruktur serverless dan basis data dari serangan DDoS, brute-force login, dan penyalahgunaan kuota invocations, Cukupin™ mengimplementasikan lapisan rate limiter berbasis *sliding-window* pada Edge Proxy Next.js 16 (`proxy.ts`):
+
+```mermaid
+flowchart TD
+    Req["Request Masuk (/api/*)"] --> Edge["proxy.ts Middleware"]
+    Edge --> ExtractIP["Ekstraksi Identitas Klien (x-forwarded-for)"]
+    ExtractIP --> RLCheck["checkRateLimit(clientIp, preset)"]
+    RLCheck --> WindowEval{"Jumlah Request dalam 60s < Limit?"}
+    
+    WindowEval -- Ya --> Allow["NextResponse.next() + Inject RateLimit Headers"]
+    Allow --> RouteHandler["Serverless Route Handler"]
+    
+    WindowEval -- Tidak --> Block["HTTP 429 Too Many Requests"]
+    Block --> Headers["Inject Retry-After & X-RateLimit-*"]
+    Headers --> Reject["Kirim Respons JSON Error ke Klien"]
+```
+
+### Spesifikasi Header Standar RFC:
+| Header | Tipe | Deskripsi |
+| :--- | :--- | :--- |
+| `X-RateLimit-Limit` | `number` | Batas maksimum request dalam satu jendela waktu (misal: `60`) |
+| `X-RateLimit-Remaining`| `number` | Sisa request yang diizinkan dalam jendela saat ini |
+| `X-RateLimit-Reset` | `number` | Estimasi waktu (detik) hingga kuota ter-reset penuh |
+| `Retry-After` | `number` | Durasi tunggu wajib (detik) yang dikirimkan saat status `429` |
 
