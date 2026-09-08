@@ -334,7 +334,7 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
       />
 
       {/* Top Structured KPI Summary Cards */}
-      <div className="mb-4 grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
+      <div className="mb-4 grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
         <div className="rounded-[18px] border border-line bg-card p-3 sm:p-4 shadow-2xs">
           <div className="flex items-center justify-between text-muted text-xs">
             <span className="font-bold text-[10px] uppercase tracking-wider">Total Nilai</span>
@@ -342,7 +342,7 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
               <ShoppingBag size={14} />
             </div>
           </div>
-          <strong className="mt-1.5 block !font-mono tabular-nums text-base sm:text-xl md:text-2xl font-bold text-ink truncate" title={currency(totalWishlistValue)}>
+          <strong className="mt-1.5 block !font-numeric tabular-nums !text-sm sm:!text-[15px] md:!text-base lg:!text-xl xl:!text-2xl tracking-tight sm:tracking-tighter lg:tracking-tight font-bold text-ink truncate" title={currency(totalWishlistValue)}>
             {currency(totalWishlistValue)}
           </strong>
           <small className="mt-0.5 block text-[10px] sm:text-[11px] text-muted">
@@ -357,7 +357,7 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
               <Sparkles size={14} />
             </div>
           </div>
-          <strong className="mt-1.5 block !font-mono tabular-nums text-base sm:text-xl md:text-2xl font-bold text-green">
+          <strong className="mt-1.5 block !font-numeric tabular-nums !text-sm sm:!text-[15px] md:!text-base lg:!text-xl xl:!text-2xl tracking-tight sm:tracking-tighter lg:tracking-tight font-bold text-green">
             {affordableCount} Barang
           </strong>
           <small className="mt-0.5 block text-[10px] sm:text-[11px] text-muted truncate">
@@ -372,7 +372,7 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
               <Wallet size={14} />
             </div>
           </div>
-          <strong className={`mt-1.5 block !font-mono tabular-nums text-base sm:text-xl md:text-2xl font-bold truncate ${currentBalance >= 0 ? 'text-ink' : 'text-coral'}`} title={currency(currentBalance)}>
+          <strong className={`mt-1.5 block !font-numeric tabular-nums !text-sm sm:!text-[15px] md:!text-base lg:!text-xl xl:!text-2xl tracking-tight sm:tracking-tighter lg:tracking-tight font-bold truncate ${currentBalance >= 0 ? 'text-ink' : 'text-coral'}`} title={currency(currentBalance)}>
             {currency(currentBalance)}
           </strong>
           <small className="mt-0.5 block text-[10px] sm:text-[11px] text-muted">
@@ -382,13 +382,19 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
       </div>
 
       {/* Filter Tabs Bar */}
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-[18px] border border-line bg-card px-4 py-3 shadow-2xs">
-        <div className="flex flex-wrap items-center gap-1.5">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-muted mr-1">Filter:</span>
+      <div className="mb-4 rounded-[18px] border border-line bg-card p-3.5 sm:p-4 shadow-2xs">
+        <div className="flex items-center justify-between gap-2 mb-2.5">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-muted">Filter</span>
+          <span className="text-[11px] font-medium text-muted">
+            Menampilkan <strong>{filteredWishlist.length}</strong> barang
+          </span>
+        </div>
+
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 sm:pb-0 sm:flex-wrap no-scrollbar">
           <button
             type="button"
             onClick={() => setFilterTab('all')}
-            className={`rounded-xl px-3 py-1.5 text-xs font-bold transition-colors ${filterTab === 'all' ? 'bg-ink !text-white shadow-2xs' : 'bg-paper text-muted hover:bg-black/5 hover:text-ink'
+            className={`shrink-0 rounded-xl px-3 py-1.5 text-xs font-bold transition-colors cursor-pointer ${filterTab === 'all' ? 'bg-ink !text-white shadow-2xs' : 'bg-paper text-muted hover:bg-black/5 hover:text-ink'
               }`}
           >
             Semua ({data.wishlist.length})
@@ -396,40 +402,39 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
           <button
             type="button"
             onClick={() => setFilterTab('affordable')}
-            className={`rounded-xl px-3 py-1.5 text-xs font-bold transition-colors ${filterTab === 'affordable' ? 'bg-green !text-white shadow-2xs' : 'bg-green-soft text-green hover:bg-green/20'
+            className={`shrink-0 rounded-xl px-3 py-1.5 text-xs font-bold transition-colors cursor-pointer ${filterTab === 'affordable' ? 'bg-green !text-white shadow-2xs' : 'bg-green-soft text-green hover:bg-green/20'
               }`}
           >
             Siap Dibeli ({affordableCount})
           </button>
+
+          <span className="h-4 w-px bg-line shrink-0 mx-0.5" />
+
           <button
             type="button"
             onClick={() => setFilterTab('High')}
-            className={`rounded-xl px-3 py-1.5 text-xs font-bold transition-colors ${filterTab === 'High' ? 'bg-coral !text-white shadow-2xs' : 'bg-coral-soft text-coral hover:bg-coral/20'
+            className={`shrink-0 rounded-xl px-3 py-1.5 text-xs font-bold transition-colors cursor-pointer ${filterTab === 'High' ? 'bg-coral !text-white shadow-2xs' : 'bg-coral-soft text-coral hover:bg-coral/20'
               }`}
           >
-            Prioritas Tinggi
+            <span className="hidden sm:inline">Prioritas </span>Tinggi
           </button>
           <button
             type="button"
             onClick={() => setFilterTab('Medium')}
-            className={`rounded-xl px-3 py-1.5 text-xs font-bold transition-colors ${filterTab === 'Medium' ? 'bg-blue !text-white shadow-2xs' : 'bg-blue-soft text-blue hover:bg-blue/20'
+            className={`shrink-0 rounded-xl px-3 py-1.5 text-xs font-bold transition-colors cursor-pointer ${filterTab === 'Medium' ? 'bg-blue !text-white shadow-2xs' : 'bg-blue-soft text-blue hover:bg-blue/20'
               }`}
           >
-            Sedang
+            <span className="hidden sm:inline">Prioritas </span>Sedang
           </button>
           <button
             type="button"
             onClick={() => setFilterTab('Low')}
-            className={`rounded-xl px-3 py-1.5 text-xs font-bold transition-colors ${filterTab === 'Low' ? 'bg-ink !text-white shadow-2xs' : 'bg-paper text-muted hover:bg-black/5 hover:text-ink'
+            className={`shrink-0 rounded-xl px-3 py-1.5 text-xs font-bold transition-colors cursor-pointer ${filterTab === 'Low' ? 'bg-ink !text-white shadow-2xs' : 'bg-paper text-muted hover:bg-black/5 hover:text-ink'
               }`}
           >
-            Rendah
+            <span className="hidden sm:inline">Prioritas </span>Rendah
           </button>
         </div>
-
-        <span className="text-[11px] font-medium text-muted">
-          Menampilkan <strong>{filteredWishlist.length}</strong> barang
-        </span>
       </div>
 
       {/* Structured Wishlist Cards Grid */}
@@ -474,7 +479,7 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
                   </h3>
 
                   {/* Price */}
-                  <strong className="mt-2 block !font-mono tabular-nums text-xl font-bold text-ink">
+                  <strong className="mt-2 block !font-numeric tabular-nums text-xl font-bold text-ink">
                     {currency(itemPrice)}
                   </strong>
 
@@ -559,7 +564,7 @@ export function WishlistView({ supabase, data, userId }: WishlistViewProps) {
                 value={price}
                 onChange={e => setPrice(formatRupiahInput(e.target.value))}
                 placeholder="Contoh: 750.000"
-                className="rounded-xl border border-line bg-paper px-3.5 py-2.5 text-xs text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green font-mono font-medium"
+                className="rounded-xl border border-line bg-paper px-3.5 py-2.5 text-xs text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green font-numeric tabular-nums font-medium"
               />
             </label>
 

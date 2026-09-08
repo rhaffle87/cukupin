@@ -1,5 +1,5 @@
 import React from 'react'
-import { describe, it, expect, vi } from 'vitest'
+/// <reference types="vitest/globals" />
 import { render, screen, fireEvent } from '@testing-library/react'
 import { TransactionRow } from '@/components/finance/TransactionRow'
 import { CategoryBudgetWidget } from '@/components/finance/CategoryBudgetWidget'

@@ -244,19 +244,19 @@ export function MonthlyExpenseTemplate({
       <div className="mb-6 grid grid-cols-4 gap-3 rounded-xl border border-[#D1D5DB] bg-[#F9FAFB] p-3.5 text-xs w-full">
         <div>
           <span className="block text-[10px] uppercase tracking-wider text-[#6B7280]" style={{ lineHeight: '1.5' }}>Total Anggaran/Masuk</span>
-          <strong className="text-[13px] font-medium text-[#15803D] font-mono tabular-nums" style={{ display: 'block', lineHeight: '1.5' }}>{currency(stats.income)}</strong>
+          <strong className="text-[13px] font-medium text-[#15803D] font-numeric tabular-nums" style={{ display: 'block', lineHeight: '1.5' }}>{currency(stats.income)}</strong>
         </div>
         <div>
           <span className="block text-[10px] uppercase tracking-wider text-[#6B7280]" style={{ lineHeight: '1.5' }}>Total Pengeluaran</span>
-          <strong className="text-[13px] font-medium text-[#DC2626] font-mono tabular-nums" style={{ display: 'block', lineHeight: '1.5' }}>{currency(stats.expense)}</strong>
+          <strong className="text-[13px] font-medium text-[#DC2626] font-numeric tabular-nums" style={{ display: 'block', lineHeight: '1.5' }}>{currency(stats.expense)}</strong>
         </div>
         <div>
           <span className="block text-[10px] uppercase tracking-wider text-[#6B7280]" style={{ lineHeight: '1.5' }}>Sisa Bersih</span>
-          <strong className="text-[13px] font-medium text-[#1D4ED8] font-mono tabular-nums" style={{ display: 'block', lineHeight: '1.5' }}>{currency(stats.balance)}</strong>
+          <strong className="text-[13px] font-medium text-[#1D4ED8] font-numeric tabular-nums" style={{ display: 'block', lineHeight: '1.5' }}>{currency(stats.balance)}</strong>
         </div>
         <div>
           <span className="block text-[10px] uppercase tracking-wider text-[#6B7280]" style={{ lineHeight: '1.5' }}>Total Catatan</span>
-          <strong className="text-[13px] font-medium text-[#111827] font-mono tabular-nums" style={{ display: 'block', lineHeight: '1.5' }}>{stats.count} Transaksi</strong>
+          <strong className="text-[13px] font-medium text-[#111827] font-numeric tabular-nums" style={{ display: 'block', lineHeight: '1.5' }}>{stats.count} Transaksi</strong>
         </div>
       </div>
 
@@ -316,10 +316,10 @@ export function MonthlyExpenseTemplate({
                       )}
                     </div>
                   </td>
-                  <td className="border-r border-[#111827] px-3 py-2 text-right font-mono font-medium tabular-nums whitespace-nowrap" style={{ textAlign: 'right', verticalAlign: 'middle', lineHeight: '1.5' }}>
+                  <td className="border-r border-[#111827] px-3 py-2 text-right font-numeric font-medium tabular-nums whitespace-nowrap" style={{ textAlign: 'right', verticalAlign: 'middle', lineHeight: '1.5' }}>
                     {currency(Number(tx.amount))}
                   </td>
-                  <td className="px-3 py-2 text-right font-mono font-medium text-[#111827] tabular-nums whitespace-nowrap" style={{ textAlign: 'right', verticalAlign: 'middle', lineHeight: '1.5' }}>
+                  <td className="px-3 py-2 text-right font-numeric font-medium text-[#111827] tabular-nums whitespace-nowrap" style={{ textAlign: 'right', verticalAlign: 'middle', lineHeight: '1.5' }}>
                     {currency(tx.runningTotal)}
                   </td>
                 </tr>
@@ -349,10 +349,10 @@ export function MonthlyExpenseTemplate({
               <td colSpan={4} className="border-r border-[#111827] px-3 py-2.5 text-right uppercase tracking-wider text-[10px]" style={{ textAlign: 'right', verticalAlign: 'middle', lineHeight: '1.5' }}>
                 Total Pengeluaran Bulan Ini
               </td>
-              <td className="border-r border-[#111827] px-3 py-2.5 text-right font-mono text-[12px] text-[#DC2626] tabular-nums" style={{ textAlign: 'right', verticalAlign: 'middle', lineHeight: '1.5' }}>
+              <td className="border-r border-[#111827] px-3 py-2.5 text-right font-numeric text-[12px] text-[#DC2626] tabular-nums" style={{ textAlign: 'right', verticalAlign: 'middle', lineHeight: '1.5' }}>
                 {currency(stats.expense)}
               </td>
-              <td className="px-3 py-2.5 text-right font-mono text-[12px] text-[#111827] tabular-nums" style={{ textAlign: 'right', verticalAlign: 'middle', lineHeight: '1.5' }}>
+              <td className="px-3 py-2.5 text-right font-numeric text-[12px] text-[#111827] tabular-nums" style={{ textAlign: 'right', verticalAlign: 'middle', lineHeight: '1.5' }}>
                 {currency(runningTransactions.length > 0 ? runningTransactions[runningTransactions.length - 1].runningTotal : 0)}
               </td>
             </tr>
@@ -376,7 +376,7 @@ export function MonthlyExpenseTemplate({
                     <span className="text-[#4B5563]">{cat}</span>
                     <div className="flex items-center gap-3">
                       <span className="text-[10px] text-gray-400">{percent}%</span>
-                      <strong className="font-mono tabular-nums">{currency(val)}</strong>
+                      <strong className="font-numeric tabular-nums">{currency(val)}</strong>
                     </div>
                   </div>
                 )

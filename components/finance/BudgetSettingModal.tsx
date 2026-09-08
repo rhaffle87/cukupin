@@ -132,7 +132,7 @@ export function BudgetSettingModal({
                   placeholder="0 (Tanpa batas)"
                   value={limits[cat] || ''}
                   onChange={(e) => handleInputChange(cat, e.target.value)}
-                  className="w-full rounded-lg border border-line bg-card !pl-8 pr-2.5 py-1.5 text-xs font-mono text-ink outline-none focus:border-ink focus:ring-1 focus:ring-ink"
+                  className="w-full rounded-lg border border-line bg-card !pl-8 pr-2.5 py-1.5 text-xs font-numeric tabular-nums text-ink outline-none focus:border-ink focus:ring-1 focus:ring-ink"
                 />
               </div>
             </div>

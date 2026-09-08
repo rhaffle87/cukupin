@@ -78,45 +78,71 @@ export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> 
       />
       
       {/* Date Filter Bar */}
-      <div className="mb-4 flex flex-col sm:flex-row sm:items-end justify-between gap-4 rounded-[18px] border border-line bg-card p-5 shadow-[0_4px_16px_rgba(30,50,73,0.02)]">
-        <div>
-          <Eyebrow>RENTANG TANGGAL</Eyebrow>
-          <strong className="mt-1 block font-display text-lg font-bold text-ink">Pilih periode laporan</strong>
+      <div className="mb-4 flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4 rounded-[18px] border border-line bg-card p-4 sm:p-5 shadow-[0_4px_16px_rgba(30,50,73,0.02)]">
+        <div className="flex items-center justify-between sm:block">
+          <div>
+            <Eyebrow>RENTANG TANGGAL</Eyebrow>
+            <strong className="mt-1 block font-display text-base sm:text-lg font-bold text-ink">Pilih periode laporan</strong>
+          </div>
+          {/* Mobile-only month buttons in header */}
+          <div className="flex items-center gap-1 sm:hidden">
+            <button
+              type="button"
+              onClick={() => stepMonth(-1)}
+              title="Bulan Sebelumnya"
+              className="flex h-8 w-8 items-center justify-center rounded-lg border border-line bg-paper text-muted hover:bg-black/5 hover:text-ink transition-colors cursor-pointer active:scale-95"
+              aria-label="Bulan Sebelumnya"
+            >
+              <ChevronLeft size={16} />
+            </button>
+            <button
+              type="button"
+              onClick={() => stepMonth(1)}
+              title="Bulan Berikutnya"
+              className="flex h-8 w-8 items-center justify-center rounded-lg border border-line bg-paper text-muted hover:bg-black/5 hover:text-ink transition-colors cursor-pointer active:scale-95"
+              aria-label="Bulan Berikutnya"
+            >
+              <ChevronRight size={16} />
+            </button>
+          </div>
         </div>
-        <div className="flex items-center gap-1.5 sm:gap-2">
+        
+        <div className="grid grid-cols-2 gap-2 sm:flex sm:items-end sm:gap-2">
+          {/* Desktop-only month back button */}
           <button
             type="button"
             onClick={() => stepMonth(-1)}
             title="Bulan Sebelumnya"
-            className="self-end mb-1 rounded-lg border border-line bg-paper p-1.5 sm:p-2 text-muted hover:bg-black/5 hover:text-ink transition-colors cursor-pointer"
+            className="hidden sm:inline-flex mb-1 rounded-lg border border-line bg-paper p-1.5 sm:p-2 text-muted hover:bg-black/5 hover:text-ink transition-colors cursor-pointer"
             aria-label="Bulan Sebelumnya"
           >
             <ChevronLeft size={16} />
           </button>
-          <label className="flex flex-col text-[11px] font-bold text-muted">
+          <label className="flex flex-col text-[11px] font-bold text-muted min-w-0">
             Dari
             <input
               type="date"
               value={from}
               onChange={e => setFrom(e.target.value)}
-              className="mt-1 w-[115px] sm:w-[130px] rounded-lg border border-line bg-paper px-2 py-1.5 text-xs text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
+              className="mt-1 w-full sm:w-[130px] rounded-lg border border-line bg-paper px-2 py-1.5 text-xs text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
             />
           </label>
-          <span className="self-end pb-2 text-xs font-medium text-muted">s/d</span>
-          <label className="flex flex-col text-[11px] font-bold text-muted">
+          <span className="hidden sm:inline-block self-end pb-2 text-xs font-medium text-muted">s/d</span>
+          <label className="flex flex-col text-[11px] font-bold text-muted min-w-0">
             Sampai
             <input
               type="date"
               value={to}
               onChange={e => setTo(e.target.value)}
-              className="mt-1 w-[115px] sm:w-[130px] rounded-lg border border-line bg-paper px-2 py-1.5 text-xs text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
+              className="mt-1 w-full sm:w-[130px] rounded-lg border border-line bg-paper px-2 py-1.5 text-xs text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
             />
           </label>
+          {/* Desktop-only month forward button */}
           <button
             type="button"
             onClick={() => stepMonth(1)}
             title="Bulan Berikutnya"
-            className="self-end mb-1 rounded-lg border border-line bg-paper p-1.5 sm:p-2 text-muted hover:bg-black/5 hover:text-ink transition-colors cursor-pointer"
+            className="hidden sm:inline-flex mb-1 rounded-lg border border-line bg-paper p-1.5 sm:p-2 text-muted hover:bg-black/5 hover:text-ink transition-colors cursor-pointer"
             aria-label="Bulan Berikutnya"
           >
             <ChevronRight size={16} />
@@ -124,9 +150,11 @@ export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> 
         </div>
       </div>
       
-      {/* Stat Cards */}
-      <div className="mb-4 grid grid-cols-3 gap-2 md:gap-3">
-        <StatCard label="Pemasukan" value={currency(stats.income)} tone="green" icon={ArrowDownLeft} note="Periode ini" />
+      {/* Stat Cards — Bento: hero card full-width on mobile, 3-col sm+ */}
+      <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-3 md:gap-3">
+        <div className="col-span-2 sm:col-span-1">
+          <StatCard label="Pemasukan" value={currency(stats.income)} tone="green" icon={ArrowDownLeft} note="Periode ini" featured />
+        </div>
         <StatCard label="Pengeluaran" value={currency(stats.expense)} tone="coral" icon={ArrowUpRight} note="Periode ini" />
         <StatCard label="Saldo akhir" value={currency(stats.balance)} tone="blue" icon={Wallet} note="Sisa uang periode ini" />
       </div>
@@ -139,7 +167,7 @@ export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> 
               <Eyebrow>POLA PENGELUARAN (50/30/20)</Eyebrow>
               <h2 className="mt-1 font-display text-lg sm:text-xl font-bold tracking-tight text-ink">Kebutuhan vs Keinginan</h2>
             </div>
-            <span className="self-start sm:self-auto rounded-full border border-line bg-paper px-3 py-1 text-[10px] font-bold text-muted">
+            <span className="self-start sm:self-auto rounded-full border border-line bg-paper px-3 py-1 text-[10px] font-bold font-numeric tabular-nums text-muted">
               Total {currency(rule503020.totalExpense)}
             </span>
           </div>
@@ -200,7 +228,7 @@ export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> 
                     style={{ width: `${Math.min(100, Math.max(4, pm.percentage))}%` }}
                   />
                 </div>
-                <small className="mt-1.5 block text-[11px] font-mono text-muted">
+                <small className="mt-1.5 block text-[11px] font-numeric tabular-nums font-medium text-muted">
                   {currency(pm.amount)}
                 </small>
               </div>
@@ -222,20 +250,31 @@ export function ReportsView({ data }: { data: ReturnType<typeof useFinanceData> 
         </div>
         
         {comp.length ? (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3 sm:gap-4">
             {comp.map(item => (
-              <div className="grid grid-cols-[140px_minmax(100px,1fr)_70px] sm:grid-cols-[180px_minmax(100px,1fr)_80px] items-center gap-3.5" key={item.category}>
-                <div>
-                  <strong className="block text-xs font-bold text-ink">{item.category}</strong>
-                  <span className="block text-[10px] text-muted">{currency(item.current)} vs {currency(item.previous)}</span>
+              <div
+                className="flex flex-col gap-2 rounded-xl border border-line/40 bg-paper/30 p-3 sm:border-0 sm:bg-transparent sm:p-0 sm:grid sm:grid-cols-[180px_minmax(100px,1fr)_80px] sm:items-center sm:gap-3.5"
+                key={item.category}
+              >
+                <div className="flex items-center justify-between sm:block">
+                  <div>
+                    <strong className="block text-xs font-bold text-ink">{item.category}</strong>
+                    <span className="block text-[10px] font-numeric tabular-nums text-muted">{currency(item.current)} vs {currency(item.previous)}</span>
+                  </div>
+                  {/* Mobile Percentage Badge */}
+                  <div className={`sm:hidden flex items-center gap-1 text-xs font-bold font-numeric tabular-nums shrink-0 ${item.change > 0 ? 'text-coral' : 'text-green'}`}>
+                    {item.change > 0 ? <TrendingUp size={13} /> : <TrendingDown size={13} />}
+                    {Math.abs(item.change).toFixed(0)}%
+                  </div>
                 </div>
-                <div className="h-2 overflow-hidden rounded-full bg-line">
+                <div className="h-2 w-full overflow-hidden rounded-full bg-line">
                   <div
                     className="h-full rounded-full bg-blue transition-all"
                     style={{ width: `${Math.min(100, Math.max(4, (item.current / Math.max(item.current, item.previous || 1)) * 100))}%` }}
                   />
                 </div>
-                <div className={`flex items-center justify-end gap-1 text-xs font-bold ${item.change > 0 ? 'text-coral' : 'text-green'}`}>
+                {/* Desktop Percentage */}
+                <div className={`hidden sm:flex items-center justify-end gap-1 text-xs font-bold shrink-0 ${item.change > 0 ? 'text-coral' : 'text-green'}`}>
                   {item.change > 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
                   {Math.abs(item.change).toFixed(0)}%
                 </div>

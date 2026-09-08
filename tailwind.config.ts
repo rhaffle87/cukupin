@@ -66,7 +66,8 @@ const config: Config = {
       fontFamily: {
         sans: ['var(--font-sans)', 'DM Sans', 'sans-serif'],
         display: ['var(--font-display)', 'Fraunces', 'serif'],
-        mono: ['var(--font-mono)', 'DM Mono', 'ui-monospace', 'monospace'],
+        numeric: ['var(--font-numeric)', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        mono: ['var(--font-mono)', 'JetBrains Mono', 'DM Mono', 'ui-monospace', 'monospace'],
       },
       borderRadius: {
         none: '0px',

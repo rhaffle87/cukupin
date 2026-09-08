@@ -272,7 +272,7 @@ export function TransactionForm({ supabase, userId, initial, onDone }: Transacti
             setFormError(null)
           }}
           placeholder="0"
-          className="w-full h-11 px-3.5 py-2.5 rounded-xl border border-line bg-[#fcfcf8] text-base text-ink focus-visible:ring-2 focus-visible:ring-green focus-visible:outline-none font-semibold font-mono transition-all placeholder:text-muted/60"
+          className="w-full h-11 px-3.5 py-2.5 rounded-xl border border-line bg-[#fcfcf8] text-base text-ink focus-visible:ring-2 focus-visible:ring-green focus-visible:outline-none font-semibold font-numeric tabular-nums transition-all placeholder:text-muted/60"
         />
       </label>
 

@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+/// <reference types="vitest/globals" />
 import { generateFullBackupPayload, validateBackupFile } from '@/lib/backup'
 import { escapeCsvField } from '@/lib/finance'
 import type { Transaction, SavingGoal, WishlistItem, RecurringBill, CategoryBudget } from '@/lib/database.types'

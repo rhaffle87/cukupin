@@ -39,8 +39,8 @@ Dokumentasi arsitektur dan operasional lengkap tersedia di direktori [`docs/`](.
 - **Typography**: [DM Sans](https://fonts.google.com/specimen/DM+Sans), [Fraunces](https://fonts.google.com/specimen/Fraunces), dan [DM Mono](https://fonts.google.com/specimen/DM+Mono) via `next/font/google`
 - **Database & Auth**: [Supabase](https://supabase.com/) (PostgreSQL dengan RLS)
 - **Analytics & Observability**: [Vercel Analytics](https://vercel.com/analytics) & [Vercel Speed Insights](https://vercel.com/docs/speed-insights) (*privacy consent-gated*)
-- **Charts & Visuals**: Recharts, Lucide Icons, html2canvas
-- **Testing**: Vitest + jsdom (44 unit tests, 100% passing)
+- **Charts & Visuals**: Recharts, Lucide Icons, canvas-confetti
+- **Testing**: Vitest + jsdom (80 unit, component & flow tests) & Python Playwright (6 E2E journeys)
 
 ---
 
@@ -80,11 +80,14 @@ Buka [http://localhost:3000](http://localhost:3000) di peramban Anda.
 
 Jalankan rangkaian unit test suite:
 ```bash
-# Sekali jalan (CI mode)
+# Unit, Component & Flow Tests (Vitest - 80 tests)
 npm run test
 
 # Mode interaktif / watch
 npm run test:watch
+
+# End-to-End Browser Journeys (Playwright - 6 user journeys)
+npm run test:e2e
 ```
 
 ---

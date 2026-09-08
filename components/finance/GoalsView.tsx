@@ -263,15 +263,18 @@ export function GoalsView({ supabase, data, userId }: GoalsViewProps) {
         }
       />
 
-      {/* 3 KPI Summary Cards */}
-      <div className="mb-4 grid grid-cols-3 gap-2 md:gap-3">
-        <StatCard
-          label="Total Target"
-          value={currency(totalTarget)}
-          tone="blue"
-          icon={Target}
-          note={`${counts.all} target tabungan`}
-        />
+      {/* 3 KPI Summary Cards — Bento: hero card full-width on mobile, 3-col sm+ */}
+      <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-3 md:gap-3">
+        <div className="col-span-2 sm:col-span-1">
+          <StatCard
+            label="Total Target"
+            value={currency(totalTarget)}
+            tone="blue"
+            icon={Target}
+            note={`${counts.all} target tabungan`}
+            featured
+          />
+        </div>
         <StatCard
           label="Total Terkumpul"
           value={currency(totalSaved)}
@@ -381,13 +384,13 @@ export function GoalsView({ supabase, data, userId }: GoalsViewProps) {
                   <div className="mt-2.5 flex items-baseline justify-between">
                     <div>
                       <span className="text-[10px] font-semibold text-muted uppercase tracking-wider block">Terkumpul</span>
-                      <strong className="text-xl !font-mono tabular-nums font-bold text-ink">
+                      <strong className="text-xl !font-numeric tabular-nums font-bold text-ink">
                         {currency(current)}
                       </strong>
                     </div>
                     <div className="text-right">
                       <span className="text-[10px] font-semibold text-muted uppercase tracking-wider block">Target</span>
-                      <span className="text-sm !font-mono tabular-nums font-bold text-muted">
+                      <span className="text-sm !font-numeric tabular-nums font-bold text-muted">
                         {currency(targetAmt)}
                       </span>
                     </div>
@@ -471,7 +474,7 @@ export function GoalsView({ supabase, data, userId }: GoalsViewProps) {
                 value={target}
                 onChange={e => setTarget(formatRupiahInput(e.target.value))}
                 placeholder="0"
-                className="font-mono font-medium"
+                className="font-numeric tabular-nums font-medium"
               />
             </label>
             <button className="button primary wide cursor-pointer mt-2">Simpan target</button>
@@ -494,7 +497,7 @@ export function GoalsView({ supabase, data, userId }: GoalsViewProps) {
                 value={amount}
                 onChange={e => setAmount(formatRupiahInput(e.target.value))}
                 placeholder="0"
-                className="font-mono font-medium"
+                className="font-numeric tabular-nums font-medium"
               />
             </label>
             <label className="flex flex-row items-center gap-2 cursor-pointer text-xs font-semibold text-ink pt-1">

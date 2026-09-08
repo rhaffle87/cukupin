@@ -101,7 +101,7 @@ export default function LandingPage() {
               href="/auth/login"
               className="group flex h-12 w-full sm:w-auto items-center justify-center gap-2.5 rounded-2xl bg-ink px-7 text-sm font-bold !text-white shadow-xl shadow-ink/15 transition-all hover:-translate-y-0.5 hover:bg-ink/90 active:translate-y-0 focus-visible:ring-2 focus-visible:ring-green"
             >
-              Coba Sekarang, Gratis
+              Coba Sekarang
               <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-1" />
             </Link>
             <a
@@ -204,7 +204,7 @@ export default function LandingPage() {
                   href="/auth/login"
                   className="group inline-flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-xs font-bold text-ink shadow-md transition-all hover:bg-[#F0F1EA] active:scale-95 focus-visible:ring-2 focus-visible:ring-green"
                 >
-                  Mulai Sekarang Gratis <ArrowRight size={14} className="transition-transform duration-200 group-hover:translate-x-0.5" />
+                  Coba Sekarang <ArrowRight size={14} className="transition-transform duration-200 group-hover:translate-x-0.5" />
                 </Link>
               </div>
             </div>
@@ -477,9 +477,8 @@ export default function LandingPage() {
                   <span>{f.q}</span>
                   <ChevronDown
                     size={16}
-                    className={`text-muted transition-transform duration-200 ${
-                      openFaq === i ? 'rotate-180 text-green' : ''
-                    }`}
+                    className={`text-muted transition-transform duration-200 ${openFaq === i ? 'rotate-180 text-green' : ''
+                      }`}
                   />
                 </button>
                 {openFaq === i && (
@@ -514,7 +513,7 @@ export default function LandingPage() {
                 href="/auth/login"
                 className="mt-8 group inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-white px-8 text-sm font-bold text-ink shadow-lg transition-all hover:bg-[#F0F1EA] active:scale-95 focus-visible:ring-2 focus-visible:ring-green"
               >
-                Coba Cukupin Sekarang, Gratis
+                Coba Sekarang
                 <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-1" />
               </Link>
             </div>
@@ -536,7 +535,7 @@ export default function LandingPage() {
               <p className="text-xs leading-relaxed text-muted max-w-sm">
                 Pencatatan keuangan mandiri tanpa rumus rumit, tanpa akses rekening bank, dan 100% bebas biaya. Dirancang untuk membantu kamu mengontrol pengeluaran dengan tenang setiap hari.
               </p>
-              
+
               {/* Trust Badges */}
               <div className="flex flex-wrap items-center gap-2 pt-1">
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-card px-3 py-1 text-[11px] font-medium text-ink shadow-2xs">

@@ -1,5 +1,5 @@
 import React from 'react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+/// <reference types="vitest/globals" />
 import { render, screen, fireEvent, act } from '@testing-library/react'
 import { Brand } from '@/components/ui/Brand'
 import { EmptyState } from '@/components/ui/EmptyState'

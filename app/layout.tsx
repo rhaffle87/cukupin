@@ -1,6 +1,6 @@
 import { AnalyticsConsent } from '@/components/analytics/AnalyticsConsent'
 import type { Metadata, Viewport } from 'next'
-import { DM_Sans, Fraunces, DM_Mono } from 'next/font/google'
+import { DM_Sans, Fraunces, Inter, JetBrains_Mono } from 'next/font/google'
 import { Toaster } from 'sonner'
 import { CookieConsent } from '@/components/ui/CookieConsent'
 import { RegisterServiceWorker } from '@/components/pwa/RegisterServiceWorker'
@@ -20,11 +20,18 @@ const fraunces = Fraunces({
   weight: ['500', '600', '700'],
 })
 
-const dmMono = DM_Mono({
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-numeric',
+  display: 'swap',
+  weight: ['400', '500', '600', '700', '800'],
+})
+
+const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
   variable: '--font-mono',
   display: 'swap',
-  weight: ['400', '500'],
+  weight: ['400', '500', '600', '700'],
 })
 
 export const metadata: Metadata = {
@@ -101,7 +108,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="id" className={`${dmSans.variable} ${fraunces.variable} ${dmMono.variable} bg-paper text-ink font-sans`}>
+    <html lang="id" className={`${dmSans.variable} ${fraunces.variable} ${inter.variable} ${jetbrainsMono.variable} bg-paper text-ink font-sans`}>
       <body className="font-sans antialiased bg-paper text-ink">
         {children}
         <Toaster position="top-center" />

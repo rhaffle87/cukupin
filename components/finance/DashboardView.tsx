@@ -43,7 +43,7 @@ function DashboardSkeleton() {
         </div>
         <div className="h-[140px] w-full rounded-[22px] border border-white/10 bg-white/5 md:h-[175px] md:w-[280px]" />
       </div>
-      <div className="grid grid-cols-3 gap-2 md:gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 md:gap-3">
         {[1, 2, 3].map(i => (
           <div className="flex h-[116px] flex-col rounded-[18px] border border-line bg-card p-3 md:h-[150px] md:p-5" key={i}>
             <div className="h-[10px] w-[35%] rounded-full bg-line" />
@@ -145,13 +145,13 @@ export function DashboardView({ data, user, supabase }: DashboardViewProps) {
 
   return (
     <>
-      <div className="relative mb-4 flex min-h-[240px] flex-col justify-between gap-6 overflow-hidden rounded-[24px] bg-ink p-7 text-white md:min-h-[230px] md:flex-row md:items-center md:px-11 md:py-8 animate-in slide-in-from-bottom-2 duration-500">
+      <div className="relative mb-4 flex min-h-[240px] flex-col justify-between gap-6 overflow-hidden rounded-[24px] bg-ink p-5 sm:p-7 md:px-8 lg:px-11 md:py-7 text-white md:min-h-[230px] md:flex-row md:items-center animate-in slide-in-from-bottom-2 duration-500">
         {/* Subtle circular arc in background matching Image 2 */}
         <div className="pointer-events-none absolute -right-14 -top-20 h-[380px] w-[380px] rounded-full border border-white/[0.08] shadow-[0_0_0_28px_rgba(255,255,255,0.018),0_0_0_64px_rgba(255,255,255,0.012)]" />
 
         <div className="relative z-10 max-w-[500px]">
           <p className="text-[10px] font-bold tracking-widest text-[#B9C6BD] uppercase">{monthLabel().toUpperCase()}</p>
-          <h1 className="mt-2.5 font-display text-[2.45rem] font-bold leading-tight tracking-tight">
+          <h1 className="mt-2.5 font-display text-2xl xs:text-3xl sm:text-4xl md:text-[2.2rem] lg:text-[2.45rem] font-bold leading-tight tracking-tight">
             Halo, {firstName}.<br />
             <em className="text-mint not-italic">Cek uangmu bulan ini.</em>
           </h1>
@@ -210,7 +210,7 @@ export function DashboardView({ data, user, supabase }: DashboardViewProps) {
               </span>
             </div>
             <div className="mt-1 flex items-baseline">
-              <strong className="font-mono text-2xl sm:text-[27px] font-extrabold leading-none tracking-tight text-mint tabular-nums">
+              <strong className="font-numeric text-2xl sm:text-[27px] font-extrabold leading-none tracking-tight text-mint tabular-nums">
                 {currency(stats.balance)}
               </strong>
             </div>
@@ -228,7 +228,7 @@ export function DashboardView({ data, user, supabase }: DashboardViewProps) {
             </div>
             {stats.balance > 0 && (
               <div className="text-right">
-                <span className="inline-flex items-center gap-1 rounded-lg bg-white/10 px-2 py-1 text-[10px] font-semibold text-mint border border-white/10 font-mono tabular-nums">
+                <span className="inline-flex items-center gap-1 rounded-lg bg-white/10 px-2 py-1 text-[10px] font-semibold text-mint border border-white/10 font-numeric tabular-nums">
                   Aman: {shortCurrency(safeSpend.dailyAllowance)}/hr
                 </span>
               </div>
@@ -237,9 +237,9 @@ export function DashboardView({ data, user, supabase }: DashboardViewProps) {
         </div>
       </div>
 
-      <div className="mb-4 grid grid-cols-3 gap-2 md:gap-3">
-        <div className="animate-in slide-in-from-bottom-2 duration-500 delay-50 fill-mode-both">
-          <StatCard label="Pemasukan" value={currency(stats.income)} tone="green" icon={ArrowDownLeft} note="Bulan ini" />
+      <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-3 md:gap-3">
+        <div className="col-span-2 sm:col-span-1 animate-in slide-in-from-bottom-2 duration-500 delay-50 fill-mode-both">
+          <StatCard label="Pemasukan" featured value={currency(stats.income)} tone="green" icon={ArrowDownLeft} note="Bulan ini" />
         </div>
         <div className="animate-in slide-in-from-bottom-2 duration-500 delay-75 fill-mode-both">
           <StatCard label="Pengeluaran" value={currency(stats.expense)} tone="coral" icon={ArrowUpRight} note="Bulan ini" />
@@ -305,7 +305,7 @@ export function DashboardView({ data, user, supabase }: DashboardViewProps) {
         )
       })()}
 
-      <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-[minmax(0,1.55fr)_minmax(270px,0.85fr)]">
+      <div className="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1.55fr)_minmax(270px,0.85fr)]">
         <section className="min-h-[320px] rounded-[18px] border border-line bg-card p-5 shadow-[0_5px_20px_rgba(30,50,73,0.025)] md:min-h-[347px] md:p-6 animate-in slide-in-from-bottom-2 duration-500 delay-100 fill-mode-both">
           <div className="mb-5 flex items-start justify-between gap-3 md:mb-6">
             <div>
@@ -320,7 +320,7 @@ export function DashboardView({ data, user, supabase }: DashboardViewProps) {
             <ResponsiveContainer width="100%" height={260}>
               <BarChart data={series} barGap={2}>
                 <CartesianGrid vertical={false} stroke="#E8E7E0" />
-                <XAxis dataKey="label" tickLine={false} axisLine={false} interval={4} tick={{ fill: '#829087', fontSize: 11 }} />
+                <XAxis dataKey="label" tickLine={false} axisLine={false} interval={5} tick={{ fill: '#829087', fontSize: 10 }} />
                 <YAxis tickLine={false} axisLine={false} tick={{ fill: '#829087', fontSize: 11 }} tickFormatter={v => `${Math.round(v / 1000)}k`} />
                 <Tooltip formatter={(v: any) => currency(Number(v))} contentStyle={{ borderRadius: 10, border: '1px solid #E8E7E0', boxShadow: '0 8px 24px #1e324912' }} />
                 <Bar dataKey="income" name="Pemasukan" fill="#3E8F68" radius={[4, 4, 0, 0]} />

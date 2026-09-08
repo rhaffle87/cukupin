@@ -17,7 +17,7 @@ export const TransactionRow = React.memo(function TransactionRow({ transaction: 
       </div>
       <div className="transaction-meta">
         <div className="flex items-center gap-1.5 flex-wrap">
-          <strong>{t.description || t.note || t.category}</strong>
+          <strong className="truncate max-w-[200px] xs:max-w-xs">{t.description || t.note || t.category}</strong>
           {(t.note || '').match(/#[\w-]+/g)?.map(tag => (
             <span key={tag} className="rounded-md bg-green-soft px-1.5 py-0.2 text-[9px] font-bold text-green">
               {tag}
@@ -29,7 +29,7 @@ export const TransactionRow = React.memo(function TransactionRow({ transaction: 
           {t.payment_method && ` · ${t.payment_method}`}
         </span>
       </div>
-      <strong className={`transaction-amount ${t.type}`}>
+      <strong className={`transaction-amount ${t.type} shrink-0`}>
         {t.type === 'income' ? '+' : '-'}
         {currency(Number(t.amount))}
       </strong>

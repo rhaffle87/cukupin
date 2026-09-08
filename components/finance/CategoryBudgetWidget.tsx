@@ -129,13 +129,13 @@ export function CategoryBudgetWidget({
                   <div className="mt-3 flex items-baseline justify-between">
                     <div>
                       <span className="text-[10px] uppercase font-mono text-muted">Terpakai</span>
-                      <div className={`font-serif font-bold text-base ${textColor}`}>
+                      <div className={`font-numeric tabular-nums font-bold text-base ${textColor}`}>
                         {currency(spent)}
                       </div>
                     </div>
                     <div className="text-right">
                       <span className="text-[10px] uppercase font-mono text-muted">Batas Maksimal</span>
-                      <div className="font-mono text-xs font-semibold text-ink">
+                      <div className="font-numeric tabular-nums text-xs font-semibold text-ink">
                         {currency(limit)}
                       </div>
                     </div>

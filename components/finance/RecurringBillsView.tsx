@@ -192,7 +192,7 @@ export function RecurringBillsView({
           <div className="text-[11px] font-mono uppercase tracking-wider text-muted">
             Total Komitmen Rutin
           </div>
-          <div className="mt-1 font-serif text-2xl font-bold text-ink">
+          <div className="mt-1 font-numeric tabular-nums text-2xl font-bold text-ink">
             {currency(totalMonthlyCommitment)}
           </div>
           <div className="mt-0.5 text-xs text-muted">
@@ -287,7 +287,7 @@ export function RecurringBillsView({
                     </div>
 
                     <div className="text-right">
-                      <div className="font-serif font-bold text-base text-ink">
+                      <div className="font-numeric tabular-nums font-bold text-base text-ink">
                         {currency(bill.amount)}
                       </div>
                       <div className="text-[10px] text-muted">per bulan</div>
@@ -396,7 +396,7 @@ export function RecurringBillsView({
                     placeholder="0"
                     value={amountStr}
                     onChange={(e) => setAmountStr(formatRupiahInput(e.target.value))}
-                    className="w-full rounded-xl border border-line bg-paper !pl-9 pr-3.5 py-2.5 text-sm font-mono text-ink outline-none focus:border-ink focus:ring-1 focus:ring-ink"
+                    className="w-full rounded-xl border border-line bg-paper !pl-9 pr-3.5 py-2.5 text-sm font-numeric tabular-nums text-ink outline-none focus:border-ink focus:ring-1 focus:ring-ink"
                     required
                   />
                 </div>
@@ -412,7 +412,7 @@ export function RecurringBillsView({
                   max={31}
                   value={dueDay}
                   onChange={(e) => setDueDay(Math.min(31, Math.max(1, Number(e.target.value))))}
-                  className="w-full rounded-xl border border-line bg-paper px-3.5 py-2.5 text-sm font-mono text-ink outline-none focus:border-ink focus:ring-1 focus:ring-ink"
+                  className="w-full rounded-xl border border-line bg-paper px-3.5 py-2.5 text-sm font-numeric tabular-nums text-ink outline-none focus:border-ink focus:ring-1 focus:ring-ink"
                   required
                 />
               </div>

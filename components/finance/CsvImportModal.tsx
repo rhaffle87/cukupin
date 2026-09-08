@@ -277,7 +277,7 @@ export function CsvImportModal({ supabase, userId, onClose, onSuccess }: CsvImpo
                         </span>
                       </td>
                       <td className="p-2 truncate max-w-[140px]">{r.description}</td>
-                      <td className="p-2 text-right font-mono font-semibold">{currency(r.amount)}</td>
+                      <td className="p-2 text-right font-numeric tabular-nums font-semibold">{currency(r.amount)}</td>
                     </tr>
                   ))}
                 </tbody>

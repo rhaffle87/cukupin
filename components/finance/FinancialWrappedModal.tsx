@@ -209,10 +209,10 @@ export function FinancialWrappedModal({
                 SKOR KESEHATAN FINANSIAL
               </span>
               <div className="mt-1 flex items-baseline gap-2">
-                <strong className="font-mono text-4xl sm:text-5xl font-extrabold text-mint tabular-nums">
+                <strong className="font-numeric text-4xl sm:text-5xl font-extrabold text-mint tabular-nums">
                   {totalScore}
                 </strong>
-                <span className="font-mono text-sm text-white/50">/ 100</span>
+                <span className="font-numeric text-sm text-white/50">/ 100</span>
               </div>
               <p className="mt-1 text-xs text-[#BAC9C0]">
                 Predikat: <span className="font-bold text-white">{gradeLabel}</span>
@@ -337,7 +337,7 @@ export function FinancialWrappedModal({
             <div className="text-right">
               <p className="font-mono text-[10px] tracking-wider text-white/50 mb-0.5">TOTAL TERCATAT</p>
               <p
-                className="font-mono font-bold text-mint text-xs tabular-nums"
+                className="font-numeric font-bold text-mint text-xs tabular-nums"
                 style={{
                   color: '#BEE6CF',
                   lineHeight: '1.6',

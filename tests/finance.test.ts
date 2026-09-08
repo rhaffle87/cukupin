@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+// vitest globals used
 import {
   currency,
   shortCurrency,

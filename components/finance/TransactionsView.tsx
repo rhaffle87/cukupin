@@ -493,7 +493,7 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
       ) : (
         <>
           {/* Polished & Structured Filter Panel (Solves Image 1 cluttering) */}
-          <section className="mb-4 rounded-[20px] border border-line bg-card p-5 shadow-[0_4px_20px_rgba(30,50,73,0.03)]">
+          <section className="mb-4 rounded-[20px] border border-line bg-card p-3.5 sm:p-5 shadow-[0_4px_20px_rgba(30,50,73,0.03)]">
         {/* Row 1: Search + Jenis + Kategori + Urutkan */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[minmax(220px,1.6fr)_minmax(130px,1fr)_minmax(140px,1fr)_minmax(140px,1fr)] gap-3">
           {/* Search Input */}
@@ -562,43 +562,46 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
         {/* Row 2: Date Range + Month Steppers + Presets */}
         <div className="mt-4 pt-3.5 border-t border-line/50 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
           {/* Date Picker with Month Stepper */}
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-muted mr-0.5">Periode:</span>
-            <div className="flex items-center gap-1">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2 w-full lg:w-auto">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-muted">Periode:</span>
+            <div className="flex items-center justify-between gap-1 w-full sm:w-auto">
               <button
                 type="button"
                 onClick={() => stepMonth(-1)}
                 title="Bulan Sebelumnya"
-                className="rounded-lg border border-line bg-paper p-1.5 text-muted hover:bg-black/5 hover:text-ink transition-colors cursor-pointer"
+                className="rounded-lg border border-line bg-paper p-1.5 text-muted hover:bg-black/5 hover:text-ink transition-colors cursor-pointer shrink-0"
                 aria-label="Bulan Sebelumnya"
               >
                 <ChevronLeft size={15} />
               </button>
-              <input
-                type="date"
-                value={from}
-                onChange={e => { setFrom(e.target.value); setVisibleCount(10) }}
-                className="w-[125px] sm:w-auto rounded-lg border border-line bg-paper px-2 py-1.5 text-xs text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
-              />
-              <span className="text-xs text-muted">s/d</span>
-              <input
-                type="date"
-                value={to}
-                onChange={e => { setTo(e.target.value); setVisibleCount(10) }}
-                className="w-[125px] sm:w-auto rounded-lg border border-line bg-paper px-2 py-1.5 text-xs text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
-              />
+              <div className="flex items-center gap-1 flex-1 sm:flex-initial min-w-0">
+                <input
+                  type="date"
+                  value={from}
+                  onChange={e => { setFrom(e.target.value); setVisibleCount(10) }}
+                  className="w-full sm:w-[125px] min-w-0 rounded-lg border border-line bg-paper px-1.5 xs:px-2 py-1.5 text-[11px] xs:text-xs text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
+                  aria-label="Dari Tanggal"
+                />
+                <span className="text-[11px] xs:text-xs text-muted shrink-0 px-0.5">s/d</span>
+                <input
+                  type="date"
+                  value={to}
+                  onChange={e => { setTo(e.target.value); setVisibleCount(10) }}
+                  className="w-full sm:w-[125px] min-w-0 rounded-lg border border-line bg-paper px-1.5 xs:px-2 py-1.5 text-[11px] xs:text-xs text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
+                  aria-label="Sampai Tanggal"
+                />
+              </div>
               <button
                 type="button"
                 onClick={() => stepMonth(1)}
                 title="Bulan Berikutnya"
-                className="rounded-lg border border-line bg-paper p-1.5 text-muted hover:bg-black/5 hover:text-ink transition-colors cursor-pointer"
+                className="rounded-lg border border-line bg-paper p-1.5 text-muted hover:bg-black/5 hover:text-ink transition-colors cursor-pointer shrink-0"
                 aria-label="Bulan Berikutnya"
               >
                 <ChevronRight size={15} />
               </button>
             </div>
           </div>
-
           {/* Quick Date Presets */}
           <div className="flex flex-wrap items-center gap-1.5">
             <span className="text-[10px] font-bold uppercase tracking-wider text-muted mr-1">Preset:</span>
@@ -712,18 +715,18 @@ export function TransactionsView({ supabase, data, userId }: TransactionsViewPro
 
           {/* Filtered KPI Summary Strip */}
           {filtered.length > 0 && (
-            <div className="mb-4 grid grid-cols-3 gap-2 rounded-xl bg-paper/80 p-3 border border-line/60 text-xs shadow-2xs">
-              <div>
+            <div className="mb-4 grid grid-cols-2 gap-x-3 gap-y-2 sm:grid-cols-3 rounded-xl bg-paper/80 p-3 border border-line/60 text-xs shadow-2xs">
+              <div className="col-span-2 sm:col-span-1">
                 <span className="block text-[10px] font-bold text-muted uppercase">Pemasukan</span>
-                <strong className="text-green !font-mono tabular-nums font-bold text-sm">{currency(filteredStats.income)}</strong>
+                <strong className="text-green !font-numeric tabular-nums font-bold text-sm">{currency(filteredStats.income)}</strong>
               </div>
               <div>
                 <span className="block text-[10px] font-bold text-muted uppercase">Pengeluaran</span>
-                <strong className="text-coral !font-mono tabular-nums font-bold text-sm">{currency(filteredStats.expense)}</strong>
+                <strong className="text-coral !font-numeric tabular-nums font-bold text-sm">{currency(filteredStats.expense)}</strong>
               </div>
               <div>
                 <span className="block text-[10px] font-bold text-muted uppercase">Net Sisa</span>
-                <strong className={`!font-mono tabular-nums font-bold text-sm ${filteredStats.balance >= 0 ? 'text-blue' : 'text-coral'}`}>
+                <strong className={`!font-numeric tabular-nums font-bold text-sm ${filteredStats.balance >= 0 ? 'text-blue' : 'text-coral'}`}>
                   {currency(filteredStats.balance)}
                 </strong>
               </div>
