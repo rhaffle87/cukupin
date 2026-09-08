@@ -35,7 +35,7 @@ Dokumentasi audit keamanan, pemodelan ancaman (STRIDE), mitigasi OWASP Top 10, d
 ### 3.1. A01:2021 - Broken Access Control
 - **Implementasi**: 
   - Seluruh 5 tabel (`transactions`, `saving_goals`, `wishlist`, `recurring_bills`, `category_budgets`) diwajibkan `ENABLE ROW LEVEL SECURITY`.
-  - Edge reverse proxy di [proxy.ts](file:///e:/Projects/cukupin-v0/proxy.ts) mencegat seluruh request ke `/(protected)` sebelum HTML atau data server action dirender.
+  - Edge reverse proxy di [`proxy.ts`](../proxy.ts) mencegat seluruh request ke `/(protected)` sebelum HTML atau data server action dirender.
 
 ### 3.2. A02:2021 - Cryptographic Failures
 - **Implementasi**:
@@ -45,7 +45,7 @@ Dokumentasi audit keamanan, pemodelan ancaman (STRIDE), mitigasi OWASP Top 10, d
 ### 3.3. A03:2021 - Injection (SQL, XSS, & CSV)
 - **SQL Injection**: Bebas 100% dari raw SQL concatenation. Seluruh kueri data menggunakan parameterized client library Supabase (`.from('transactions').insert(...)`).
 - **CSV Formula Injection**:
-  Jika pengguna mengekspor transaksi yang memiliki deskripsi diawali simbol eksekusi spreadsheet (`=`, `+`, `-`, `@`, `\t`, `\r`), fungsi `escapeCsvField` di [lib/finance.ts](file:///e:/Projects/cukupin-v0/lib/finance.ts) otomatis menyisipkan tanda petik tunggal (`'`) di awal teks agar aplikasi spreadsheet (Excel, Google Sheets, LibreOffice) memperlakukannya murni sebagai string teks dan mematikan eksekusi macro DDE.
+  Jika pengguna mengekspor transaksi yang memiliki deskripsi diawali simbol eksekusi spreadsheet (`=`, `+`, `-`, `@`, `\t`, `\r`), fungsi `escapeCsvField` di [`lib/finance.ts`](../lib/finance.ts) otomatis menyisipkan tanda petik tunggal (`'`) di awal teks agar aplikasi spreadsheet (Excel, Google Sheets, LibreOffice) memperlakukannya murni sebagai string teks dan mematikan eksekusi macro DDE.
   ```typescript
   export function escapeCsvField(val: string | number | null | undefined): string {
     if (val === null || val === undefined) return '""';
@@ -58,12 +58,12 @@ Dokumentasi audit keamanan, pemodelan ancaman (STRIDE), mitigasi OWASP Top 10, d
 
 ### 3.4. A04:2021 - Insecure Design
 - **Implementasi**:
-  - Offline-first resilience: Ketika jaringan terputus, mutasi tidak hilang melainkan disimpan di antrean aman [lib/offlineQueue.ts](file:///e:/Projects/cukupin-v0/lib/offlineQueue.ts) dan disinkronkan kembali saat koneksi pulih.
-  - Zod Schema Validation: Input form divalidasi dua lapis (klien dan server) menggunakan skema yang terdefinisi di [lib/validations/finance.ts](file:///e:/Projects/cukupin-v0/lib/validations/finance.ts).
+  - Offline-first resilience: Ketika jaringan terputus, mutasi tidak hilang melainkan disimpan di antrean aman [`lib/offlineQueue.ts`](../lib/offlineQueue.ts) dan disinkronkan kembali saat koneksi pulih.
+  - Zod Schema Validation: Input form divalidasi dua lapis (klien dan server) menggunakan skema yang terdefinisi di [`lib/validations/finance.ts`](../lib/validations/finance.ts).
 
 ### 3.5. A05:2021 - Security Misconfiguration
 - **Implementasi**:
-  - `poweredByHeader: false` diaktifkan di `next.config.mjs` untuk menghapus header `X-Powered-By: Next.js`.
+  - `poweredByHeader: false` diaktifkan di [`next.config.mjs`](../next.config.mjs) untuk menghapus header `X-Powered-By: Next.js`.
   - Header keamanan lengkap:
     ```javascript
     X-Frame-Options: 'DENY'
@@ -77,7 +77,7 @@ Dokumentasi audit keamanan, pemodelan ancaman (STRIDE), mitigasi OWASP Top 10, d
 
 ## 4. Analisis Content Security Policy (CSP)
 
-Kebijakan CSP dikonfigurasi di [next.config.mjs](file:///e:/Projects/cukupin-v0/next.config.mjs) dengan prinsip least-privilege:
+Kebijakan CSP dikonfigurasi di [`next.config.mjs`](../next.config.mjs) dengan prinsip least-privilege:
 
 ```text
 default-src 'self';
@@ -104,7 +104,8 @@ Aplikasi Cukupin™ dirancang sesuai dengan mandat **Undang-Undang Perlindungan 
 1. **Hak Pengakhiran & Penghapusan Data (Right to Erasure / Pasal 39 UU PDP)**:
    - Fitur **"Hapus Seluruh Data" (Purge Data)** di halaman transaksi memungkinkan pengguna menghapus permanen seluruh riwayat finansial, target tabungan, tagihan rutin, dan wishlist mereka dari database dengan konfirmasi ketik nama.
 2. **Persetujuan Sadar (Consent Management / Pasal 20 UU PDP)**:
-   - Komponen [CookieConsent.tsx](file:///e:/Projects/cukupin-v0/components/ui/CookieConsent.tsx) dan [AnalyticsConsent.tsx](file:///e:/Projects/cukupin-v0/components/analytics/AnalyticsConsent.tsx) memberikan opsi eksplisit bagi pengguna untuk Menerima atau Menolak cookie analitik.
+   - Komponen [`CookieConsent.tsx`](../components/ui/CookieConsent.tsx) dan [`AnalyticsConsent.tsx`](../components/analytics/AnalyticsConsent.tsx) memberikan opsi eksplisit bagi pengguna untuk Menerima atau Menolak cookie analitik.
    - Jika pengguna menolak, hook `beforeSend` Vercel Analytics & Speed Insights otomatis membatalkan pengiriman data telemetri.
 3. **Kemandirian & Portabilitas Data (Data Portability / Pasal 41 UU PDP)**:
    - Pengguna memiliki hak mengunduh salinan lengkap data mereka kapan saja dalam format standar JSON (v2.0 Backup Engine) dan format CSV terbuka tanpa terkunci vendor (*zero vendor lock-in*).
+

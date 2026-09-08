@@ -208,4 +208,7 @@ Untuk panduan mendalam lainnya, silakan merujuk ke pustaka dokumentasi resmi di 
 - [**API_AND_DATA_FLOW.md**](./API_AND_DATA_FLOW.md) — Arsitektur alur data, antrean offline-first, backup payload v2.0, & pipeline CSV.
 - [**DEVELOPER_GUIDE.md**](./DEVELOPER_GUIDE.md) — Panduan onboarding developer, setup lokal tanpa Supabase, TDD Vitest, & konvensi kode.
 - [**SUPABASE_DEPLOYMENT.md**](./SUPABASE_DEPLOYMENT.md) — Panduan migrasi database 1-klik, penyelesaian preview branching, dan konfigurasi produksi.
+- [**RESOURCES.md**](./RESOURCES.md) — Panduan alokasi sumber daya Vercel & Supabase, batas free tier, dan strategi mitigasi bottleneck.
+- [**BENCHMARK.md**](./BENCHMARK.md) — Tolok ukur empiris ukuran payload data, simulasi matematis egress, dan batas timeout 10 detik.
+
 

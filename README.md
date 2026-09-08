@@ -30,6 +30,9 @@ Dokumentasi arsitektur dan operasional lengkap tersedia di direktori [`docs/`](.
 - 🔄 [**Alur Data & API (API_AND_DATA_FLOW.md)**](./docs/API_AND_DATA_FLOW.md) — Arsitektur alur data, antrean offline-first, backup payload v2.0, & pipeline CSV.
 - 🛠️ [**Panduan Developer (DEVELOPER_GUIDE.md)**](./docs/DEVELOPER_GUIDE.md) — Panduan onboarding developer, setup lokal tanpa Supabase, TDD Vitest, & konvensi kode.
 - 🚀 [**Panduan Deploy Supabase (SUPABASE_DEPLOYMENT.md)**](./docs/SUPABASE_DEPLOYMENT.md) — Panduan migrasi 1-klik, konfigurasi branch preview, & variabel produksi.
+- ⚡ [**Alokasi Sumber Daya & Kuota Cloud (RESOURCES.md)**](./docs/RESOURCES.md) — Rincian batas gratis Vercel & Supabase, analisis 3 bottleneck, & mitigasi kuota.
+- 📊 [**Tolok Ukur Performa & Egress (BENCHMARK.md)**](./docs/BENCHMARK.md) — Pengukuran byte payload, simulasi egress bulanan, & uji timeout 10 detik.
+
 
 ---
 
@@ -45,7 +48,7 @@ Dokumentasi arsitektur dan operasional lengkap tersedia di direktori [`docs/`](.
 - **Database & Auth**: [Supabase](https://supabase.com/) (PostgreSQL dengan Row-Level Security)
 - **Analytics & Observability**: [Vercel Analytics](https://vercel.com/analytics) & [Vercel Speed Insights](https://vercel.com/docs/speed-insights) (*privacy consent-gated*)
 - **Charts & Visuals**: Recharts, Lucide Icons, canvas-confetti, html-to-image
-- **Testing**: Vitest + jsdom (80 unit, component & flow tests) & Python Playwright (6 E2E user journeys)
+- **Testing**: Vitest + jsdom (129 unit, component, resource & flow tests across 12 suites) & Python Playwright (6 E2E user journeys)
 
 ---
 
@@ -85,7 +88,7 @@ Buka [http://localhost:3000](http://localhost:3000) di peramban Anda.
 
 Jalankan rangkaian pengujian otomatis:
 ```bash
-# Unit, Component & Flow Tests (Vitest - 80 tests)
+# Unit, Component, Flow & Resource Tests (Vitest - 129 tests)
 npm test
 
 # Mode interaktif / watch

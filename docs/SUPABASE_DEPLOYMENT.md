@@ -38,7 +38,7 @@ Tersedia file migrasi konsolidasi lengkap yang siap dieksekusi dalam 1 kali klik
 1. Buka project Anda di **Supabase Dashboard**.
 2. Klik tab **SQL Editor** di navigasi kiri (ikon `>_`).
 3. Klik tombol **+ New Query**.
-4. Salin seluruh isi file [`supabase/migrations/full_schema.sql`](file:///e:/Projects/cukupin-v0/supabase/migrations/full_schema.sql).
+4. Salin seluruh isi file [`supabase/migrations/full_schema.sql`](../supabase/migrations/full_schema.sql).
 5. Tempel ke dalam SQL Editor, lalu klik tombol **Run** (atau tekan `Ctrl + Enter`).
 6. Pesan `Success. No rows returned` akan muncul menandakan 5 tabel, 20 RLS policies, 6 index performa, dan publikasi Realtime telah aktif sempurna.
 

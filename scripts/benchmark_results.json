@@ -1,0 +1,207 @@
+{
+  "generatedAt": "2026-09-08T07:48:20.470Z",
+  "payloadScaling": [
+    {
+      "count": 10,
+      "unpaginatedRawBytes": 3016,
+      "unpaginatedRawKB": 2.95,
+      "unpaginatedGzipKB": 0.52,
+      "paginatedRawBytes": 3016,
+      "paginatedRawKB": 2.95,
+      "paginatedGzipKB": 0.52,
+      "savingsPercentage": 0
+    },
+    {
+      "count": 25,
+      "unpaginatedRawBytes": 7529,
+      "unpaginatedRawKB": 7.35,
+      "unpaginatedGzipKB": 0.83,
+      "paginatedRawBytes": 7529,
+      "paginatedRawKB": 7.35,
+      "paginatedGzipKB": 0.83,
+      "savingsPercentage": 0
+    },
+    {
+      "count": 50,
+      "unpaginatedRawBytes": 15032,
+      "unpaginatedRawKB": 14.68,
+      "unpaginatedGzipKB": 1.33,
+      "paginatedRawBytes": 7529,
+      "paginatedRawKB": 7.35,
+      "paginatedGzipKB": 0.83,
+      "savingsPercentage": 49.9
+    },
+    {
+      "count": 100,
+      "unpaginatedRawBytes": 30128,
+      "unpaginatedRawKB": 29.42,
+      "unpaginatedGzipKB": 2.31,
+      "paginatedRawBytes": 7529,
+      "paginatedRawKB": 7.35,
+      "paginatedGzipKB": 0.83,
+      "savingsPercentage": 75
+    },
+    {
+      "count": 250,
+      "unpaginatedRawBytes": 75559,
+      "unpaginatedRawKB": 73.79,
+      "unpaginatedGzipKB": 5.27,
+      "paginatedRawBytes": 7529,
+      "paginatedRawKB": 7.35,
+      "paginatedGzipKB": 0.83,
+      "savingsPercentage": 90
+    },
+    {
+      "count": 500,
+      "unpaginatedRawBytes": 151221,
+      "unpaginatedRawKB": 147.68,
+      "unpaginatedGzipKB": 10.08,
+      "paginatedRawBytes": 7529,
+      "paginatedRawKB": 7.35,
+      "paginatedGzipKB": 0.83,
+      "savingsPercentage": 95
+    },
+    {
+      "count": 1000,
+      "unpaginatedRawBytes": 302675,
+      "unpaginatedRawKB": 295.58,
+      "unpaginatedGzipKB": 19.68,
+      "paginatedRawBytes": 7529,
+      "paginatedRawKB": 7.35,
+      "paginatedGzipKB": 0.83,
+      "savingsPercentage": 97.5
+    },
+    {
+      "count": 2500,
+      "unpaginatedRawBytes": 759025,
+      "unpaginatedRawKB": 741.24,
+      "unpaginatedGzipKB": 48.53,
+      "paginatedRawBytes": 7529,
+      "paginatedRawKB": 7.35,
+      "paginatedGzipKB": 0.83,
+      "savingsPercentage": 99
+    }
+  ],
+  "latencies": [
+    {
+      "name": "totals_calculation",
+      "avgMs": 0.09419430000000102,
+      "p50Ms": 0.06610000000000582,
+      "p95Ms": 0.17960000000005039,
+      "p99Ms": 0.5783999999999878
+    },
+    {
+      "name": "category_breakdown",
+      "avgMs": 0.19922990000000004,
+      "p50Ms": 0.08709999999996398,
+      "p95Ms": 0.2865999999999076,
+      "p99Ms": 1.6450999999999567
+    },
+    {
+      "name": "budget_rule_503020",
+      "avgMs": 0.030714200000000802,
+      "p50Ms": 0.017699999999990723,
+      "p95Ms": 0.130800000000022,
+      "p99Ms": 0.22939999999994143
+    }
+  ],
+  "egressScenarios": [
+    {
+      "name": "Solo Developer",
+      "users": 1,
+      "sessionsPerMonth": 60,
+      "queriesPerSession": 4,
+      "avgTxCount": 50,
+      "totalQueries": 240,
+      "unpaginatedGB": 0.004,
+      "unpaginatedQuotaPct": 0.1,
+      "paginatedGB": 0.002,
+      "paginatedQuotaPct": 0,
+      "status": "SAFE"
+    },
+    {
+      "name": "University Demo",
+      "users": 30,
+      "sessionsPerMonth": 8,
+      "queriesPerSession": 5,
+      "avgTxCount": 40,
+      "totalQueries": 1200,
+      "unpaginatedGB": 0.015,
+      "unpaginatedQuotaPct": 0.3,
+      "paginatedGB": 0.011,
+      "paginatedQuotaPct": 0.2,
+      "status": "SAFE"
+    },
+    {
+      "name": "Small Beta",
+      "users": 150,
+      "sessionsPerMonth": 15,
+      "queriesPerSession": 6,
+      "avgTxCount": 200,
+      "totalQueries": 13500,
+      "unpaginatedGB": 0.673,
+      "unpaginatedQuotaPct": 13.5,
+      "paginatedGB": 0.123,
+      "paginatedQuotaPct": 2.5,
+      "status": "SAFE"
+    },
+    {
+      "name": "Public Launch",
+      "users": 500,
+      "sessionsPerMonth": 20,
+      "queriesPerSession": 6,
+      "avgTxCount": 500,
+      "totalQueries": 60000,
+      "unpaginatedGB": 7.18,
+      "unpaginatedQuotaPct": 143.6,
+      "paginatedGB": 0.545,
+      "paginatedQuotaPct": 10.9,
+      "status": "SAFE"
+    },
+    {
+      "name": "Scaleout SaaS",
+      "users": 1000,
+      "sessionsPerMonth": 25,
+      "queriesPerSession": 6,
+      "avgTxCount": 600,
+      "totalQueries": 150000,
+      "unpaginatedGB": 21.444,
+      "unpaginatedQuotaPct": 428.9,
+      "paginatedGB": 1.362,
+      "paginatedQuotaPct": 27.2,
+      "status": "SAFE"
+    }
+  ],
+  "timeoutBenchmarks": [
+    {
+      "operation": "Client Math Aggregation",
+      "durationMs": 0.12,
+      "maxAllowedMs": 10000,
+      "type": "Client CPU"
+    },
+    {
+      "operation": "Edge Proxy Auth Middleware",
+      "durationMs": 25,
+      "maxAllowedMs": 10000,
+      "type": "Vercel Edge"
+    },
+    {
+      "operation": "Supabase Indexed Query",
+      "durationMs": 78,
+      "maxAllowedMs": 10000,
+      "type": "PostgreSQL DB"
+    },
+    {
+      "operation": "Recurring Bills Server Cron",
+      "durationMs": 295,
+      "maxAllowedMs": 10000,
+      "type": "Vercel Serverless"
+    },
+    {
+      "operation": "PDF Export (Client-Side)",
+      "durationMs": 0,
+      "maxAllowedMs": 10000,
+      "type": "Client DOM (Zero Serverless)"
+    }
+  ]
+}

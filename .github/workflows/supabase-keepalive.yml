@@ -1,0 +1,31 @@
+name: Supabase Free Tier Keep-Alive
+
+on:
+  schedule:
+    # Runs at 00:00 UTC every 5 days (1st, 6th, 11th, 16th, 21st, 26th of each month)
+    # Safely stays ahead of Supabase's 7-day inactivity auto-pause threshold
+    - cron: '0 0 */5 * *'
+  workflow_dispatch: # Allows manual trigger from GitHub Actions tab
+
+jobs:
+  ping-database:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --prefer-offline
+
+      - name: Execute Supabase Keep-Alive Ping
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL || secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY || secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+        run: node scripts/supabase-keepalive.js
+
