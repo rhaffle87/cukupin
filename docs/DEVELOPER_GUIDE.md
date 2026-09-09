@@ -75,7 +75,10 @@ cukupin-v0/
 │   └── validations/            # Skema validasi Zod untuk form & data entry
 ├── public/                     # Aset statis, ikon PWA, dan Service Worker (sw.js)
 ├── supabase/                   # Konfigurasi CLI & skrip migrasi PostgreSQL SQL
-├── tests/                      # Suite pengujian otomatis Vitest & Playwright
+├── tests/                      # Suite pengujian otomatis Vitest, Playwright, & k6
+│   ├── load/                   # Skenario load & stress testing k6 & runner simulator lokal
+│   ├── components/             # Unit test komponen antarmuka & widget finansial
+│   └── flows/                  # Integration test alur data lifecycle & guest mode
 ├── vercel.json                 # Konfigurasi Vercel Daily Cron (/api/cron/recurring-bills)
 ├── proxy.ts                    # Next.js 16 Edge Reverse Proxy & Session Refresher
 └── next.config.mjs             # Konfigurasi Next.js, Security Headers, & CSP

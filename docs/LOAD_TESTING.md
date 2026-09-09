@@ -157,7 +157,12 @@ sudo apt-get install k6
 docker run --rm -i --net="host" grafana/k6 run - < tests/load/smoke_test.js
 ```
 
+> [!TIP]
+> **Catatan Tampilan Markdown Preview di IDE:**
+> Jika Markdown Preview editor Anda menampilkan galat diagram pada blok perintah shell di atas, pastikan untuk menonaktifkan ekstensi pihak ketiga *Mermaid Chart* (`mermaidchart.vscode-mermaid-chart`) pada menu Extensions IDE Anda. Ekstensi tersebut memiliki bug upstream pada versi terbarunya yang salah mengintersepsi blok kode terminal ketika pengguna belum melakukan login akun.
+
 ---
+
 
 ## 5. Pengujian Terhadap Server Target (Staging / Produksi)
 
