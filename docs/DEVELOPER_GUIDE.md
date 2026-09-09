@@ -120,6 +120,15 @@ npm run build
 
 # 4. Jalankan pengujian browser end-to-end (6 user journeys)
 npm run test:e2e
+
+# 5. Jalankan pengujian beban mandiri (Node.js Simulated Load Runner)
+npm run test:load
+
+# 6. Jalankan pengujian beban k6 (lihat docs/LOAD_TESTING.md)
+npm run test:load:k6:smoke
+npm run test:load:k6:average
+npm run test:load:k6:spike
+npm run test:load:k6:rate-limit
 ```
 
 ### Cakupan Pengujian di `tests/`
@@ -139,6 +148,7 @@ Pengujian unit dan komponen menggunakan **Vitest** dengan konfigurasi di `vitest
 - `tests/flows/dataLifecycle.test.ts`: 3 tests alur cadangkan & pulihkan data.
 - `tests/e2e/test_user_flows.py`: 6 user journeys Playwright (Desktop & Mobile).
 - `tests/e2e/test_security_and_recurring.py`: Regression Playwright untuk alur kunci PIN & visual verification.
+- `tests/load/`: Rangkaian skrip uji beban k6 (Smoke, Average, Spike Stress, Rate Limiting) dan simulator mandiri Node.js. Panduan lengkap: [**LOAD_TESTING.md**](./LOAD_TESTING.md).
 
 ---
 

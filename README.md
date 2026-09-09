@@ -34,6 +34,7 @@ Dokumentasi arsitektur dan operasional lengkap tersedia di direktori [`docs/`](.
 - [**Panduan Deploy Supabase (SUPABASE_DEPLOYMENT.md)**](./docs/SUPABASE_DEPLOYMENT.md) — Panduan migrasi 1-klik, konfigurasi branch preview, & variabel produksi.
 - [**Alokasi Sumber Daya & Kuota Cloud (RESOURCES.md)**](./docs/RESOURCES.md) — Rincian batas gratis Vercel & Supabase, analisis bottleneck, & mitigasi kuota.
 - [**Tolok Ukur Performa & Egress (BENCHMARK.md)**](./docs/BENCHMARK.md) — Pengukuran byte payload, simulasi egress bulanan, & uji timeout 10 detik.
+- [**Uji Beban, Stres & Kapasitas k6 (LOAD_TESTING.md)**](./docs/LOAD_TESTING.md) — Skenario k6 (smoke, average, spike stress, rate limit) & runner native Node.js.
 
 ---
 
@@ -50,7 +51,7 @@ Dokumentasi arsitektur dan operasional lengkap tersedia di direktori [`docs/`](.
 - **Edge Shielding & Throttling**: Sliding-Window Rate Limiter di Next.js 16 Edge Proxy (`proxy.ts`)
 - **Analytics & Observability**: [Vercel Analytics](https://vercel.com/analytics) & [Vercel Speed Insights](https://vercel.com/docs/speed-insights) (*privacy consent-gated*)
 - **Charts & Visuals**: Recharts (Cursor-following tooltip with boundary clamping), Lucide Icons, canvas-confetti, html-to-image
-- **Testing**: Vitest + jsdom (135 unit, component, rate limit & flow tests across 13 suites) & Python Playwright (6 E2E user journeys)
+- **Testing**: Vitest + jsdom (135 unit, component, rate limit & flow tests across 13 suites), Python Playwright (6 E2E user journeys), & k6 / Node.js Load Testing Suite
 
 ---
 
@@ -99,6 +100,15 @@ npm run test:watch
 
 # End-to-End Browser Journeys (Playwright - 6 user journeys)
 npm run test:e2e
+
+# Uji Beban & Latensi Mandiri (Simulated Load Runner)
+npm run test:load
+
+# Rangkaian Uji Beban k6
+npm run test:load:k6:smoke       # Smoke Test (3 VUs, 30s)
+npm run test:load:k6:average     # Average Load (100 VUs, 5m)
+npm run test:load:k6:spike       # Spike Stress Test (500 VUs)
+npm run test:load:k6:rate-limit  # Rate Limiter / DDoS Test (HTTP 429)
 ```
 
 ---

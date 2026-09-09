@@ -122,6 +122,7 @@ Diuji pada kumpulan data 500 transaksi menggunakan modul Node.js `perf_hooks`:
 1. **Efektivitas Paginasi**: Paginasi 25 baris menekan transfer data hingga **95–99%** pada akun dengan ratusan transaksi, menjadikan kuota 5 GB Supabase mampu menopang **hingga >1.000 pengguna aktif** tanpa biaya.
 2. **Keamanan Timeout**: Arsitektur *client-side document generation* terbukti berhasil melindungi sistem dari batas keras 10 detik Vercel Hobby.
 3. **Automasi Pemeliharaan**: Workflow GitHub Actions keep-alive ([`.github/workflows/supabase-keepalive.yml`](../.github/workflows/supabase-keepalive.yml)) menjaga database tetap aktif 24/7 dan mengeliminasi risiko penonaktifan otomatis akibat 7 hari tanpa aktivitas.
+4. **Validasi Beban Tinggi (Load & Stress Testing)**: Untuk pengujian ketahanan konkurensi (smoke, average load 100 VU, spike 500 VU, rate limit), lihat panduan komprehensif di [Panduan Load & Stress Testing k6](LOAD_TESTING.md).
 
 ---
 
@@ -136,4 +137,14 @@ python scripts/generate_benchmark_charts.py
 
 # Menjalankan pengujian unit dan verifikasi matematis limit free tier
 npx vitest run tests/resourcesAndLimits.test.ts
+
+# Menjalankan simulasi pengujian beban lokal (Node.js load runner)
+npm run test:load
+
+# Menjalankan skenario k6 load & stress testing (membutuhkan k6 CLI)
+npm run test:load:k6:smoke
+npm run test:load:k6:average
+npm run test:load:k6:spike
+npm run test:load:k6:rate-limit
 ```
+

@@ -8,10 +8,15 @@
     "start": "next start",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:e2e": "python tests/e2e/test_user_flows.py",
+    "test:load": "node tests/load/run-simulated-load.js",
+    "test:load:k6:smoke": "k6 run tests/load/smoke_test.js",
+    "test:load:k6:average": "k6 run tests/load/average_load_test.js",
+    "test:load:k6:spike": "k6 run tests/load/spike_stress_test.js",
+    "test:load:k6:rate-limit": "k6 run tests/load/rate_limit_test.js",
     "db:push": "supabase db push",
     "db:diff": "supabase db diff",
-    "db:lint": "supabase db lint",
-    "test:e2e": "python tests/e2e/test_user_flows.py"
+    "db:lint": "supabase db lint"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",

@@ -221,5 +221,6 @@ Untuk panduan mendalam lainnya, silakan merujuk ke pustaka dokumentasi resmi di 
 - [**SUPABASE_DEPLOYMENT.md**](./SUPABASE_DEPLOYMENT.md) — Panduan migrasi database 1-klik, penyelesaian preview branching, dan konfigurasi produksi.
 - [**RESOURCES.md**](./RESOURCES.md) — Panduan alokasi sumber daya Vercel & Supabase, batas free tier, dan strategi mitigasi bottleneck.
 - [**BENCHMARK.md**](./BENCHMARK.md) — Tolok ukur empiris ukuran payload data, simulasi matematis egress, dan batas timeout 10 detik.
+- [**LOAD_TESTING.md**](./LOAD_TESTING.md) — Panduan uji beban k6, skenario stres/lonjakan (spike), mitigasi DDoS, dan runner Node.js.
 
 
