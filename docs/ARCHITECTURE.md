@@ -138,12 +138,10 @@ flowchart TD
     CheckConfig -- Ya --> CheckSession{"Sesi Masih Aktif?<br/>(Within Auto-Lock Window)"}
     CheckSession -- Ya --> MonitorIdle["Pasang Idle Listener (5-60 Menit)"]
     CheckSession -- Tidak --> Lock["Kunci Layar (ScreenLockOverlay)"]
-
     Lock --> UserOption{"Pilihan Buka Kunci"}
     UserOption -- "WebAuthn Biometrik" --> PlatformAuth["navigator.credentials.get()"]
     PlatformAuth -- Sukses --> UnlockScreen["Unlock Sesi & Reset Idle Timer"]
     PlatformAuth -- Gagal / Dibatalkan --> UserOption
-
     UserOption -- "Input 6-Digit PIN" --> HashInput["SHA-256(PIN + Salt) via Web Crypto"]
     HashInput --> VerifyHash{"Cocok dengan Stored Hash?"}
     VerifyHash -- Ya --> UnlockScreen

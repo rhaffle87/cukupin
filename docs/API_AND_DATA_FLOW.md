@@ -260,10 +260,8 @@ flowchart TD
     Edge --> ExtractIP["Ekstraksi Identitas Klien (x-forwarded-for)"]
     ExtractIP --> RLCheck["checkRateLimit(clientIp, preset)"]
     RLCheck --> WindowEval{"Jumlah Request dalam 60s < Limit?"}
-    
     WindowEval -- Ya --> Allow["NextResponse.next() + Inject RateLimit Headers"]
     Allow --> RouteHandler["Serverless Route Handler"]
-    
     WindowEval -- Tidak --> Block["HTTP 429 Too Many Requests"]
     Block --> Headers["Inject Retry-After & X-RateLimit-*"]
     Headers --> Reject["Kirim Respons JSON Error ke Klien"]
