@@ -35,6 +35,7 @@ Dokumentasi arsitektur dan operasional lengkap tersedia di direktori [`docs/`](.
 - [**Alokasi Sumber Daya & Kuota Cloud (RESOURCES.md)**](./docs/RESOURCES.md) — Rincian batas gratis Vercel & Supabase, analisis bottleneck, & mitigasi kuota.
 - [**Tolok Ukur Performa & Egress (BENCHMARK.md)**](./docs/BENCHMARK.md) — Pengukuran byte payload, simulasi egress bulanan, & uji timeout 10 detik.
 - [**Uji Beban, Stres & Kapasitas k6 (LOAD_TESTING.md)**](./docs/LOAD_TESTING.md) — Skenario k6 (smoke, average, spike stress, rate limit) & runner native Node.js.
+- [**Proposal Business Plan (Cukupin™ Proposal)**](./docs/proposal/Proposal%20Bisnis%20Cukupin%20(Financial%20Tracker).md) — Proposal bisnis, analisis TOWS, unit economics, target pasar & roadmap ([Versi PDF](./docs/proposal/Proposal%20Bisnis%20Cukupin%20(Financial%20Tracker).pdf)).
 
 ---
 

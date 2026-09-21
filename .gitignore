@@ -59,3 +59,22 @@ yarn-error.log*
 *.sln
 *.sw?
 *.bak
+
+# Scripts: Debug, Benchmarks, Load Testing & Feature Testing
+scripts/*benchmark*
+scripts/*load-test*
+scripts/*loadtest*
+scripts/*stress*
+scripts/*debug*
+scripts/test_*
+scripts/test-*
+scripts/*testing*
+scripts/benchmarks/
+scripts/debug/
+scripts/testing/
+scripts/*.json
+scripts/*.log
+scripts/*.tmp.*
+scripts/temp_*
+!scripts/supabase-keepalive.js
+!scripts/generate_proposal.py

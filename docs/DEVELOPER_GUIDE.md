@@ -60,6 +60,7 @@ cukupin-v0/
 │   └── ui/                     # Primitives UI (Modal, Brand, Eyebrow, StatCard, CookieConsent)
 ├── context/                    # React Context Global (FinanceContext, ScreenLockContext)
 ├── docs/                       # Dokumentasi Arsitektur, Basis Data, Keamanan, & Panduan Dev
+│   └── proposal/               # Proposal Rencana Bisnis Cukupin™ (Markdown, PDF, HTML, Aset, & Referensi)
 ├── hooks/                      # Custom Hooks (useFinanceData, useAutoRecurringBills)
 ├── lib/                        # Utilitas Logika Bisnis & Infrastruktur Data
 │   ├── analytics.ts            # Perekam event kustom terproteksi
@@ -70,10 +71,11 @@ cukupin-v0/
 │   ├── rateLimit.ts            # Sliding-window rate limiter & DDoS mitigation (RFC headers)
 │   ├── recurringBillsWorker.ts # Evaluasi dan eksekusi batch otomatisasi tagihan jatuh tempo
 │   ├── resourceBudget.ts       # Pagination math, monthly bounds, & simulasi kapasitas free tier
-│   ├── security/               # SHA-256 + salt PIN hashing & WebAuthn biometrik
+│   ├── security/               # Salted SHA-256 PIN hashing & WebAuthn biometrik (screenLock.ts)
 │   ├── constants/              # Konstanta kunci storage, metadata, & navigasi
 │   └── validations/            # Skema validasi Zod untuk form & data entry
-├── public/                     # Aset statis, ikon PWA, dan Service Worker (sw.js)
+├── public/                     # Aset statis, ikon PWA, grafik tolok ukur, & Service Worker (sw.js)
+├── scripts/                    # Skrip Utilitas (generate_proposal.py, supabase-keepalive.js)
 ├── supabase/                   # Konfigurasi CLI & skrip migrasi PostgreSQL SQL
 ├── tests/                      # Suite pengujian otomatis Vitest, Playwright, & k6
 │   ├── load/                   # Skenario load & stress testing k6 & runner simulator lokal

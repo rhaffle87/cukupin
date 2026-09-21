@@ -154,7 +154,7 @@ flowchart TD
 - Menggunakan `window.crypto.subtle` bawaan browser standar W3C.
 - Setiap pembuatan/perubahan PIN menghasilkan **salt unik acak 16-byte** (`crypto.getRandomValues(new Uint8Array(16))`).
 - Salt digabungkan dengan PIN numerik 6 digit sebelum di-hash menggunakan algoritma SHA-256.
-- Hash dan salt disimpan secara lokal (`cukupin_screen_lock_hash`, `cukupin_screen_lock_salt`). PIN mentah (plaintext) **tidak pernah disimpan** di disk maupun memori jangka panjang.
+- Hash dan salt disimpan secara lokal dalam format objek JSON terpadu (`cukupin_screen_lock_config`). PIN mentah (plaintext) **tidak pernah disimpan** di disk maupun memori jangka panjang.
 
 ### 6.2. Integrasi WebAuthn (Touch ID, Face ID, Windows Hello)
 - Memanfaatkan platform authenticator bawaan (`PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()`).
@@ -222,5 +222,6 @@ Untuk panduan mendalam lainnya, silakan merujuk ke pustaka dokumentasi resmi di 
 - [**RESOURCES.md**](./RESOURCES.md) — Panduan alokasi sumber daya Vercel & Supabase, batas free tier, dan strategi mitigasi bottleneck.
 - [**BENCHMARK.md**](./BENCHMARK.md) — Tolok ukur empiris ukuran payload data, simulasi matematis egress, dan batas timeout 10 detik.
 - [**LOAD_TESTING.md**](./LOAD_TESTING.md) — Panduan uji beban k6, skenario stres/lonjakan (spike), mitigasi DDoS, dan runner Node.js.
+- [**PROPOSAL (Proposal Bisnis Cukupin)**](./proposal/Proposal%20Bisnis%20Cukupin%20(Financial%20Tracker).md) — Proposal rencana bisnis, analisis TOWS Oxford, unit economics, BEP, & payback period ([PDF](./proposal/Proposal%20Bisnis%20Cukupin%20(Financial%20Tracker).pdf)).
 
 

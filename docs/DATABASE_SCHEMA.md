@@ -88,7 +88,7 @@ Menyimpan mutasi keuangan harian (pemasukan & pengeluaran).
 | `amount` | `numeric(12,2)` | NOT NULL | - | `check (amount > 0)` |
 | `category` | `text` | NOT NULL | - | `check (char_length(category) between 1 and 40)` |
 | `transaction_date` | `date` | NOT NULL | `current_date` | Format ISO `YYYY-MM-DD` |
-| `payment_method` | `text` | NULL | NULL | Misal: 'Tunai', 'BCA', 'GoPay', dsb. |
+| `payment_method` | `text` | NULL | `'Transfer Bank'` | Misal: 'Tunai', 'BCA', 'GoPay', dsb. |
 | `note` | `text` | NULL | NULL | Catatan opsional & tag `#tag` |
 | `created_at` | `timestamptz` | NOT NULL | `now()` | Waktu pembuatan record |
 

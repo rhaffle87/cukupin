@@ -120,10 +120,10 @@ Aplikasi Cukupin™ dirancang sesuai dengan mandat **Undang-Undang Perlindungan 
 
 ## 6. Kriptografi Layar & Otentikasi Biometrik Lokal
 
-1. **Web Crypto Salted SHA-256 (`lib/security/crypto.ts`)**:
+1. **Web Crypto Salted SHA-256 (`lib/security/screenLock.ts`)**:
    - Menggunakan `crypto.subtle.digest('SHA-256', ...)` standar W3C.
    - Setiap PIN 6-digit digabungkan dengan **16-byte cryptographically secure random salt** (`crypto.getRandomValues`) sebelum di-hash. Plaintext PIN tidak pernah disimpan di disk atau dikirim melalui jaringan.
-2. **WebAuthn Biometrics (`lib/security/webauthn.ts`)**:
+2. **WebAuthn Biometrics (`lib/security/screenLock.ts`)**:
    - Memanfaatkan Touch ID, Face ID, atau Windows Hello bawaan perangkat melalui `navigator.credentials.get()`.
 3. **Pembersihan Memori Otomatis**:
    - URL Blob hasil ekspor CSV/JSON otomatis dihapus dari memori peramban via `URL.revokeObjectURL(url)` setelah 150ms.

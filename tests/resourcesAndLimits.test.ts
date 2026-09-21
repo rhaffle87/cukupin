@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+/// <reference types="vitest/globals" />
 import {
   FREE_TIER_LIMITS,
   calculatePaginationRange,

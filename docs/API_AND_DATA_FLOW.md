@@ -211,39 +211,42 @@ sequenceDiagram
     autonumber
     actor User as Pengguna
     participant ScreenLock as ScreenLockContext
-    participant Crypto as lib/security/crypto.ts (Web Crypto)
-    participant WebAuthn as lib/security/webauthn.ts
-    participant Storage as LocalStorage (cukupin_screen_lock_*)
+    participant Engine as lib/security/screenLock.ts (Web Crypto)
+    participant Storage as LocalStorage (cukupin_screen_lock_config)
 
     Note over User,Storage: Alur Registrasi PIN 6-Digit
     User->>ScreenLock: Input PIN baru (6-digit)
-    ScreenLock->>Crypto: hashPin(pin)
-    Crypto->>Crypto: Generate random 16-byte salt via crypto.getRandomValues()
-    Crypto->>Crypto: SHA-256(PIN + Salt) via crypto.subtle.digest()
-    Crypto-->>ScreenLock: { hash, salt }
-    ScreenLock->>Storage: Simpan salt, hash, & config (enabled=true)
+    ScreenLock->>Engine: hashPin(pin)
+    Engine->>Engine: Generate random 16-byte salt via crypto.getRandomValues()
+    Engine->>Engine: SHA-256(PIN + Salt) via crypto.subtle.digest()
+    Engine-->>ScreenLock: { hash, salt }
+    ScreenLock->>Storage: Simpan salt, hash, & config JSON (enabled: true)
 
     Note over User,Storage: Alur Buka Kunci (Unlock)
     alt Opsi 1: Verifikasi PIN
         User->>ScreenLock: Input PIN (6-digit)
-        ScreenLock->>Crypto: verifyPin(pin, storedSalt, storedHash)
-        Crypto->>Crypto: SHA-256(inputPin + storedSalt)
-        Crypto-->>ScreenLock: true / false
+        ScreenLock->>Engine: verifyPin(pin, storedSalt, storedHash)
+        Engine->>Engine: SHA-256(inputPin + storedSalt)
+        Engine-->>ScreenLock: true / false
     else Opsi 2: Verifikasi WebAuthn Biometrik
         User->>ScreenLock: Klik "Buka dengan Biometrik"
-        ScreenLock->>WebAuthn: verifyBiometrics() -> navigator.credentials.get()
-        WebAuthn-->>ScreenLock: true / false
+        ScreenLock->>Engine: authenticateWithBiometrics(credentialId) -> navigator.credentials.get()
+        Engine-->>ScreenLock: true / false
     end
-    ScreenLock->>ScreenLock: Jika valid -> setIsLocked(false), recordActivity()
+    ScreenLock->>ScreenLock: Jika valid -> setIsUnlocked(true), recordActivity()
 ```
 
-### Parameter Konfigurasi Keamanan Layar:
-- `cukupin_screen_lock_enabled`: Flag boolean (`true` / `false`).
-- `cukupin_screen_lock_salt`: Hex string 16-byte acak cryptographic salt.
-- `cukupin_screen_lock_hash`: Hex string 32-byte SHA-256 hash.
-- `cukupin_screen_lock_biometrics`: Flag boolean (`true` / `false`) untuk aktivasi WebAuthn.
-- `cukupin_screen_lock_timeout`: Pilihan durasi timeout: `immediately`, `5m`, `15m`, `30m`, `60m`.
-- `cukupin_screen_lock_last_active`: Timestamp epoch millisecond aktivitas pengguna terakhir.
+### Parameter Konfigurasi Keamanan Layar (`ScreenLockConfig`):
+Konfigurasi keamanan disimpan terpusat sebagai objek JSON pada kunci `cukupin_screen_lock_config`:
+- `enabled`: Flag boolean (`true` / `false`).
+- `salt`: Hex string 16-byte acak cryptographic salt.
+- `pinHash`: Hex string 32-byte SHA-256 hash.
+- `biometricEnabled`: Flag boolean (`true` / `false`) untuk aktivasi WebAuthn.
+- `autoLockTimeoutMinutes`: Durasi timeout: `0` (segera), `1`, `5`, `15`, atau `-1` (tidak pernah).
+- `credentialId`: ID kredensial WebAuthn tersimpan (opsional).
+- **Kunci Sesi & Aktivitas**:
+  - `cukupin_screen_unlocked`: Status buka kunci sesi saat ini (`'true'` / `'false'`).
+  - `cukupin_last_active_time`: Timestamp epoch millisecond aktivitas pengguna terakhir.
 
 ---
 
