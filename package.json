@@ -2,6 +2,11 @@
   "name": "cukupin",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rhaffle87/cukupin-v0.git"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",

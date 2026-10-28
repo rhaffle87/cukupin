@@ -139,3 +139,14 @@ Aplikasi ini dibangun dengan kepatuhan penuh terhadap standar perlindungan priva
 - **Keamanan HTTP & DDoS**: Dilengkapi HSTS (`max-age=63072000`), CSP ketat, proteksi anti-Clickjacking (`DENY`), dan Edge Rate Limiting di `proxy.ts`.
 
 Informasi hukum dan ketentuan layanan dapat diakses di `/legal/privacy` dan `/legal/terms`.
+
+---
+
+## Lisensi
+
+Proyek ini dilisensikan di bawah [MIT License](./LICENSE).
+
+## Keamanan
+
+Untuk pelaporan kerentanan atau isu keamanan, silakan baca [SECURITY.md](./SECURITY.md).
+
