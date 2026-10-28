@@ -5,7 +5,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/rhaffle87/cukupin-v0.git"
+    "url": "https://github.com/rhaffle87/cukupin.git"
   },
   "scripts": {
     "dev": "next dev",
